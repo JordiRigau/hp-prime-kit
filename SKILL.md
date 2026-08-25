@@ -93,12 +93,17 @@ vez y vale para cualquier programa: el tamaño se ajusta solo.
 nada: al conectar, el CK la sobrescribe con lo que haya en la calculadora, y
 tu fichero desaparece. Está comprobado por las malas.
 
-Lo que sí instala es **arrastrar el fichero dentro de la ventana del CK**,
-sobre la calculadora de destino, que es la misma operación con la que se pasa
-un programa de una calculadora a otra.
+Y el arrastre desde el explorador a la ventana del CK, que es lo que dice el
+manual, **puede no funcionar**: en la instalación donde se desarrolló esto lo
+rechaza con el cursor de prohibido, incluso con ficheros que había escrito el
+propio CK. O sea que no es cosa de lo generado.
 
-O sea: `write` te ahorra crear el programa a mano y pegar el texto dentro,
-pero el último paso sigue siendo un arrastre en la interfaz del CK.
+**Comprueba la vía de entrega antes de prometerla.** Lo único verificado de
+punta a punta es pegar el texto en el editor del CK. Lo que sí está probado
+del escritor es que produce ficheros idénticos byte a byte a los del CK.
+
+Por eso, hoy la parte más rentable de `hpprgm.py` es **leer**: sacar el fuente
+de lo instalado y compararlo con el repositorio.
 
 ### Dos cosas más
 

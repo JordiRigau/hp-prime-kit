@@ -153,9 +153,29 @@ Comprobado por las malas: se copiaron ahí dos binarios corregidos, y al abrir
 el emulador seguía la versión vieja. Los ficheros que quedaron en la carpeta
 después eran los que había escrito la calculadora, con su bloque compilado.
 
-Lo que sí instala es **arrastrar el fichero dentro de la ventana del CK**,
-sobre la calculadora de destino — la misma operación con la que se pasa un
-programa de una calculadora a otra.
+El manual del CK dice que se arrastra el fichero desde el escritorio al panel
+de calculadoras. **En la máquina donde se desarrolló esto, eso no funciona**:
+el cursor muestra el símbolo de prohibido y no pasa nada, sin ningún diálogo.
+
+Y no es cosa de los ficheros generados. La comprobación que lo zanja: se sacó
+al escritorio un programa **escrito por el propio CK** y se volvió a arrastrar
+adentro — mismo rechazo. Así que el generador queda descartado como causa.
+
+Estado real de cada vía, sin adornos:
+
+| Vía | Estado |
+|---|---|
+| Pegar el texto en el editor del CK | **funciona**, es como se instaló todo aquí |
+| Arrastrar entre calculadoras **dentro** del CK | funciona (experiencia previa del autor) |
+| Arrastrar un fichero desde el explorador al CK | **rechazado**, también los del propio CK |
+| Copiar el fichero a `Calculators\<calculadora>\` | no instala: el CK la sobrescribe |
+
+O sea: el escritor produce ficheros **idénticos byte a byte a los que escribe
+el CK** —verificado a 579, 986, 11.918 y 18.007 caracteres de fuente—, pero
+todavía **no hay una vía comprobada para entregarlos** a la calculadora desde
+el PC en esta instalación. Mientras no la haya, la mitad valiosa de
+`hpprgm.py` es la de **leer**: sacar el fuente de lo instalado y compararlo
+con el repositorio.
 
 Una pista para saber cuál es tu calculadora cuando hay varias carpetas: el
 fichero `settings` de cada una lleva su identificador, y el de la calculadora

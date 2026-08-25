@@ -63,10 +63,13 @@ mano y pegar el texto dentro —el último paso sigue siendo arrastrarlo dentro
 de la ventana del Connectivity Kit, ver abajo—, y **comparar lo instalado con
 el repositorio** para ver si la calculadora se ha quedado atrás.
 
-> La carpeta `Calculators\<tu calculadora>\` del CK **no es un buzón**: es un
-> espejo que el CK escribe desde la calculadora. Copiar ahí un fichero no
-> instala nada; al conectar, el CK lo sobrescribe. Se instala arrastrando
-> dentro de la ventana del CK.
+> **Cuidado con la entrega.** La carpeta `Calculators\<tu calculadora>\` del
+> CK no es un buzón: es un espejo que el CK escribe desde la calculadora, y lo
+> que dejes ahí lo sobrescribe al conectar. Y el arrastre desde el explorador,
+> que es lo que dice el manual, puede rechazarse — aquí lo hace incluso con
+> ficheros escritos por el propio CK. Lo verificado de punta a punta sigue
+> siendo pegar el texto en el editor. Detalle en
+> [`references/formato-hpprgm.md`](references/formato-hpprgm.md).
 
 ### Ejecutar PPL en el PC
 
