@@ -126,10 +126,23 @@ def leer(datos):
     return txt.rstrip('\0'), lens, ini, fin
 
 
+CABECERA = 0x98      # 152: cabecera pelada, el fuente empieza justo aqui
+
+
 def tiene_bloque_compilado(datos, ini):
-    """True si hay payload entre la cabecera y el fuente: matrices ya
-    compiladas que dejarian de cuadrar si se cambia el texto."""
-    return ini > 0x200
+    """True si hay algo entre la cabecera y el fuente.
+
+    Un fichero recien escrito por el Connectivity Kit tiene el fuente en el
+    offset 152 exacto. Cualquier cosa mas es bloque compilado, y entonces no
+    sirve de plantilla: al cambiarle el texto, el bloque dejaria de
+    corresponderle.
+
+    El umbral era `> 0x200` y estaba mal. Los programas que guarda la
+    calculadora llevan bloques pequenos -- 96, 184, 360 bytes -- que se
+    colaban por debajo. Se veia en las reconstrucciones cruzadas, que salian
+    exactamente esos bytes mas cortas.
+    """
+    return ini > CABECERA
 
 
 def normaliza_fuente(txt):

@@ -93,17 +93,19 @@ vez y vale para cualquier programa: el tamaño se ajusta solo.
 nada: al conectar, el CK la sobrescribe con lo que haya en la calculadora, y
 tu fichero desaparece. Está comprobado por las malas.
 
-Y el arrastre desde el explorador a la ventana del CK, que es lo que dice el
-manual, **puede no funcionar**: en la instalación donde se desarrolló esto lo
-rechaza con el cursor de prohibido, incluso con ficheros que había escrito el
-propio CK. O sea que no es cosa de lo generado.
+**El escritor está validado contra hardware**: un programa generado desde
+Python acabó cargado y compilado en una HP Prime, con el fuente intacto y los
+acentos bien. Se sabe porque la calculadora le añadió su bloque compilado, que
+sólo escribe si lo ha entendido.
 
-**Comprueba la vía de entrega antes de prometerla.** Lo único verificado de
-punta a punta es pegar el texto en el editor del CK. Lo que sí está probado
-del escritor es que produce ficheros idénticos byte a byte a los del CK.
+Lo inconstante es **la entrega**. El arrastre desde el explorador a la ventana
+del CK, que es lo que dice el manual, a veces se rechaza con el cursor de
+prohibido — y cuando pasa, pasa también con ficheros escritos por el propio
+CK, así que no es cosa de lo generado. Si te ocurre, insiste o pega el texto,
+pero **no des por hecho que el fichero está mal**.
 
-Por eso, hoy la parte más rentable de `hpprgm.py` es **leer**: sacar el fuente
-de lo instalado y compararlo con el repositorio.
+Y no te fíes de haber instalado: **compruébalo leyendo el binario de vuelta**,
+que es la parte de `hpprgm.py` que nunca falla.
 
 ### Dos cosas más
 

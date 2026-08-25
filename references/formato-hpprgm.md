@@ -49,10 +49,14 @@ Dos detalles que parecen menores y no lo son:
   un bloque compilado, su tamaño no es múltiplo de 4 y el registro del fuente
   queda desalineado. En el fichero de datos de TermoHP empieza en el offset
   367.557, que es impar.
-- **La cola no mide siempre 1008 bytes.** Lo mide en todo lo que escribe el
-  Connectivity Kit, y suponerlo funciona… hasta que se prueba con las apps de
-  fábrica de la calculadora, que lo desmienten. No hay que darlo por supuesto:
-  lo que va detrás del fuente se conserva tal cual.
+- **La cola no es constante.** Mide 1008 bytes en casi todo, pero las apps de
+  fábrica desmienten hasta eso, y además puede llevar **metadatos dentro**:
+  entre dos ficheros con el mismo fuente aparecieron 15 bytes de diferencia
+  ahí, con texto UTF-16 (`qt-p…`). No hay que darla por supuesta: lo que va
+  detrás del fuente se conserva tal cual al reescribir, y al **generar** se
+  copia la de la plantilla. La calculadora acepta el resultado, pero eso
+  significa que generar no es byte-exacto para un fichero cualquiera: lo es
+  para la cabecera y el fuente, que es lo que el escritor construye.
 
 ## Saltos de línea
 
@@ -65,7 +69,11 @@ dentro: el contenedor acepta las dos cosas.
 ## El bloque compilado
 
 Un programa que sólo tiene código, **tal como lo escribe el Connectivity
-Kit**, es cabecera + fuente + cola. Uno que declara matrices grandes lleva
+Kit**, es cabecera + fuente + cola, con el fuente empezando en el offset
+**152 exacto**. Cualquier cosa por encima de 152 es bloque compilado: ése es
+el criterio para saber si un fichero sirve de plantilla. (Un umbral más laxo
+deja pasar los bloques pequeños que añade la calculadora — 96, 184, 360
+bytes — y entonces lo generado sale justo esos bytes más corto.) Uno que declara matrices grandes lleva
 además un bloque **antes** del fuente con los números ya en formato interno de
 la calculadora. (La propia calculadora añade ese bloque a todo lo que guarda,
 también al código suelto — ver «Quién escribe qué».)
@@ -165,17 +173,27 @@ Estado real de cada vía, sin adornos:
 
 | Vía | Estado |
 |---|---|
-| Pegar el texto en el editor del CK | **funciona**, es como se instaló todo aquí |
-| Arrastrar entre calculadoras **dentro** del CK | funciona (experiencia previa del autor) |
-| Arrastrar un fichero desde el explorador al CK | **rechazado**, también los del propio CK |
+| Pegar el texto en el editor del CK | **funciona** |
+| Arrastrar entre calculadoras **dentro** del CK | funciona |
+| Arrastrar un fichero desde el explorador al CK | **inconstante**: rechazado con el cursor de prohibido en varios intentos, también con ficheros escritos por el propio CK — o sea que cuando falla no es por el fichero |
 | Copiar el fichero a `Calculators\<calculadora>\` | no instala: el CK la sobrescribe |
 
-O sea: el escritor produce ficheros **idénticos byte a byte a los que escribe
-el CK** —verificado a 579, 986, 11.918 y 18.007 caracteres de fuente—, pero
-todavía **no hay una vía comprobada para entregarlos** a la calculadora desde
-el PC en esta instalación. Mientras no la haya, la mitad valiosa de
-`hpprgm.py` es la de **leer**: sacar el fuente de lo instalado y compararlo
-con el repositorio.
+## El escritor, validado contra hardware
+
+Un programa generado desde Python —cabecera de una plantilla, fuente metido
+por `hpprgm.py`, nunca tocado por el CK ni por la calculadora— **acabó
+cargado y compilado en una HP Prime**:
+
+| | |
+|---|---|
+| Lo generado | 3.134 bytes, sin bloque compilado |
+| Lo que quedó en la calculadora | 3.406 bytes, con **272 de bloque compilado** |
+| El fuente de dentro | idéntico al `.txt` original |
+| Los acentos (`àèóç`) | intactos |
+
+Ese bloque compilado lo escribe la calculadora al cargar el programa. Que
+esté ahí es la prueba: **la calculadora leyó el fichero, lo entendió y lo
+compiló.** El programa de prueba está en `examples/PROVAESC.txt`.
 
 Una pista para saber cuál es tu calculadora cuando hay varias carpetas: el
 fichero `settings` de cada una lleva su identificador, y el de la calculadora
