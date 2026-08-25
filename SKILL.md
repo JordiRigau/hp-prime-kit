@@ -94,9 +94,8 @@ nada: al conectar, el CK la sobrescribe con lo que haya en la calculadora, y
 tu fichero desaparece. Está comprobado por las malas.
 
 **El escritor está validado contra hardware**: un programa generado desde
-Python acabó cargado y compilado en una HP Prime, con el fuente intacto y los
-acentos bien. Se sabe porque la calculadora le añadió su bloque compilado, que
-sólo escribe si lo ha entendido.
+Python se instaló en una HP Prime y **se ejecutó dando el resultado correcto**,
+con el fuente intacto y los acentos bien.
 
 La entrega es **arrastrar el fichero desde el explorador a la calculadora**
 en la ventana del CK. Copiarlo a `Calculators\<calculadora>\` no sirve: esa

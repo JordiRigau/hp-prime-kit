@@ -63,8 +63,9 @@ mano y pegar el texto dentro —el último paso sigue siendo arrastrarlo dentro
 de la ventana del Connectivity Kit, ver abajo—, y **comparar lo instalado con
 el repositorio** para ver si la calculadora se ha quedado atrás.
 
-Está **validado contra hardware**: un programa generado desde Python acabó
-cargado y compilado en una HP Prime, con el fuente y los acentos intactos.
+Está **validado contra hardware**: un programa generado desde Python se
+instaló en una HP Prime y se ejecutó allí dando el resultado correcto, con el
+fuente y los acentos intactos.
 
 Lo generado se instala **arrastrándolo a la calculadora** en la ventana del
 CK.

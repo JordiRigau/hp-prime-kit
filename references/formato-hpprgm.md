@@ -213,10 +213,16 @@ cargado y compilado en una HP Prime**:
 | Lo que quedó en la calculadora | 3.406 bytes, con **272 de bloque compilado** |
 | El fuente de dentro | idéntico al `.txt` original |
 | Los acentos (`àèóç`) | intactos |
+| **Ejecutado en la calculadora** | `PESC3()` → **1** |
 
-Ese bloque compilado lo escribe la calculadora al cargar el programa. Que
-esté ahí es la prueba: **la calculadora leyó el fichero, lo entendió y lo
-compiló.** El programa de prueba está en `examples/PROVAESC.txt`.
+El bloque compilado lo escribe la calculadora al cargar el programa, así que
+su sola presencia ya dice que lo entendió. Pero la prueba de verdad es la
+última fila: `PESC3()` comprueba por dentro que el bucle da 385 y que la
+cadena con acentos mide 26 caracteres. **El programa generado desde Python
+calcula bien en la calculadora.**
+
+El programa de prueba está en `examples/PROVAESC.txt`: se regenera y se
+repite el experimento con un comando.
 
 Una pista para saber cuál es tu calculadora cuando hay varias carpetas: el
 fichero `settings` de cada una lleva su identificador, y el de la calculadora
