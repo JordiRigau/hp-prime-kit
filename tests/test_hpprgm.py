@@ -47,7 +47,7 @@ def main(argv):
         print('SALTADA: no hay programas en %s' % carpeta)
         return 0
 
-    ok = fallos = saltados = 0
+    ok = fallos = saltados = cruzados = 0
     plantilla = None
     for path in binarios:
         datos = open(path, 'rb').read()
@@ -72,6 +72,20 @@ def main(argv):
         if not H.tiene_bloque_compilado(datos, ini) and plantilla is None:
             plantilla = (nombre, datos)
 
+    # Una plantilla guardada a mano gana a lo que haya en la carpeta del CK:
+    # esos ficheros dejan de servir en cuanto la calculadora reescribe el
+    # programa, porque entonces llevan su propio bloque compilado.
+    fija = os.environ.get('HP_PRIME_PLANTILLA') or os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        'plantilla_codigo.hpprgm')
+    if os.path.isfile(fija):
+        d = open(fija, 'rb').read()
+        try:
+            if not H.tiene_bloque_compilado(d, H.leer(d)[2]):
+                plantilla = (os.path.basename(fija), d)
+        except H.FormatoInesperado:
+            pass
+
     # 2) cruzado: meter el fuente de un programa en la plantilla de otro.
     #    Es la prueba que de verdad valida la aritmetica de longitudes,
     #    porque el tamano cambia.
@@ -89,6 +103,7 @@ def main(argv):
             if H.tiene_bloque_compilado(datos, ini):
                 continue
             gen = H.escribir(pd, txt)
+            cruzados += 1
             if gen == datos:
                 ok += 1
                 print('  ok    %-24s reconstruido desde la plantilla %s'
@@ -98,7 +113,23 @@ def main(argv):
                 print('  FALLO %-24s reconstruido != original (%d vs %d)'
                       % (nombre, len(gen), len(datos)))
 
-    print('\nPASS: %d   FAIL: %d' % (ok, fallos))
+    print('\nPASS: %d   FAIL: %d   saltados (programas vacios): %d'
+          % (ok, fallos, saltados))
+    if cruzados:
+        print('reconstrucciones cruzadas: %d' % cruzados)
+    else:
+        # La prueba fuerte es reconstruir un programa desde la plantilla de
+        # OTRO de distinto tamano: es lo unico que ejercita la aritmetica de
+        # longitudes. Sin plantilla esto son solo round-trips, que valen
+        # bastante menos. Mejor decirlo que encogerse en silencio.
+        print('')
+        print('AVISO: ninguna reconstruccion cruzada, que es la comprobacion')
+        print('  que de verdad valida el escritor. Hace falta un .hpprgm de')
+        print('  codigo SIN bloque compilado, o sea escrito por el')
+        print('  Connectivity Kit y no por la calculadora: en cuanto la')
+        print('  calculadora reescribe un programa, deja de servir.')
+        print('  Guarda uno como plantilla_codigo.hpprgm en la raiz del')
+        print('  repositorio, o apuntalo con HP_PRIME_PLANTILLA.')
     return 1 if fallos else 0
 
 

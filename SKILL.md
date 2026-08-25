@@ -86,19 +86,30 @@ Connectivity Kit; están en
 `Documentos\HP Connectivity Kit\Calculators\<tu calculadora>\`. Se copia una
 vez y vale para cualquier programa: el tamaño se ajusta solo.
 
-Con eso, desplegar es **copiar un fichero** a esa carpeta en vez de crear un
-programa a mano y pegar el texto dentro.
+### Cómo se instala lo generado (leer esto)
 
-### Dos cosas que hay que saber
+**Esa carpeta NO es un buzón.** Es un espejo que el Connectivity Kit escribe
+*desde* la calculadora. Copiar un fichero dentro con el CK cerrado no instala
+nada: al conectar, el CK la sobrescribe con lo que haya en la calculadora, y
+tu fichero desaparece. Está comprobado por las malas.
 
-- **Programas con matrices grandes**: llevan además un bloque compilado
-  *antes* del fuente (los números ya en formato interno; es lo que hace que
-  el fichero pese ~3× y que al recibirlo no haya que esperar compilación).
-  Ese bloque no se sabe generar, así que `write` rechaza esas plantillas. Los
-  programas de datos se pegan una vez a mano; el código se despliega por
-  fichero.
-- **La primera vez sigue haciendo falta el CK**, para obtener una plantilla y
-  para crear el `.hpappdir` de una app. A partir de ahí, no.
+Lo que sí instala es **arrastrar el fichero dentro de la ventana del CK**,
+sobre la calculadora de destino, que es la misma operación con la que se pasa
+un programa de una calculadora a otra.
+
+O sea: `write` te ahorra crear el programa a mano y pegar el texto dentro,
+pero el último paso sigue siendo un arrastre en la interfaz del CK.
+
+### Dos cosas más
+
+- **Programas con matrices grandes**: llevan un bloque compilado *antes* del
+  fuente (los números ya en formato interno; hace que el fichero pese ~3× y
+  que al recibirlo no haya que esperar compilación). Ese bloque no se sabe
+  generar, así que `write` rechaza esas plantillas.
+- **Usa como plantilla un fichero del CK, no uno de la calculadora.** Cuando
+  la calculadora guarda un programa le añade su propio bloque compilado,
+  también si es sólo código. Los del CK son sólo fuente, que es lo que hay
+  que generar.
 
 ### Comprobar antes de tocar la calculadora
 

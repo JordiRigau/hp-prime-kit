@@ -58,9 +58,15 @@ UTF-16LE**. Está documentado en
 reconstruyendo programas byte a byte, incluido uno de 1 MB con datos
 compilados.
 
-Sirve para dos cosas: **desplegar copiando un fichero** en vez de crear el
-programa a mano y pegar el texto, y **comparar lo instalado con el
-repositorio** para ver si la calculadora se ha quedado atrás.
+Sirve para dos cosas: **generar el binario** en vez de crear el programa a
+mano y pegar el texto dentro —el último paso sigue siendo arrastrarlo dentro
+de la ventana del Connectivity Kit, ver abajo—, y **comparar lo instalado con
+el repositorio** para ver si la calculadora se ha quedado atrás.
+
+> La carpeta `Calculators\<tu calculadora>\` del CK **no es un buzón**: es un
+> espejo que el CK escribe desde la calculadora. Copiar ahí un fichero no
+> instala nada; al conectar, el CK lo sobrescribe. Se instala arrastrando
+> dentro de la ventana del CK.
 
 ### Ejecutar PPL en el PC
 

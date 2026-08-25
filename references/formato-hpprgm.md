@@ -6,8 +6,9 @@ Connectivity Kit y verificándolo por reconstrucción byte a byte.
 
 **La conclusión práctica**: el fuente PPL va dentro **literal**, en UTF-16LE.
 Ni comprimido ni cifrado. Se puede leer y se puede escribir desde el PC, así
-que desplegar deja de ser «crear el programa a mano y pegar el texto» y pasa a
-ser copiar un fichero.
+que generar un programa deja de ser «crearlo a mano en el Connectivity Kit y
+pegar el texto dentro». Ojo con el último paso, que tiene trampa — ver
+[Cómo se instala](#como-se-instala-lo-generado).
 
 ## Estructura
 
@@ -63,11 +64,13 @@ dentro: el contenedor acepta las dos cosas.
 
 ## El bloque compilado
 
-Un programa que sólo tiene código es cabecera + fuente + cola. Uno que declara
-matrices grandes lleva además un bloque **antes** del fuente con los números
-ya en formato interno de la calculadora.
+Un programa que sólo tiene código, **tal como lo escribe el Connectivity
+Kit**, es cabecera + fuente + cola. Uno que declara matrices grandes lleva
+además un bloque **antes** del fuente con los números ya en formato interno de
+la calculadora. (La propia calculadora añade ese bloque a todo lo que guarda,
+también al código suelto — ver «Quién escribe qué».)
 
-Se nota en el tamaño. En TermoHP:
+Se nota en el tamaño. En TermoHP, con los ficheros del CK:
 
 | Programa | Fuente | Fichero | Bloque compilado |
 |---|---|---|---|
@@ -77,9 +80,9 @@ Se nota en el tamaño. En TermoHP:
 Ese bloque es lo que hace que un programa de datos abra **al instante** en la
 calculadora que lo recibe, sin esperar compilación. Generarlo no está resuelto:
 `hpprgm.py` rechaza usar como plantilla un programa que lo lleve, porque
-cambiarle el fuente lo dejaría descuadrado. En la práctica no estorba — los
-datos se pegan una vez y no cambian nunca; el código, que sí cambia, se
-despliega por fichero.
+cambiarle el fuente lo dejaría descuadrado. En la práctica no estorba: los
+datos se pegan una vez y no cambian nunca, y el código, que sí cambia, se
+genera y se arrastra.
 
 ## Apps
 
@@ -119,6 +122,46 @@ aritmética de longitudes.
 
 `tests/test_hpprgm.py` lo repite sobre los binarios que tengas en tu máquina.
 
+## Quién escribe qué, y por qué importa
+
+Hay **dos productores** de ficheros `.hpprgm`, y no escriben lo mismo:
+
+| Lo escribe | Qué mete | Ejemplo (`TERMOLIB`, mismo fuente) |
+|---|---|---|
+| El **Connectivity Kit** | sólo el fuente | 38.888 B |
+| La **calculadora**, al guardar | fuente **+ su bloque compilado** | 42.078 B (3.190 de bloque) |
+
+Es decir: el bloque compilado no aparece sólo en los programas de datos. La
+calculadora se lo añade a cualquier programa cuando lo guarda, también si es
+puro código. El de datos es llamativo porque el bloque es enorme (367 KB en un
+fichero de 1 MB), pero el mecanismo es el mismo.
+
+Los dos se leen igual de bien, y el round-trip es exacto en ambos. Pero **para
+generar hay que usar como plantilla uno del Connectivity Kit**: los de la
+calculadora llevan un bloque compilado que dejaría de corresponder al fuente
+nuevo, y `hpprgm.py write` los rechaza por eso.
+
+<a name="como-se-instala-lo-generado"></a>
+## Cómo se instala lo generado
+
+**La carpeta `Calculators\<tu calculadora>\` no es un buzón.** Es un espejo
+que el Connectivity Kit escribe *desde* la calculadora. Dejar ahí un fichero
+con el CK cerrado no instala nada: al conectar, el CK sobrescribe la carpeta
+con lo que haya en la calculadora y el fichero desaparece.
+
+Comprobado por las malas: se copiaron ahí dos binarios corregidos, y al abrir
+el emulador seguía la versión vieja. Los ficheros que quedaron en la carpeta
+después eran los que había escrito la calculadora, con su bloque compilado.
+
+Lo que sí instala es **arrastrar el fichero dentro de la ventana del CK**,
+sobre la calculadora de destino — la misma operación con la que se pasa un
+programa de una calculadora a otra.
+
+Una pista para saber cuál es tu calculadora cuando hay varias carpetas: el
+fichero `settings` de cada una lleva su identificador, y el de la calculadora
+física es su número de serie. El nombre de la carpeta es el que muestra el CK
+en su árbol.
+
 ## Qué se puede hacer con esto
 
 ```bash
@@ -138,4 +181,6 @@ Se copia una vez y sirve para siempre.
 
 Lo de comparar con el repositorio no es teórico: es lo que destapó que la app
 instalada en la calculadora llevaba semanas dos commits por detrás del código
-que se daba por bueno.
+que se daba por bueno. Y como el fuente se puede sacar también de los ficheros
+que escribe la propia calculadora, sirve para confirmar que lo que acabas de
+instalar es de verdad lo que querías instalar.
