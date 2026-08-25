@@ -98,11 +98,16 @@ Python acabó cargado y compilado en una HP Prime, con el fuente intacto y los
 acentos bien. Se sabe porque la calculadora le añadió su bloque compilado, que
 sólo escribe si lo ha entendido.
 
-Lo inconstante es **la entrega**. El arrastre desde el explorador a la ventana
-del CK, que es lo que dice el manual, a veces se rechaza con el cursor de
-prohibido — y cuando pasa, pasa también con ficheros escritos por el propio
-CK, así que no es cosa de lo generado. Si te ocurre, insiste o pega el texto,
-pero **no des por hecho que el fichero está mal**.
+La entrega es **arrastrar el fichero desde el explorador a la calculadora**
+en la ventana del CK. Copiarlo a `Calculators\<calculadora>\` no sirve: esa
+carpeta es un espejo y el CK la sobrescribe.
+
+Si el arrastre sale con el **cursor de prohibido** y no pasa nada, no es el
+fichero: mira si el CK está puesto para **ejecutarse como administrador** (o
+en modo de compatibilidad) en las propiedades del acceso directo o del `.exe`.
+Windows no deja arrastrar desde un proceso sin elevar a uno elevado. Para
+descartar el fichero en diez segundos, arrastra uno que haya escrito el propio
+CK: si también lo rechaza, es el entorno.
 
 Y no te fíes de haber instalado: **compruébalo leyendo el binario de vuelta**,
 que es la parte de `hpprgm.py` que nunca falla.

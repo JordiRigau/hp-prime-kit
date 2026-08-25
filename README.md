@@ -66,12 +66,14 @@ el repositorio** para ver si la calculadora se ha quedado atrás.
 Está **validado contra hardware**: un programa generado desde Python acabó
 cargado y compilado en una HP Prime, con el fuente y los acentos intactos.
 
-> **Cuidado con la entrega, que es lo inconstante.** La carpeta
-> `Calculators\<tu calculadora>\` del CK no es un buzón: es un espejo que el
-> CK escribe desde la calculadora, y lo que dejes ahí lo sobrescribe al
-> conectar. Y el arrastre desde el explorador a veces se rechaza — también con
-> ficheros escritos por el propio CK, así que cuando pasa no es por el
-> fichero. Detalle en
+Lo generado se instala **arrastrándolo a la calculadora** en la ventana del
+CK.
+
+> Dos avisos, los dos aprendidos por las malas: la carpeta
+> `Calculators\<tu calculadora>\` **no es un buzón** —es un espejo que el CK
+> sobrescribe—, y si el arrastre sale con el cursor de prohibido, mira si el
+> CK está puesto para ejecutarse **como administrador**: Windows no deja
+> arrastrar de un proceso sin elevar a uno elevado. Detalle en
 > [`references/formato-hpprgm.md`](references/formato-hpprgm.md).
 
 ### Ejecutar PPL en el PC

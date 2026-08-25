@@ -173,10 +173,33 @@ Estado real de cada vía, sin adornos:
 
 | Vía | Estado |
 |---|---|
-| Pegar el texto en el editor del CK | **funciona** |
+| Arrastrar el fichero desde el explorador al CK | **funciona** — es la vía buena |
 | Arrastrar entre calculadoras **dentro** del CK | funciona |
-| Arrastrar un fichero desde el explorador al CK | **inconstante**: rechazado con el cursor de prohibido en varios intentos, también con ficheros escritos por el propio CK — o sea que cuando falla no es por el fichero |
-| Copiar el fichero a `Calculators\<calculadora>\` | no instala: el CK la sobrescribe |
+| Pegar el texto en el editor del CK | funciona, pero es el camino lento |
+| Copiar el fichero a `Calculators\<calculadora>\` | **no instala**: esa carpeta es un espejo y el CK la sobrescribe al conectar |
+
+### Si el arrastre se rechaza con el cursor de prohibido
+
+Síntoma: arrastras el `.hpprgm` sobre la calculadora, sale el símbolo de
+prohibido y no pasa nada. Ningún diálogo, ningún error.
+
+**No es el fichero.** La forma de comprobarlo en diez segundos es arrastrar un
+programa que haya escrito el propio CK: si también lo rechaza, el problema es
+del entorno.
+
+La causa aquí fue que el Connectivity Kit tenía activado, en su pestaña de
+compatibilidad, **modo Windows 8 y «ejecutar como administrador»**. Windows
+prohíbe el arrastre entre procesos de distinto nivel de integridad (UIPI): el
+explorador va sin elevar y no puede soltar nada en una ventana elevada. Al
+quitar esas dos casillas, el arrastre funciona.
+
+Dónde mirar: propiedades del acceso directo **y del `.exe`** → *Compatibilidad*.
+Ojo con comprobarlo por registro: la marca vive en
+`HKCU\Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers`
+con la ruta del ejecutable como nombre del valor, pero si la casilla está
+puesta en un acceso directo concreto no aparece ahí — hay que mirar el `.lnk`
+que se usa de verdad para arrancarlo, que no tiene por qué ser el del
+escritorio.
 
 ## El escritor, validado contra hardware
 
