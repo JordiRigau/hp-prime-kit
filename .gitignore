@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+
+# binarios de la calculadora que uno deja por medio al probar
+*.hpprgm
+*.hpappprgm
+!tests/fixtures/*.hpprgm
