@@ -13,8 +13,10 @@ sintaxis** y **el ritual de copiar y pegar en el Connectivity Kit**.
 
 Lee `references/ppl.md`. No es un tutorial: son los límites y trampas medidos
 en una G2 real, incluidas **cuatro hipótesis que parecen razonables y son
-falsas**. Para el formato binario, `references/formato-hpprgm.md`. Escribir PPL de memoria lleva a inventarse restricciones que no
+falsas**. Escribir PPL de memoria lleva a inventarse restricciones que no
 existen y a saltarse la única que importa.
+
+Para el formato binario de los programas, `references/formato-hpprgm.md`.
 
 ## Antes de compilar: pasar el linter
 
