@@ -36,10 +36,19 @@ Uso:
     python hpprgm.py read  PROG.hpprgm [-o salida.txt]
     python hpprgm.py write fuente.txt -t plantilla.hpprgm -o PROG.hpprgm
     python hpprgm.py check PROG.hpprgm          # round-trip: leer y reescribir
+    python hpprgm.py plantillas <carpeta>       # cuales sirven de plantilla
 
-La plantilla es cualquier .hpprgm de codigo que haya escrito el Connectivity
-Kit; esta en Documentos\\HP Connectivity Kit\\Calculators\\<tu calculadora>\\.
-Se copia una vez y sirve para siempre.
+CONSEGUIR UNA PLANTILLA. Tiene que ser un .hpprgm de codigo escrito por el
+Connectivity Kit, sin bloque compilado. Y NO vale coger cualquiera de
+Documentos\\HP Connectivity Kit\\Calculators\\<tu calculadora>\\: esa carpeta es
+el espejo, todo lo que hay dentro ha pasado por la calculadora, y la
+calculadora le anade su bloque compilado a todo lo que guarda. Medido en una
+maquina: de 58 contenedores, 2 servian.
+
+El comando `plantillas` dice cuales. Si no hay ninguno, crea un programa
+DENTRO del propio CK y copialo fuera antes de enviarlo a la calculadora.
+Guardalo como plantilla_codigo.hpprgm en la raiz y las demas herramientas lo
+cogen solas.
 """
 from __future__ import unicode_literals
 import io, os, struct, sys
@@ -182,7 +191,49 @@ def _cli(argv):
     def opt(flag, defecto=None):
         return args[args.index(flag) + 1] if flag in args else defecto
 
-    datos = open(path, 'rb').read()
+    if cmd == 'plantillas':
+        # Cuales de tus binarios sirven de plantilla para `write`. Hace falta
+        # porque la intuicion falla: en la carpeta espejo del CK esta todo lo
+        # que ha pasado por la calculadora, y la calculadora le anade su
+        # bloque compilado a lo que guarda. Medido en una maquina: 2 de 58.
+        import glob
+        raices = [path] if os.path.isdir(path) else []
+        if not raices:
+            print('uso: hpprgm.py plantillas <carpeta>')
+            return 2
+        cands = []
+        for raiz in raices:
+            for patron in ('*.hpprgm', os.path.join('*', '*.hpprgm'),
+                           os.path.join('*.hpappdir', '*.hpappprgm'),
+                           os.path.join('*', '*.hpappdir', '*.hpappprgm')):
+                cands.extend(sorted(glob.glob(os.path.join(raiz, patron))))
+        buenos, total, mudos = [], 0, 0
+        for p in cands:
+            total += 1
+            try:
+                d = open(p, 'rb').read()
+                _, _, ini, _ = leer(d)
+            except Exception:
+                mudos += 1
+                continue
+            if not tiene_bloque_compilado(d, ini):
+                buenos.append((len(d), p))
+        for n, p in sorted(buenos):
+            print('  %8d B  %s' % (n, p))
+        print('\n%d contenedor(es): %d sirven de plantilla, %d con bloque '
+              'compilado, %d sin fuente que leer'
+              % (total, len(buenos), total - len(buenos) - mudos, mudos))
+        if not buenos:
+            print('\nNinguno sirve. Crea un programa DENTRO del Connectivity')
+            print('Kit y copialo fuera antes de enviarlo a la calculadora:')
+            print('ese no lleva bloque compilado.')
+        else:
+            print('\nCopia uno a plantilla_codigo.hpprgm en la raiz y las')
+            print('herramientas lo cogeran solas.')
+        return 0 if buenos else 1
+
+    if cmd != 'plantillas':
+        datos = open(path, 'rb').read()
 
     if cmd == 'read':
         txt, lens, ini, fin = leer(datos)
