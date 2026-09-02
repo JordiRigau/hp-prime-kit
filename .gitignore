@@ -4,4 +4,15 @@ __pycache__/
 # binarios de la calculadora que uno deja por medio al probar
 *.hpprgm
 *.hpappprgm
+*.hpapp
+*.hpappnote
+*.hpmat
+*.hplist
 !tests/fixtures/*.hpprgm
+
+# los envoltorios de plantillas/ SI van al repositorio: son el esqueleto de
+# una app, salen de apps que arrancan en una G2 y no llevan nada dentro que
+# identifique a nadie
+!plantillas/*.hpapp
+!plantillas/*.hpappprgm
+!plantillas/*.hpappnote
