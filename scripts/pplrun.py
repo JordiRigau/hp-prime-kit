@@ -799,6 +799,12 @@ class Maquina(object):
             cond = self.evalua(args_n[0], marco)
             return self.evalua(args_n[1] if _verdad(cond) else args_n[2], marco)
 
+        # MAKEMAT y MAKELIST tambien son perezosos: su primer argumento es una
+        # PLANTILLA que se evalua una vez por elemento, con las variables del
+        # indice puestas en el marco.
+        if base[0] == 'var' and base[1].upper() in ('MAKEMAT', 'MAKELIST'):
+            return self._construye(base[1].upper(), args_n, marco)
+
         if base[0] == 'var':
             nombre = base[1]
             # 1) indexar una lista o matriz
@@ -816,7 +822,79 @@ class Maquina(object):
                 return fn(self, [self.evalua(a, marco) for a in args_n])
             raise ErrorPPL('no existe %s (ni variable, ni funcion, ni '
                            'comando soportado)' % nombre)
+
+        # L(2)(1): indexar el resultado de OTRO indexado. En la Prime vale
+        # -son listas anidadas- asi que aqui tambien.
+        #
+        # Lo que NO se admite es indexar el resultado de una LLAMADA, del
+        # estilo SIZE(M)(1): eso la Prime lo rechaza al compilar, y dejarlo
+        # pasar aqui daria un numero donde la calculadora da un error, que es
+        # justo la divergencia que este interprete existe para cazar. El
+        # linter lo marca aparte, con la regla `indexar-llamada`.
+        if base[0] == 'llama' and self._es_contenedor(base, marco):
+            cont = self.evalua(base, marco)
+            if isinstance(cont, (list, Matriz, str)):
+                return self._indexa(cont, [self.evalua(a, marco)
+                                           for a in args_n], '(anidado)')
         raise NoSoportado('llamada sobre una expresion')
+
+    def _es_contenedor(self, e, marco):
+        """La base de este indexado, es una variable de tipo contenedor?
+
+        Se mira sin evaluar nada: se baja hasta la variable del fondo y se
+        comprueba que sea una lista o una matriz, no una funcion.
+        """
+        while e[0] == 'llama':
+            e = e[1]
+        if e[0] != 'var':
+            return False
+        v = marco.get(e[1], self.globales.get(e[1]))
+        return isinstance(v, (list, Matriz, str))
+
+    def _construye(self, cual, args_n, marco):
+        """MAKEMAT(plantilla, filas, cols) y MAKELIST(plantilla, var, de, a
+        [, paso]).
+
+        En MAKEMAT la plantilla ve I y J, 1-based, como en la calculadora.
+        """
+        if cual == 'MAKEMAT':
+            if len(args_n) not in (2, 3):
+                raise ErrorPPL('MAKEMAT lleva (plantilla, filas [, cols])')
+            nf = int(round(self.evalua(args_n[1], marco)))
+            nc = int(round(self.evalua(args_n[2], marco))) if len(args_n) == 3 else nf
+            if nf < 1 or nc < 1:
+                raise ErrorPPL('MAKEMAT con dimensiones %dx%d' % (nf, nc))
+            hijo = dict(marco)
+            filas = []
+            for i in range(1, nf + 1):
+                fila = []
+                for j in range(1, nc + 1):
+                    hijo['I'], hijo['J'] = float(i), float(j)
+                    fila.append(self.evalua(args_n[0], hijo))
+                filas.append(fila)
+            return Matriz(filas)
+
+        if len(args_n) < 4:
+            raise ErrorPPL('MAKELIST lleva (plantilla, var, de, a [, paso])')
+        if args_n[1][0] != 'var':
+            raise ErrorPPL('el 2o argumento de MAKELIST es el nombre de la '
+                           'variable del bucle')
+        nombre = args_n[1][1]
+        de = self.evalua(args_n[2], marco)
+        a = self.evalua(args_n[3], marco)
+        paso = self.evalua(args_n[4], marco) if len(args_n) > 4 else 1.0
+        if paso == 0:
+            raise ErrorPPL('MAKELIST con paso 0')
+        hijo = dict(marco)
+        fuera, x, n = [], de, 0
+        while (x <= a + 1e-12) if paso > 0 else (x >= a - 1e-12):
+            hijo[nombre] = x
+            fuera.append(self.evalua(args_n[0], hijo))
+            n += 1
+            if n > 1000000:
+                raise ErrorPPL('MAKELIST no termina')
+            x = de + n * paso
+        return fuera
 
     def _indexa(self, cont, idx, nombre):
         ie = [int(round(x)) for x in idx]
@@ -883,6 +961,100 @@ def _b_round(m, a):
     return math.floor(abs(x) * f + 0.5) / f * (1 if x >= 0 else -1)
 
 
+def _mat(v, quien):
+    if not isinstance(v, Matriz):
+        raise ErrorPPL('%s necesita una matriz' % quien)
+    return v
+
+
+def _b_rref(m, a):
+    """Gauss-Jordan con pivoteo parcial. Es la que la Prime trae de fabrica.
+
+    Estaba sin cubrir, y su ausencia AQUI tenia consecuencias alla: en
+    CiclesHP se escribio el Gauss-Jordan a mano en PPL, cuarenta lineas, para
+    no dejar la pieza central del solver sin poder probarse fuera de la
+    calculadora. Ahora RREF se puede usar y seguir probando.
+    """
+    M = _mat(a[0], 'RREF').copia()
+    filas, cols = M.dim()
+    fila = 0
+    for col in range(cols):
+        if fila >= filas:
+            break
+        p = max(range(fila, filas), key=lambda r: abs(M.filas[r][col]))
+        if abs(M.filas[p][col]) < 1e-12:
+            continue
+        M.filas[fila], M.filas[p] = M.filas[p], M.filas[fila]
+        piv = M.filas[fila][col]
+        M.filas[fila] = [x / piv for x in M.filas[fila]]
+        for r in range(filas):
+            if r != fila and M.filas[r][col] != 0:
+                f = M.filas[r][col]
+                M.filas[r] = [x - f * y for x, y in zip(M.filas[r],
+                                                        M.filas[fila])]
+        fila += 1
+    return M
+
+
+def _b_trn(m, a):
+    M = _mat(a[0], 'TRN')
+    f, c = M.dim()
+    return Matriz([[M.filas[i][j] for i in range(f)] for j in range(c)])
+
+
+def _b_idenmat(m, a):
+    n = int(round(a[0]))
+    if n < 1:
+        raise ErrorPPL('IDENMAT(%d)' % n)
+    return Matriz([[1.0 if i == j else 0.0 for j in range(n)]
+                   for i in range(n)])
+
+
+def _lu(M, quien):
+    """Eliminacion con pivoteo. -> (copia triangular, signo, n) o error."""
+    f, c = M.dim()
+    if f != c:
+        raise ErrorPPL('%s necesita una matriz cuadrada' % quien)
+    A = [list(x) for x in M.filas]
+    signo = 1.0
+    for k in range(f):
+        p = max(range(k, f), key=lambda r: abs(A[r][k]))
+        if abs(A[p][k]) < 1e-14:
+            return A, 0.0, f
+        if p != k:
+            A[k], A[p] = A[p], A[k]
+            signo = -signo
+        for r in range(k + 1, f):
+            factor = A[r][k] / A[k][k]
+            A[r] = [x - factor * y for x, y in zip(A[r], A[k])]
+    return A, signo, f
+
+
+def _b_det(m, a):
+    A, signo, n = _lu(_mat(a[0], 'DET'), 'DET')
+    if signo == 0.0:
+        return 0.0
+    d = signo
+    for k in range(n):
+        d *= A[k][k]
+    return d
+
+
+def _b_inverse(m, a):
+    M = _mat(a[0], 'INVERSE')
+    f, c = M.dim()
+    if f != c:
+        raise ErrorPPL('INVERSE necesita una matriz cuadrada')
+    ampliada = Matriz([list(M.filas[i]) + [1.0 if i == j else 0.0
+                                           for j in range(f)]
+                       for i in range(f)])
+    R = _b_rref(m, [ampliada])
+    for i in range(f):
+        if abs(R.filas[i][i] - 1.0) > 1e-9:
+            raise ErrorPPL('matriz singular: no tiene inversa')
+    return Matriz([fila[f:] for fila in R.filas])
+
+
 def _registra(nombre, retorno=0.0):
     def fn(m, a):
         m.io.append((nombre, a))
@@ -911,6 +1083,13 @@ BUILTINS = {
     'MOD': lambda m, a: math.fmod(a[0], a[1]),
     'RGB': lambda m, a: float(int(a[0]) * 65536 + int(a[1]) * 256 + int(a[2])),
     'CONCAT': lambda m, a: list(a[0]) + list(a[1]),
+    # algebra matricial. MAKEMAT y MAKELIST no estan aqui: son perezosas y
+    # se resuelven en _llamada, porque su primer argumento es una plantilla.
+    'RREF': _b_rref,
+    'TRN': _b_trn,
+    'IDENMAT': _b_idenmat,
+    'DET': _b_det,
+    'INVERSE': _b_inverse,
     # interfaz: no se dibuja, se anota
     'TEXTOUT_P': _registra('TEXTOUT_P'),
     'TEXTOUT': _registra('TEXTOUT'),

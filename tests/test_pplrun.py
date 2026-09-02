@@ -190,10 +190,94 @@ EXPORT F() BEGIN RETURN SIZE(G(-1)); END;
     ('palabras clave en minuscula', """
 export F() begin local x; x := 1; if x == 1 then return 42; end; return 0; end;
 """, 'F()', 42.0),
+
+    # --- algebra matricial y constructores -------------------------------
+    # Faltaban, y su ausencia tenia consecuencias: en CiclesHP se escribio el
+    # Gauss-Jordan a mano en PPL para no perder la red de poder probarlo en el
+    # PC, y las matrices de trabajo se generaron como literal por no haber
+    # MAKEMAT. Las dos cosas dejan de hacer falta.
+    ('MAKEMAT ve I y J, 1-based', """
+EXPORT F() BEGIN LOCAL M; M := MAKEMAT(I*10+J, 2, 3); RETURN M(2,3); END;
+""", 'F()', 23.0),
+
+    ('MAKEMAT de ceros', """
+EXPORT F() BEGIN LOCAL M, d; M := MAKEMAT(0, 4, 5); d := DIM(M);
+RETURN d(1)*100 + d(2) + M(3,3); END;
+""", 'F()', 405.0),
+
+    ('MAKEMAT cuadrada con un solo tamano', """
+EXPORT F() BEGIN LOCAL M, d; M := MAKEMAT(1, 3); d := DIM(M);
+RETURN d(1)*10 + d(2); END;
+""", 'F()', 33.0),
+
+    ('MAKELIST', """
+EXPORT F() BEGIN LOCAL L; L := MAKELIST(X*X, X, 1, 5); RETURN L(4); END;
+""", 'F()', 16.0),
+
+    ('MAKELIST con paso', """
+EXPORT F() BEGIN LOCAL L; L := MAKELIST(X, X, 0, 10, 2.5); RETURN SIZE(L)*100 + L(3); END;
+""", 'F()', 505.0),
+
+    ('RREF resuelve un sistema', """
+EXPORT F() BEGIN LOCAL R; R := RREF([[2,1,5],[1,-1,1]]);
+RETURN R(1,3)*10 + R(2,3); END;
+""", 'F()', 21.0),
+
+    ('RREF deja la identidad a la izquierda', """
+EXPORT F() BEGIN LOCAL R; R := RREF([[2,1,5],[1,-1,1]]);
+RETURN R(1,1)*1000 + R(1,2)*100 + R(2,1)*10 + R(2,2); END;
+""", 'F()', 1001.0),
+
+    ('RREF con una fila dependiente no revienta', """
+EXPORT F() BEGIN LOCAL R; R := RREF([[1,2,3],[2,4,6]]);
+RETURN R(2,1)*100 + R(2,2)*10 + R(2,3); END;
+""", 'F()', 0.0),
+
+    ('TRN', """
+EXPORT F() BEGIN LOCAL T, d; T := TRN([[1,2,3],[4,5,6]]); d := DIM(T);
+RETURN d(1)*100 + d(2)*10 + T(3,2); END;
+""", 'F()', 326.0),
+
+    ('IDENMAT', """
+EXPORT F() BEGIN LOCAL M; M := IDENMAT(3); RETURN M(2,2)*10 + M(2,3); END;
+""", 'F()', 10.0),
+
+    ('DET', """
+EXPORT F() BEGIN RETURN DET([[1,2],[3,4]]); END;
+""", 'F()', -2.0),
+
+    ('DET de una singular da 0', """
+EXPORT F() BEGIN RETURN DET([[1,2],[2,4]]); END;
+""", 'F()', 0.0),
+
+    ('INVERSE', """
+EXPORT F() BEGIN LOCAL I; I := INVERSE([[4,7],[2,6]]);
+RETURN I(1,1)*1000 + I(2,2)*100; END;
+""", 'F()', 640.0),
+
+    ('listas anidadas: L(2)(1)', """
+EXPORT F() BEGIN LOCAL L; L := {{1,2},{3,4}}; RETURN L(2)(1); END;
+""", 'F()', 3.0),
+
+    ('una fila de matriz se indexa otra vez', """
+EXPORT F() BEGIN LOCAL M; M := [[1,2,3],[4,5,6]]; RETURN M(2)(3); END;
+""", 'F()', 6.0),
 ]
 
 # Casos donde tiene que FALLAR, no inventarse un numero
 ERRORES = [
+    ('indexar el retorno de una llamada, que la Prime rechaza', """
+EXPORT F(M) BEGIN RETURN SIZE(M)(1); END;
+""", 'F([[1,2],[3,4]])'),
+    ('MAKELIST con paso 0 no cuelga', """
+EXPORT F() BEGIN RETURN MAKELIST(X, X, 1, 5, 0); END;
+""", 'F()'),
+    ('INVERSE de una matriz singular', """
+EXPORT F() BEGIN RETURN INVERSE([[1,2],[2,4]]); END;
+""", 'F()'),
+    ('RREF de algo que no es matriz', """
+EXPORT F() BEGIN RETURN RREF({1,2,3}); END;
+""", 'F()'),
     ('indice 0', """
 EXPORT F() BEGIN LOCAL L; L := {1,2}; RETURN L(0); END;
 """, 'F()'),
