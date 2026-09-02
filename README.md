@@ -1,7 +1,33 @@
 # hp-prime-kit — herramientas y documentación para programar la HP Prime en serio
 
-Cinco herramientas en Python para trabajar desde el PC con la **HP Prime**, y
-la documentación que a la calculadora le falta.
+Herramientas en Python para trabajar desde el PC con la **HP Prime**, y la
+documentación que a la calculadora le falta.
+
+Sin dependencias: Python 3.7+ y nada más.
+
+## ¿Nunca has programado una HP Prime?
+
+Empieza por **[`references/empezar.md`](references/empezar.md)**. Explica qué es
+cada cosa —programa contra app, los dos lenguajes, el Connectivity Kit—, te
+lleva de un fichero de texto a un programa corriendo en la calculadora, y avisa
+de los ocho errores que te van a pasar el primer día.
+
+El resto de documentos son **referencia**: están ordenados por lo que se ha
+medido, no por lo que hace falta saber primero.
+
+Si ya conoces el terreno, el ciclo entero son tres comandos:
+
+```bash
+python scripts/lint_ppl.py mi.txt                    # lo que el compilador no explica
+python scripts/pplrun.py  mi.txt --call "F(10)"      # ejecutarlo aqui, sin calculadora
+python scripts/hpprgm.py  write mi.txt -t plantilla_codigo.hpprgm -o MIPROG.hpprgm
+```
+
+y arrastrar el `.hpprgm` a la calculadora en la ventana del Connectivity Kit.
+
+## Qué hay aquí
+
+**Herramientas**
 
 | | |
 |---|---|
@@ -11,20 +37,17 @@ la documentación que a la calculadora le falta.
 | **`scripts/mkapp.py`** | construye y verifica una app (`.hpappdir`), con sus envoltorios binarios |
 | **`scripts/hpreal.py`** | el **formato de número interno**, descifrado: lee y escribe `.hpmat` |
 
-Sin dependencias: Python 3.7+ y nada más.
-
-## La documentación
-
-La Prime está mal documentada, y de Python en la Prime **no hay documentación
-oficial ninguna**. Estos cinco documentos son lo que está **medido en una G2**,
+**Documentación.** La Prime está mal documentada, y de Python en la Prime **no
+hay documentación oficial ninguna**. Esto es lo que está **medido en una G2**,
 con la evidencia al lado y marcando lo que no está confirmado:
 
 | | |
 |---|---|
+| [`references/empezar.md`](references/empezar.md) | **de cero**: el mapa, el vocabulario, tu primer programa y el método |
 | [`references/ppl.md`](references/ppl.md) | el lenguaje: los límites que rompen, y **cuatro hipótesis que parecen razonables y son falsas** |
+| [`references/interfaz.md`](references/interfaz.md) | pantalla, teclado y táctil: `INPUT`, códigos de tecla, el toque que llega dos veces |
 | [`references/apps.md`](references/apps.md) | apps: la `.hpappdir`, los ganchos, y el byte que hace que la app abra donde no toca |
 | [`references/micropython.md`](references/micropython.md) | Python en la calculadora: el puente a PPL, y la llamada que **cierra la app** |
-| [`references/interfaz.md`](references/interfaz.md) | pantalla, teclado y táctil: `INPUT`, códigos de tecla, el toque que llega dos veces |
 | [`references/formato-hpprgm.md`](references/formato-hpprgm.md) | el contenedor binario, verificado por reconstrucción byte a byte |
 
 ## El problema que resuelven

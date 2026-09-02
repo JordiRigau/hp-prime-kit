@@ -1,5 +1,9 @@
 # Python en la HP Prime
 
+> **Antes que esto**: [`empezar.md`](empezar.md) explica los dos lenguajes de la
+> Prime y cuándo conviene cada uno. Si vas a escribir Python para la
+> calculadora, lee al menos su §1 y §2.
+
 La Prime lleva **MicroPython** desde el firmware de 2021, y con él un módulo
 propio, `hpprime`, que da dibujo directo y —lo que de verdad importa— una
 función `eval()` que **ejecuta PPL arbitrario y devuelve el resultado**.

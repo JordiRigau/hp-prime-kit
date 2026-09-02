@@ -1,5 +1,9 @@
 # PPL: lo que está medido
 
+> **¿Primera vez con una HP Prime?** Empieza por [`empezar.md`](empezar.md):
+> qué es cada cosa, cómo se instala un programa y qué se rompe el primer día.
+> Esto de aquí es referencia, no un tutorial.
+
 Firmware de referencia: **G2, 2.4 revisión 15515 (2025-09-15)**. Sus notas de
 versión sólo mencionan aritmética exacta con fracciones y multiplicación
 implícita: ningún cambio de sintaxis.

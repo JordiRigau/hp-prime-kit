@@ -1,5 +1,10 @@
 # El formato `.hpprgm`
 
+> **Este es el documento más técnico del kit, y el que menos falta hace para
+> empezar.** Para escribir tu primer programa no necesitas saber nada de esto:
+> [`empezar.md`](empezar.md) §5 lo hace con tres comandos. Ven aquí cuando algo
+> no cuadre, cuando quieras meter muchos datos, o por curiosidad.
+
 Lo que la HP Prime guarda cuando escribes un programa. No está documentado por
 HP; esto es lo que se dedujo midiendo ficheros reales escritos por el
 Connectivity Kit y verificándolo por reconstrucción byte a byte.

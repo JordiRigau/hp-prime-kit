@@ -16,11 +16,12 @@ en una G2 real, incluidas **cuatro hipótesis que parecen razonables y son
 falsas**. Escribir PPL de memoria lleva a inventarse restricciones que no
 existen y a saltarse la única que importa.
 
-Y según lo que toque, uno de los otros cuatro. Todos son lo mismo: **lo que
-está medido en una G2**, con la evidencia al lado.
+Y según lo que toque, uno de los otros cinco. Todos son lo mismo: **lo que está
+medido en una G2**, con la evidencia al lado.
 
 | Documento | Cuándo |
 |---|---|
+| [`references/empezar.md`](references/empezar.md) | si quien pregunta **no ha programado nunca una Prime**: el mapa, el vocabulario y el primer programa de principio a fin. Enlázale aquí antes que a nada |
 | [`references/ppl.md`](references/ppl.md) | **siempre**: el lenguaje, sus límites y las hipótesis falsas |
 | [`references/apps.md`](references/apps.md) | envolver algo como app: la `.hpappdir`, los ganchos, el byte que hace que abra donde no toca |
 | [`references/micropython.md`](references/micropython.md) | escribirlo en Python: el puente a PPL, y la llamada que cierra la app |

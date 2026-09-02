@@ -1,5 +1,9 @@
 # Apps de la HP Prime
 
+> **Si no sabes aún la diferencia entre un programa y una app**, o qué es el
+> Connectivity Kit, eso está en [`empezar.md`](empezar.md) §2 y §3. Aquí se dan
+> por sabidos.
+
 Un programa suelto vive en el catálogo y se abre con `[Shift][Program]` +
 navegar + `[Enter]`. Una **app** tiene icono en `[Apps]`, así que abrirla son
 **dos pulsaciones**. Bajo presión de examen esa es toda la diferencia, y es

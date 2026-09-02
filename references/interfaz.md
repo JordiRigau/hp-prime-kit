@@ -1,5 +1,9 @@
 # Interfaces en la HP Prime
 
+> **Vale para los dos lenguajes**: desde PPL se llama directo, y desde Python se
+> llama lo mismo cruzando el puente. Si no sabes qué es ese puente, o qué es un
+> *grob* o una *tecla de pantalla*, están en [`empezar.md`](empezar.md) §4.
+
 320 × 240 píxeles, un teclado con códigos que no son ASCII, una pantalla táctil
 y ningún gestor de ventanas. La documentación oficial describe los comandos uno
 a uno y no dice nada de cómo se combinan, así que casi todo lo que hay aquí sale
