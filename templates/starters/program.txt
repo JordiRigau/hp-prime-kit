@@ -1,0 +1,23 @@
+// __NAME__ - a starter program for the HP Prime.
+//
+// Two halves on purpose:
+//   AREA()  is pure arithmetic, so `hpprime run` can test it on the PC
+//   MAIN()  is the half that talks to the screen; that one needs the
+//           calculator (or the Virtual Calculator)
+//
+// Keeping them apart is the single habit that makes this platform bearable:
+// everything on the AREA side can be tested without touching a calculator.
+
+EXPORT AREA(zr)
+BEGIN
+  RETURN 3.14159265359 * zr * zr;
+END;
+
+EXPORT MAIN()
+BEGIN
+  LOCAL zr;
+  zr := 1;
+  INPUT(zr, "__NAME__", "radius:");
+  MSGBOX("area = " + STRING(AREA(zr)));
+  RETURN AREA(zr);
+END;

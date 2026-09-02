@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Pruebas del linter: que caza lo que tiene que cazar y calla con lo bueno.
+"""Linter tests: that it catches what it must, and stays quiet on good code.
 
-Los casos malos son los errores reales que costaron rondas de compilacion en
-la calculadora. Los controles son codigo que SI compila en una G2 y que en su
-momento se sospecho por error: si el linter los marca, esta de mas.
+The bad cases are real errors that cost compile rounds on the calculator.
+The controls are code that DOES compile on a G2 and that was wrongly
+suspected at some point: if the linter flags them, the linter is wrong.
 
     python tests/test_lint.py
 """
@@ -11,19 +11,19 @@ from __future__ import unicode_literals
 import os, sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                '..', 'scripts'))
-import lint_ppl as L
+                                '..'))
+from hpkit import lint as L
 
-# ---------------------------------------------------------------- casos malos
-MALOS = [
-    ('local-limite', """
+# ------------------------------------------------------------- bad cases
+BAD = [
+    ('local-limit', """
 EXPORT F(a)
 BEGIN
   LOCAL zm, zn, zi, zj, zk, zp, zq, zr, zs, zt, zu, zv, zw;
   RETURN a;
 END;
 """),
-    ('indexar-llamada', """
+    ('index-call', """
 EXPORT F(M)
 BEGIN
   LOCAL n;
@@ -34,27 +34,27 @@ END;
     ('export-multiple', """
 EXPORT A:=1, B:=2, C:=3, D:=4, E:=5, F:=6, G:=7;
 """),
-    ('end-unico', """
+    ('single-end', """
 EXPORT F(a)
 BEGIN
   IF a > 0 THEN a := 1; ENDIF;
   RETURN a;
 END;
 """),
-    ('igualdad', """
+    ('equality', """
 EXPORT F(a)
 BEGIN
   IF a = 1 THEN RETURN 2; END;
   RETURN 0;
 END;
 """),
-    ('base-1', """
+    ('one-based', """
 EXPORT F(M)
 BEGIN
   RETURN M(0,1);
 END;
 """),
-    ('local-al-principio', """
+    ('local-first', """
 EXPORT F(a)
 BEGIN
   LOCAL x;
@@ -63,7 +63,7 @@ BEGIN
   RETURN x;
 END;
 """),
-    ('bloques', """
+    ('unbalanced', """
 EXPORT F(a)
 BEGIN
   IF a > 0 THEN
@@ -71,7 +71,7 @@ BEGIN
   RETURN a;
 END;
 """),
-    ('expr-vacia', """
+    ('expr-empty', """
 EXPORT F()
 BEGIN
   LOCAL zs;
@@ -81,10 +81,10 @@ END;
 """),
 ]
 
-# ------------------------------------------------------- controles (bien)
-# Codigo que compila en una G2 real. Ninguna regla debe dispararse.
-BUENOS = [
-    ('RETURN dentro de un FOR', """
+# -------------------------------------------------------------- controls
+# Code that compiles on a real G2. No rule may fire on any of these.
+GOOD = [
+    ('RETURN inside a FOR', """
 EXPORT F(n)
 BEGIN
   LOCAL zi;
@@ -94,7 +94,7 @@ BEGIN
   RETURN 0;
 END;
 """),
-    ('locales letra+digito', """
+    ('locals of letter + digit', """
 EXPORT F()
 BEGIN
   LOCAL L12, L13, L14, r2, y1;
@@ -102,24 +102,24 @@ BEGIN
   RETURN L12;
 END;
 """),
-    ('varios locales con valor inicial', """
+    ('several locals with initial values', """
 EXPORT F()
 BEGIN
   LOCAL x1:=160, x2:=299, x3:=21;
   RETURN x1;
 END;
 """),
-    ('builtin con argumento 0', """
+    ('builtin called with a 0 argument', """
 EXPORT F()
 BEGIN
-  TEXTOUT_P("hola", 4, 24, 3, RGB(0,0,180));
+  TEXTOUT_P("hello", 4, 24, 3, RGB(0,0,180));
   RETURN 1;
 END;
 """),
-    ('lista exportada con comas', """
-EXPORT TPROP:={"P [MPa]","T [C]","T [K]","x","v","u","h","s"};
+    ('exported list with commas in it', """
+EXPORT LABELS:={"one","two","three","four","five","six","seven","eight"};
 """),
-    ('EXPR con guarda previa', """
+    ('EXPR behind a size guard', """
 EXPORT F(zs)
 BEGIN
   IF SIZE(zs) > 0 THEN
@@ -128,7 +128,7 @@ BEGIN
   RETURN 0;
 END;
 """),
-    ('8 locales, el maximo visto compilar', """
+    ('8 locals, the most seen to compile', """
 EXPORT F()
 BEGIN
   LOCAL a, b, c, d, e2, f, g, h;
@@ -139,33 +139,33 @@ END;
 
 
 def main():
-    ok = fallos = 0
+    ok = bad = 0
 
-    for regla, src in MALOS:
-        av, _ = L.revisa('caso.hpprgm', src)
-        reglas = set(a.regla for a in av)
-        if regla in reglas:
+    for rule, src in BAD:
+        found, _ = L.check_source('case.hpprgm', src)
+        rules = set(a.rule for a in found)
+        if rule in rules:
             ok += 1
-            print('  ok    caza %-20s' % regla)
+            print('  ok    catches %-20s' % rule)
         else:
-            fallos += 1
-            print('  FALLO no caza %-20s (dio: %s)'
-                  % (regla, ', '.join(sorted(reglas)) or 'nada'))
+            bad += 1
+            print('  FAIL  misses %-20s (got: %s)'
+                  % (rule, ', '.join(sorted(rules)) or 'nothing'))
 
     print('')
-    for nombre, src in BUENOS:
-        av, _ = L.revisa('bueno.hpprgm', src)
-        errores = [a for a in av if a.nivel == 'ERROR']
-        if not errores:
+    for name, src in GOOD:
+        found, _ = L.check_source('good.hpprgm', src)
+        errors = [a for a in found if a.level == 'ERROR']
+        if not errors:
             ok += 1
-            print('  ok    calla con %s' % nombre)
+            print('  ok    quiet on %s' % name)
         else:
-            fallos += 1
-            print('  FALLO falsa alarma en %s: %s'
-                  % (nombre, '; '.join(a.regla for a in errores)))
+            bad += 1
+            print('  FAIL  false alarm on %s: %s'
+                  % (name, '; '.join(a.rule for a in errors)))
 
-    print('\nPASS: %d   FAIL: %d' % (ok, fallos))
-    return 1 if fallos else 0
+    print('\nPASS: %d   FAIL: %d' % (ok, bad))
+    return 1 if bad else 0
 
 
 if __name__ == '__main__':

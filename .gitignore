@@ -1,18 +1,18 @@
 __pycache__/
 *.pyc
 
-# binarios de la calculadora que uno deja por medio al probar
+# calculator binaries you leave lying around while testing
 *.hpprgm
 *.hpappprgm
 *.hpapp
 *.hpappnote
 *.hpmat
 *.hplist
-!tests/fixtures/*.hpprgm
+*.hpappdir/
 
-# los envoltorios de plantillas/ SI van al repositorio: son el esqueleto de
-# una app, salen de apps que arrancan en una G2 y no llevan nada dentro que
-# identifique a nadie
-!plantillas/*.hpapp
-!plantillas/*.hpappprgm
-!plantillas/*.hpappnote
+# ...but the ones the kit ships DO belong in the repository: they are the
+# skeleton of a program and of an app, they come from files that run on a G2,
+# and they carry no source of anyone's inside.
+!templates/code.hpprgm
+!templates/app/*
+!tests/fixtures/*.hpprgm

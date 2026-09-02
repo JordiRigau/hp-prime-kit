@@ -1,58 +1,58 @@
 # -*- coding: utf-8 -*-
-"""Pruebas del interprete de PPL, sin depender de ningun proyecto.
+"""Interpreter tests, tied to no particular project.
 
-Cada caso es un programa PPL con un resultado conocido. Los de la seccion
-ERRORES comprueban lo contrario: que **falla** donde la calculadora fallaria,
-en vez de devolver un numero inventado.
+Each case is a PPL program with a known result. The ones in the ERRORS
+section check the opposite: that it **fails** where the calculator would
+fail, instead of returning an invented number.
 
-    python tests/test_pplrun.py
+    python tests/test_interp.py
 """
 from __future__ import unicode_literals
 import os, sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                '..', 'scripts'))
-import pplrun as P
+                                '..'))
+from hpkit import interp as P
 
-# (nombre, fuente, llamada, esperado)
-CASOS = [
-    ('aritmetica y precedencia', """
+# (name, source, call, expected)
+CASES = [
+    ('arithmetic and precedence', """
 EXPORT F() BEGIN RETURN 2 + 3 * 4 - 6 / 3; END;
 """, 'F()', 12.0),
 
-    ('potencia asociativa por la derecha', """
+    ('power is right-associative', """
 EXPORT F() BEGIN RETURN 2 ^ 3 ^ 2; END;
 """, 'F()', 512.0),
 
-    ('unario y parentesis', """
+    ('unary minus and parentheses', """
 EXPORT F() BEGIN RETURN -(2 + 3) * 2; END;
 """, 'F()', -10.0),
 
-    ('lista 1-based', """
+    ('lists are 1-based', """
 EXPORT F() BEGIN LOCAL L; L := {10, 20, 30}; RETURN L(1) + L(3); END;
 """, 'F()', 40.0),
 
-    ('matriz 1-based, fila y columna', """
+    ('matrices are 1-based, row and column', """
 EXPORT F() BEGIN LOCAL M; M := [[1,2,3],[4,5,6]]; RETURN M(2,1) * 10 + M(1,3); END;
 """, 'F()', 43.0),
 
-    ('DIM de matriz', """
+    ('DIM of a matrix', """
 EXPORT F() BEGIN LOCAL M, d; M := [[1,2,3],[4,5,6]]; d := DIM(M); RETURN d(1)*100 + d(2); END;
 """, 'F()', 203.0),
 
-    ('SIZE de lista y de cadena', """
+    ('SIZE of a list and of a string', """
 EXPORT F() BEGIN RETURN SIZE({1,2,3,4}) * 10 + SIZE("abc"); END;
 """, 'F()', 43.0),
 
-    ('asignar a un elemento', """
+    ('assigning to an element', """
 EXPORT F() BEGIN LOCAL L; L := {1,2,3}; L(2) := 99; RETURN L(2); END;
 """, 'F()', 99.0),
 
-    ('anadir al final, idiom de PPL', """
+    ('appending at the end, a PPL idiom', """
 EXPORT F() BEGIN LOCAL L; L := {1,2}; L(SIZE(L)+1) := 7; RETURN SIZE(L)*100 + L(3); END;
 """, 'F()', 307.0),
 
-    ('asignar en una matriz', """
+    ('assigning into a matrix', """
 EXPORT F() BEGIN LOCAL M; M := [[1,2],[3,4]]; M(2,2) := 9; RETURN M(2,2); END;
 """, 'F()', 9.0),
 
@@ -60,7 +60,7 @@ EXPORT F() BEGIN LOCAL M; M := [[1,2],[3,4]]; M(2,2) := 9; RETURN M(2,2); END;
 EXPORT F(a) BEGIN IF a > 5 THEN RETURN 1; ELSE RETURN 2; END; END;
 """, 'F(3)', 2.0),
 
-    ('CASE con DEFAULT', """
+    ('CASE falling through to DEFAULT', """
 EXPORT F(a)
 BEGIN
   LOCAL r;
@@ -73,7 +73,7 @@ BEGIN
 END;
 """, 'F(5)', 99.0),
 
-    ('CASE, rama que toca', """
+    ('CASE taking the matching branch', """
 EXPORT F(a)
 BEGIN
   LOCAL r;
@@ -86,7 +86,7 @@ BEGIN
 END;
 """, 'F(2)', 20.0),
 
-    ('FOR suma', """
+    ('FOR, summing', """
 EXPORT F(n) BEGIN LOCAL i, s; s := 0; FOR i FROM 1 TO n DO s := s + i; END; RETURN s; END;
 """, 'F(10)', 55.0),
 
@@ -94,11 +94,11 @@ EXPORT F(n) BEGIN LOCAL i, s; s := 0; FOR i FROM 1 TO n DO s := s + i; END; RETU
 EXPORT F() BEGIN LOCAL i, s; s := 0; FOR i FROM 5 DOWNTO 1 DO s := s * 10 + i; END; RETURN s; END;
 """, 'F()', 54321.0),
 
-    ('FOR con STEP', """
+    ('FOR with a STEP', """
 EXPORT F() BEGIN LOCAL i, s; s := 0; FOR i FROM 0 TO 10 STEP 2 DO s := s + 1; END; RETURN s; END;
 """, 'F()', 6.0),
 
-    ('RETURN dentro de un FOR (es legal)', """
+    ('RETURN inside a FOR (which is legal)', """
 EXPORT F() BEGIN LOCAL i; FOR i FROM 1 TO 100 DO IF i > 4 THEN RETURN i; END; END; RETURN 0; END;
 """, 'F()', 5.0),
 
@@ -110,12 +110,12 @@ EXPORT F() BEGIN LOCAL i, s; s := 0; FOR i FROM 1 TO 100 DO IF i > 3 THEN BREAK;
 EXPORT F() BEGIN LOCAL i; i := 1; WHILE i < 100 DO i := i * 2; END; RETURN i; END;
 """, 'F()', 128.0),
 
-    ('REPEAT UNTIL se ejecuta al menos una vez', """
+    ('REPEAT UNTIL runs at least once', """
 EXPORT F() BEGIN LOCAL i; i := 50; REPEAT i := i + 1; UNTIL i > 0; RETURN i; END;
 """, 'F()', 51.0),
 
-    ('busqueda binaria, patron del motor', """
-EXPORT BUSCA(M, c, x, r0, n)
+    ('binary search, the shape a lookup engine has', """
+EXPORT FIND(M, c, x, r0, n)
 BEGIN
   LOCAL lo, hi, mid;
   IF n < 2 THEN RETURN 0; END;
@@ -128,30 +128,30 @@ BEGIN
   END;
   RETURN lo;
 END;
-EXPORT F() BEGIN LOCAL M; M := [[10,1],[20,2],[30,3],[40,4]]; RETURN BUSCA(M,1,25,1,4); END;
+EXPORT F() BEGIN LOCAL M; M := [[10,1],[20,2],[30,3],[40,4]]; RETURN FIND(M,1,25,1,4); END;
 """, 'F()', 2.0),
 
-    ('globales que persisten entre llamadas', """
+    ('globals persist between calls', """
 EXPORT G := 5;
-EXPORT SUBE() BEGIN G := G + 1; RETURN G; END;
-EXPORT F() BEGIN SUBE(); SUBE(); RETURN G; END;
+EXPORT BUMP() BEGIN G := G + 1; RETURN G; END;
+EXPORT F() BEGIN BUMP(); BUMP(); RETURN G; END;
 """, 'F()', 7.0),
 
-    ('las matrices se pasan POR VALOR', """
-EXPORT TOCA(M) BEGIN M(1,1) := 999; RETURN 0; END;
-EXPORT F() BEGIN LOCAL M; M := [[1,2],[3,4]]; TOCA(M); RETURN M(1,1); END;
+    ('matrices are passed BY VALUE', """
+EXPORT TOUCH(M) BEGIN M(1,1) := 999; RETURN 0; END;
+EXPORT F() BEGIN LOCAL M; M := [[1,2],[3,4]]; TOUCH(M); RETURN M(1,1); END;
 """, 'F()', 1.0),
 
-    ('concatenar cadenas', """
+    ('concatenating strings', """
 EXPORT F() BEGIN RETURN "a" + "b" + STRING(3); END;
 """, 'F()', 'ab3'),
 
-    ('EXPR evalua una cadena', """
-EXPORT DATO := [[7,8]];
-EXPORT F() BEGIN LOCAL M; M := EXPR("DATO"); RETURN M(1,2); END;
+    ('EXPR evaluates a string', """
+EXPORT DATA := [[7,8]];
+EXPORT F() BEGIN LOCAL M; M := EXPR("DATA"); RETURN M(1,2); END;
 """, 'F()', 8.0),
 
-    ('IFTE solo evalua la rama que toca', """
+    ('IFTE only evaluates the branch it takes', """
 EXPORT F(a) BEGIN RETURN IFTE(a > 0, 10, 20); END;
 """, 'F(1)', 10.0),
 
@@ -159,7 +159,7 @@ EXPORT F(a) BEGIN RETURN IFTE(a > 0, 10, 20); END;
 EXPORT F() BEGIN IF (1 > 0) AND NOT (2 > 3) OR (0 == 1) THEN RETURN 1; ELSE RETURN 0; END; END;
 """, 'F()', 1.0),
 
-    ('<> es distinto', """
+    ('<> means not equal', """
 EXPORT F() BEGIN IF 2 <> 3 THEN RETURN 1; ELSE RETURN 0; END; END;
 """, 'F()', 1.0),
 
@@ -167,7 +167,7 @@ EXPORT F() BEGIN IF 2 <> 3 THEN RETURN 1; ELSE RETURN 0; END; END;
 EXPORT F() BEGIN RETURN MIN(3,5) + MAX(3,5) + ABS(-2) + IP(2.9) + FLOOR(2.9) + ROUND(2.346,2)*100; END;
 """, 'F()', 3 + 5 + 2 + 2 + 2 + 235.0),
 
-    ('IFERR atrapa el error', """
+    ('IFERR catches the error', """
 EXPORT F()
 BEGIN
   LOCAL L, r;
@@ -178,34 +178,32 @@ BEGIN
 END;
 """, 'F()', -1.0),
 
-    ('devolver una lista', """
+    ('returning a list', """
 EXPORT F() BEGIN RETURN {1, 2, 3}; END;
 """, 'F()', [1.0, 2.0, 3.0]),
 
-    ('lista vacia como convenio de error', """
+    ('an empty list as the error convention', """
 EXPORT G(a) BEGIN IF a < 0 THEN RETURN {}; END; RETURN {a}; END;
 EXPORT F() BEGIN RETURN SIZE(G(-1)); END;
 """, 'F()', 0.0),
 
-    ('palabras clave en minuscula', """
+    ('keywords in lower case', """
 export F() begin local x; x := 1; if x == 1 then return 42; end; return 0; end;
 """, 'F()', 42.0),
 
-    # --- algebra matricial y constructores -------------------------------
-    # Faltaban, y su ausencia tenia consecuencias: en CiclesHP se escribio el
-    # Gauss-Jordan a mano en PPL para no perder la red de poder probarlo en el
-    # PC, y las matrices de trabajo se generaron como literal por no haber
-    # MAKEMAT. Las dos cosas dejan de hacer falta.
-    ('MAKEMAT ve I y J, 1-based', """
+    # --- linear algebra and constructors ---------------------------------
+    # These are covered so that leaning on the calculator's own matrix
+    # commands does not cost you the ability to test off the calculator.
+    ('MAKEMAT sees I and J, 1-based', """
 EXPORT F() BEGIN LOCAL M; M := MAKEMAT(I*10+J, 2, 3); RETURN M(2,3); END;
 """, 'F()', 23.0),
 
-    ('MAKEMAT de ceros', """
+    ('MAKEMAT of zeros', """
 EXPORT F() BEGIN LOCAL M, d; M := MAKEMAT(0, 4, 5); d := DIM(M);
 RETURN d(1)*100 + d(2) + M(3,3); END;
 """, 'F()', 405.0),
 
-    ('MAKEMAT cuadrada con un solo tamano', """
+    ('MAKEMAT square, with a single size', """
 EXPORT F() BEGIN LOCAL M, d; M := MAKEMAT(1, 3); d := DIM(M);
 RETURN d(1)*10 + d(2); END;
 """, 'F()', 33.0),
@@ -214,21 +212,21 @@ RETURN d(1)*10 + d(2); END;
 EXPORT F() BEGIN LOCAL L; L := MAKELIST(X*X, X, 1, 5); RETURN L(4); END;
 """, 'F()', 16.0),
 
-    ('MAKELIST con paso', """
+    ('MAKELIST with a step', """
 EXPORT F() BEGIN LOCAL L; L := MAKELIST(X, X, 0, 10, 2.5); RETURN SIZE(L)*100 + L(3); END;
 """, 'F()', 505.0),
 
-    ('RREF resuelve un sistema', """
+    ('RREF solves a system', """
 EXPORT F() BEGIN LOCAL R; R := RREF([[2,1,5],[1,-1,1]]);
 RETURN R(1,3)*10 + R(2,3); END;
 """, 'F()', 21.0),
 
-    ('RREF deja la identidad a la izquierda', """
+    ('RREF leaves the identity on the left', """
 EXPORT F() BEGIN LOCAL R; R := RREF([[2,1,5],[1,-1,1]]);
 RETURN R(1,1)*1000 + R(1,2)*100 + R(2,1)*10 + R(2,2); END;
 """, 'F()', 1001.0),
 
-    ('RREF con una fila dependiente no revienta', """
+    ('RREF survives a dependent row', """
 EXPORT F() BEGIN LOCAL R; R := RREF([[1,2,3],[2,4,6]]);
 RETURN R(2,1)*100 + R(2,2)*10 + R(2,3); END;
 """, 'F()', 0.0),
@@ -246,7 +244,7 @@ EXPORT F() BEGIN LOCAL M; M := IDENMAT(3); RETURN M(2,2)*10 + M(2,3); END;
 EXPORT F() BEGIN RETURN DET([[1,2],[3,4]]); END;
 """, 'F()', -2.0),
 
-    ('DET de una singular da 0', """
+    ('DET of a singular matrix is 0', """
 EXPORT F() BEGIN RETURN DET([[1,2],[2,4]]); END;
 """, 'F()', 0.0),
 
@@ -255,98 +253,123 @@ EXPORT F() BEGIN LOCAL I; I := INVERSE([[4,7],[2,6]]);
 RETURN I(1,1)*1000 + I(2,2)*100; END;
 """, 'F()', 640.0),
 
-    ('listas anidadas: L(2)(1)', """
+    ('nested lists: L(2)(1)', """
 EXPORT F() BEGIN LOCAL L; L := {{1,2},{3,4}}; RETURN L(2)(1); END;
 """, 'F()', 3.0),
 
-    ('una fila de matriz se indexa otra vez', """
+    ('a matrix row can be indexed again', """
 EXPORT F() BEGIN LOCAL M; M := [[1,2,3],[4,5,6]]; RETURN M(2)(3); END;
 """, 'F()', 6.0),
+
 ]
 
-# Casos donde tiene que FALLAR, no inventarse un numero
-ERRORES = [
-    ('indexar el retorno de una llamada, que la Prime rechaza', """
+# Cases where it must FAIL rather than invent a number
+ERRORS = [
+    ('indexing the return of a call, which the Prime rejects', """
 EXPORT F(M) BEGIN RETURN SIZE(M)(1); END;
 """, 'F([[1,2],[3,4]])'),
-    ('MAKELIST con paso 0 no cuelga', """
+    ('MAKELIST with a step of 0 does not hang', """
 EXPORT F() BEGIN RETURN MAKELIST(X, X, 1, 5, 0); END;
 """, 'F()'),
-    ('INVERSE de una matriz singular', """
+    ('INVERSE of a singular matrix', """
 EXPORT F() BEGIN RETURN INVERSE([[1,2],[2,4]]); END;
 """, 'F()'),
-    ('RREF de algo que no es matriz', """
+    ('RREF of something that is not a matrix', """
 EXPORT F() BEGIN RETURN RREF({1,2,3}); END;
 """, 'F()'),
-    ('indice 0', """
+    ('index 0', """
 EXPORT F() BEGIN LOCAL L; L := {1,2}; RETURN L(0); END;
 """, 'F()'),
-    ('indice fuera de rango', """
+    ('index out of range', """
 EXPORT F() BEGIN LOCAL L; L := {1,2}; RETURN L(5); END;
 """, 'F()'),
-    ('variable no definida', """
-EXPORT F() BEGIN RETURN NOEXISTE + 1; END;
+    ('undefined variable', """
+EXPORT F() BEGIN RETURN NOSUCHTHING + 1; END;
 """, 'F()'),
-    ('division por cero', """
+    ('division by zero', """
 EXPORT F() BEGIN RETURN 1 / 0; END;
 """, 'F()'),
-    ('funcion inexistente', """
-EXPORT F() BEGIN RETURN CHISPUM(1); END;
+    ('a function that does not exist', """
+EXPORT F() BEGIN RETURN WHATSIT(1); END;
 """, 'F()'),
-    ('EXPR de cadena vacia', """
+    ('EXPR of an empty string', """
 EXPORT F() BEGIN RETURN EXPR(""); END;
 """, 'F()'),
 ]
 
 
-def evalua(fuente, llamada):
-    m = P.Maquina()
-    m.carga(fuente)
-    return m.evalua(P.Parser(P.lex(llamada), '<test>').expr(), {})
+def evaluate(source, call):
+    m = P.Machine()
+    m.load(source)
+    return m.evaluate(P.Parser(P.lex(call), '<test>').expr(), {})
 
 
-def igual(a, b):
+def same(a, b):
     if isinstance(b, list):
         return (isinstance(a, list) and len(a) == len(b)
-                and all(igual(x, y) for x, y in zip(a, b)))
+                and all(same(x, y) for x, y in zip(a, b)))
     if isinstance(b, str):
         return a == b
     return isinstance(a, float) and abs(a - b) < 1e-9
 
 
+def bom_check():
+    """A source saved by a Windows editor starts with a byte order mark, and
+    the lexer has no rule for that character: load_file has to strip it."""
+    import io as _io
+    import tempfile
+    path = os.path.join(tempfile.mkdtemp(), 'BOM.txt')
+    with _io.open(path, 'w', encoding='utf-8-sig', newline='\n') as f:
+        f.write('EXPORT F() BEGIN RETURN 7; END;')
+    m = P.Machine()
+    m.load_file(path)
+    return m.call('F') == 7.0
+
+
 def main():
-    ok = fallos = 0
-    for nombre, fuente, llamada, esperado in CASOS:
+    ok = bad = 0
+    for name, source, call, expected in CASES:
         try:
-            got = evalua(fuente, llamada)
+            got = evaluate(source, call)
         except Exception as e:
-            fallos += 1
-            print('  FALLO %-44s excepcion: %s' % (nombre, e))
+            bad += 1
+            print('  FAIL  %-44s raised: %s' % (name, e))
             continue
-        if igual(got, esperado):
+        if same(got, expected):
             ok += 1
-            print('  ok    %s' % nombre)
+            print('  ok    %s' % name)
         else:
-            fallos += 1
-            print('  FALLO %-44s da %r y se esperaba %r'
-                  % (nombre, got, esperado))
+            bad += 1
+            print('  FAIL  %-44s gave %r, expected %r'
+                  % (name, got, expected))
+
+    try:
+        if bom_check():
+            ok += 1
+            print('  ok    a file with a byte order mark still loads')
+        else:
+            bad += 1
+            print('  FAIL  a file with a byte order mark loaded wrong')
+    except Exception as e:
+        bad += 1
+        print('  FAIL  a file with a byte order mark raised: %s' % e)
 
     print('')
-    for nombre, fuente, llamada in ERRORES:
+    for name, source, call in ERRORS:
         try:
-            got = evalua(fuente, llamada)
-        except (P.ErrorPPL, P.NoSoportado):
+            got = evaluate(source, call)
+        except (P.PPLError, P.Unsupported):
             ok += 1
-            print('  ok    falla como debe: %s' % nombre)
+            print('  ok    fails as it should: %s' % name)
         except Exception as e:
-            fallos += 1
-            print('  FALLO %-44s excepcion rara: %r' % (nombre, e))
+            bad += 1
+            print('  FAIL  %-44s odd exception: %r' % (name, e))
         else:
-            fallos += 1
-            print('  FALLO %-44s deberia fallar y da %r' % (nombre, got))
+            bad += 1
+            print('  FAIL  %-44s should have failed, gave %r' % (name, got))
 
-    print('\nPASS: %d   FAIL: %d' % (ok, fallos))
-    return 1 if fallos else 0
+    print('\nPASS: %d   FAIL: %d' % (ok, bad))
+    return 1 if bad else 0
 
 
 if __name__ == '__main__':
