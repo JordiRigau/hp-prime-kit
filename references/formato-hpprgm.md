@@ -92,6 +92,121 @@ cambiarle el fuente lo dejaría descuadrado. En la práctica no estorba: los
 datos se pegan una vez y no cambian nunca, y el código, que sí cambia, se
 genera y se arrastra.
 
+## El número interno, descifrado
+
+Lo de dentro del bloque compilado ya no es opaco. **Un número son 8 bytes**,
+little-endian; leídos como un entero de 64 bits:
+
+```
+bits  0..11   exponente decimal, complemento a dos de 12 bits
+bits 12..59   12 digitos BCD de mantisa, el mas significativo arriba
+bits 60..63   signo: 0 positivo, 9 negativo     (el convenio BCD de siempre)
+
+valor = d1.d2d3...d12 x 10^exponente            y el cero es todo ceros
+```
+
+Del bloque de `TDAT`:
+
+| Palabra | Signo | Mantisa | Exp | Valor |
+|---|---|---|---|---|
+| `9760000000000001` | 9 | `760000000000` | 1 | **−76** |
+| `0600000000000FFC` | 0 | `600000000000` | −4 | **0,0006** |
+| `0205991225000002` | 0 | `205991225000` | 2 | **205,991225** |
+| `0915550000000000` | 0 | `915550000000` | 0 | **9,1555** |
+
+### Cómo se descifró, que es lo que lo hace fiable
+
+Con una **piedra de Rosetta**, no adivinando. Un programa de datos lleva el
+bloque compilado **delante del fuente**, y el fuente son *los mismos números*
+escritos en decimal. O sea que un solo fichero da decenas de miles de parejas
+(bytes, valor) que nadie ha elegido:
+
+| | |
+|---|---|
+| Matrices de `TDAT` localizadas en el bloque | **56 de 56** |
+| Números decodificados y comparados con el fuente | **44.718, exactos** |
+| Vueltos a codificar y comparados **byte a byte** | **44.718 de 44.718** |
+| Negativos dentro de esa comparación | **1.616** |
+
+Los negativos son los que importan: el primer intento puso un `1` en el nibble
+de signo, el round-trip falló en exactamente 1.482 números —todos los
+negativos— y ahí se vio que es un **9**. Sin negativos en la muestra, el error
+habría pasado.
+
+Se rehace sobre tus ficheros con `python tests/test_hpreal.py`.
+
+### Lo que abre: `.hpmat`
+
+Los ficheros `.hpmat` de las matrices `M0`..`M9` son **el mismo formato de
+número** con una cabecera de 16 bytes:
+
+```
+00  01 00      constante en todos los observados
+02  14 80      tipo: 8014 real, 8094 complejo (16 bytes por elemento)
+04  u32 = 2    rango: 2 = matriz
+08  u32        filas
+12  u32        columnas
+16  ...        los elementos, fila a fila, 8 bytes cada uno
+```
+
+Con eso, una matriz entera se lleva a la calculadora **como fichero**, sin
+pegar nada y sin pasar por el fuente de ningún programa:
+
+```bash
+python scripts/hpreal.py read  M1.hpmat -o datos.csv
+python scripts/hpreal.py write datos.csv -o M0.hpmat
+```
+
+El nombre del fichero manda: `M0.hpmat` es la matriz `M0`. Se arrastra a la
+calculadora igual que un programa, y desde PPL se copia a donde haga falta con
+una línea. Las matrices **complejas** se leen como error explícito, no como
+números inventados: no están cubiertas.
+
+Verificado: los nueve `.hpmat` reales de una G2 se leen y se vuelven a escribir
+**byte a byte idénticos**, cabecera incluida.
+
+### Lo que NO abre todavía: generar el bloque
+
+El bloque no es sólo números. Entre matriz y matriz lleva registros con el
+**nombre del símbolo en UTF-16LE**. Justo después de la primera matriz de
+`TDAT` (que ocupa hasta el offset 4504 del bloque) aparece:
+
+```
+54 13 00 00   44 00 00 00   8B 01 40 00   41 00 49 00 47 00 55 00 41 00 53 00 50 00
+[longitud]    [longitud]    [etiqueta]    A  I  G  U  A  S  P   en UTF-16LE
+```
+
+O sea: la misma clase de contenedor TLV que por fuera, con el nombre del global
+y luego su matriz. `hpreal.py matrices_de_bloque()` recorre lo que reconoce
+—las matrices— y se salta el resto, así que sirve para **mirar dentro**, no
+para reescribirlo:
+
+```bash
+python scripts/hpreal.py nums TDAT.hpprgm
+```
+
+Para generar el bloque faltaría la gramática de esos registros. Ya no es el
+número lo que lo impide, que era la parte opaca; es una estructura, y las
+estructuras se leen midiendo. Mientras tanto sigue en pie lo de siempre: los
+datos se pegan una vez y no cambian nunca.
+
+## Otros ficheros de la calculadora
+
+En la carpeta espejo del CK hay más cosas, y conviene saber cuáles sabe leer
+este kit y cuáles no, para no perder el tiempo:
+
+| | Qué es | ¿Lo lee el kit? |
+|---|---|---|
+| `.hpprgm` | un programa | **sí** — `hpprgm.py` |
+| `.hpappdir/` | una app | **sí** — `mkapp.py`, y su `.hpappprgm` con `hpprgm.py` |
+| `.hpmat` | una de las matrices `M0`..`M9` | **sí** — `hpreal.py` (las reales) |
+| `.hplist` | una de las listas `L0`..`L9` | no: otra cabecera (`FE FF 16 00`) y elementos de tamaño variable con etiqueta de tipo. Una lista vacía son 8 bytes |
+| `.hpsettings`, `settings` | ajustes; `settings` lleva el identificador de la calculadora (el número de serie, si es física) | no |
+| `.hpexammode` | un modo de examen | no |
+
+Ninguno de éstos empieza por el magic `7C 61 8A B2`: **no son el contenedor
+TLV**, así que `hpprgm.py` los rechaza a la primera en vez de inventarse nada.
+
 ## Apps
 
 Una app es una carpeta `.hpappdir` con:
@@ -103,7 +218,18 @@ X.hpappnote    la nota
 icon.png       el icono
 ```
 
-El `.hpappprgm` se lee y se escribe igual que cualquier otro programa.
+El `.hpappprgm` se lee y se escribe igual que cualquier otro programa — con una
+excepción: en una app de **Python** está **vacío** (1152 bytes, sólo la tabla de
+símbolos con un `Main`), y entonces no tiene bloque de fuente, así que `leer`
+falla y no sirve de plantilla. El código de esa app está en los `.py` de la
+carpeta.
+
+El `.hpapp` no se genera: se copia de una app que funcione. Sus **últimos cuatro
+bytes son la vista de arranque**, y es la diferencia entre que la app abra su
+pantalla o la consola de Python.
+
+Todo eso —los envoltorios, el icono, los ganchos, cómo se construye una app
+desde el PC— está en [`apps.md`](apps.md).
 
 ## Cómo está verificado
 
@@ -242,9 +368,31 @@ diff fuente.txt ppl/PROG.txt
 python scripts/hpprgm.py write fuente.txt -t plantilla.hpprgm -o PROG.hpprgm
 ```
 
-La plantilla es cualquier `.hpprgm` de código que haya escrito el Connectivity
-Kit; están en `Documentos\HP Connectivity Kit\Calculators\<tu calculadora>\`.
-Se copia una vez y sirve para siempre.
+### Conseguir una plantilla, que no es tan fácil como suena
+
+La plantilla es un `.hpprgm` de código **escrito por el Connectivity Kit**: sin
+bloque compilado, con el fuente empezando en el offset 152. Se copia una vez y
+sirve para siempre.
+
+Lo que no vale es dar por hecho que los hay en
+`Documentos\HP Connectivity Kit\Calculators\<tu calculadora>\`. Esa carpeta es
+el **espejo**, o sea que todo lo que hay dentro ha pasado por la calculadora —y
+la calculadora le añade su bloque compilado a todo lo que guarda—. Medido en la
+máquina donde se escribió esto: de **58** contenedores de programa en el espejo,
+**2** servían de plantilla, y los dos eran `.hpappprgm` de apps.
+
+```bash
+python scripts/hpprgm.py read CANDIDATO.hpprgm
+```
+
+Si dice *«lleva N bytes de bloque compilado antes del fuente»*, no sirve; y
+`write` lo rechaza por su cuenta, así que el error no se cuela.
+
+**La forma fiable de fabricar una**: crea un programa nuevo **dentro del propio
+Connectivity Kit** (clic derecho → *Nuevo* sobre *Program*), escribe dos líneas
+que compilen, y **cópialo fuera de la carpeta espejo antes de enviarlo a la
+calculadora**. Ése es un fichero escrito por el CK y nunca tocado por la
+calculadora, que es exactamente lo que hace falta.
 
 Lo de comparar con el repositorio no es teórico: es lo que destapó que la app
 instalada en la calculadora llevaba semanas dos commits por detrás del código
