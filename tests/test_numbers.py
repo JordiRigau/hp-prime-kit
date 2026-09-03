@@ -168,10 +168,21 @@ def hpmat_files():
                 continue
             seen += 1
             rebuilt = N.write_hpmat(m)
-            ok(rebuilt == data[:len(rebuilt)],
-               '%s: %dx%d, round-trip identical'
-               % (os.path.basename(p), len(m), len(m[0])),
-               '%d bytes against %d' % (len(rebuilt), len(data)))
+            # The high byte of the type varies between files -- 00, 04 and 80
+            # all appear for a real matrix -- and what is written back is the
+            # 80 form. So the bytes match exactly only for those; for the
+            # others the numbers are what has to survive.
+            kind = struct.unpack_from('<2xH', data, 0)[0]
+            if kind == N.HPMAT_WRITE_TYPE:
+                ok(rebuilt == data[:len(rebuilt)],
+                   '%s: %dx%d, round-trip identical'
+                   % (os.path.basename(p), len(m), len(m[0])),
+                   '%d bytes against %d' % (len(rebuilt), len(data)))
+            else:
+                again = N.read_hpmat(rebuilt)
+                ok(again == m,
+                   '%s: %dx%d, type %04X, the numbers survive'
+                   % (os.path.basename(p), len(m), len(m[0]), kind))
     if not seen:
         print('  --    no .hpmat files: skipping that part')
 

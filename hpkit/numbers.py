@@ -56,8 +56,14 @@ import io, os, struct, sys
 #   04  u32 = 2     rank: 2 = matrix
 #   08  u32         rows
 #   12  u32         columns
-HPMAT_REAL = 0x8014
-HPMAT_COMPLEX = 0x8094
+# The TYPE IS THE LOW BYTE. Measured over 20 real .hpmat files: the high
+# byte is 00, 04 or 80 for the same kind of matrix, and the compiled block
+# leaves uninitialised memory there. Reading the pair as a 16-bit type
+# rejects perfectly good files.
+HPMAT_REAL = 0x14
+HPMAT_COMPLEX = 0x94
+HPMAT_WRITE_TYPE = 0x8014      # what the calculator wrote in the files that
+                               # round-tripped byte for byte
 
 
 class UnexpectedFormat(Exception):
@@ -117,9 +123,9 @@ def read_hpmat(data):
     kind, rank, rows, cols = struct.unpack_from('<2xHIII', data, 0)
     if rank != 2:
         raise UnexpectedFormat('rank %d: this is not a matrix' % rank)
-    if kind == HPMAT_COMPLEX:
+    if kind & 0xFF == HPMAT_COMPLEX:
         raise UnexpectedFormat('complex matrix: not covered')
-    if kind != HPMAT_REAL:
+    if kind & 0xFF != HPMAT_REAL:
         raise UnexpectedFormat('unknown type %04X' % kind)
     needed = 16 + rows * cols * 8
     if len(data) < needed:
@@ -143,7 +149,8 @@ def write_hpmat(matrix):
     cols = len(matrix[0])
     if any(len(r) != cols for r in matrix):
         raise UnexpectedFormat('the rows are not all the same length')
-    out = bytearray(struct.pack('<HHIII', 1, HPMAT_REAL, 2, rows, cols))
+    out = bytearray(struct.pack('<HHIII', 1, HPMAT_WRITE_TYPE, 2, rows,
+                                cols))
     for row in matrix:
         for x in row:
             out += encode(x)

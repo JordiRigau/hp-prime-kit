@@ -164,7 +164,10 @@ with a 16-byte header:
 
 ```
 00  01 00      constant in everything observed
-02  14 80      type: 8014 real, 8094 complex (16 bytes per element)
+02  14 xx      TYPE IS THE LOW BYTE: 14 real, 94 complex (16 bytes per
+               element). The high byte varies -- 00, 04 and 80 all appear
+               across 20 real files for the same kind of matrix -- so a
+               reader that matches on the pair rejects good files
 04  u32 = 2    rank: 2 = matrix
 08  u32        rows
 12  u32        columns
