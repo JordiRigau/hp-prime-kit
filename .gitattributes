@@ -1,0 +1,16 @@
+# The calculator's files are binary. Git detects that on its own -- they are
+# full of NUL bytes -- but saying so is cheap insurance: a line-ending
+# conversion applied to one of these would corrupt it silently, and the whole
+# kit rests on templates/code.hpprgm being byte-exact.
+*.hpprgm     binary
+*.hpappprgm  binary
+*.hpapp      binary
+*.hpappnote  binary
+*.hpmat      binary
+*.hplist     binary
+*.png        binary
+
+# Everything else is text, stored with LF. Checkouts on Windows still get
+# CRLF if git is set up that way, and that is fine: the tools normalise line
+# endings when they write a .hpprgm, and the interpreter reads either.
+*            text=auto
