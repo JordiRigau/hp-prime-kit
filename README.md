@@ -134,7 +134,7 @@ Deliberately still open, and listed so nobody leans on them:
 
 | | |
 |---|---|
-| A key code for the six on-screen **soft-key positions** | one number is ambiguous: `[Num]` measures 11, and 11 is also what two apps use as soft key 6 |
+| The **lower keyboard**'s key codes | the top three rows are measured key by key; everything below them is still taken from reading other people's apps |
 | The interpreter's **string functions** | left out: their edge behaviour is not measured, and guessing would defeat the purpose |
 | **G1** | everything here is a G2. Same firmware, different hardware |
 | MicroPython **speed** and an app's **memory limit** | not measured. The bridge crossing is: 0.2 ms |

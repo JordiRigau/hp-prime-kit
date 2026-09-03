@@ -143,28 +143,47 @@ This is the first thing that trips people: the code for `[Enter]` is **30**,
 not 13. And the same code means different things in different modes -- 42 is
 `1` in normal mode and `y` in alpha mode.
 
-| Key | Code | Confidence |
-|---|---|---|
-| `Enter` | **30** | **measured** with a diagnostic program |
-| `Esc` | 4 | two working apps agree |
-| ▲ ▼ ◄ ► | 2, 12, 7, 8 | two working apps agree |
-| Backspace | 19 | same |
-| `ON` | 46 | same |
-| Soft keys 1..6 | 0, 5, 10, 1, 6, 11 | same, and in use |
-| Digits 1..9 | 42, 43, 44, 37, 38, 39, 32, 33, 34 | same, and in use |
-| `View` | **9** | **measured**, read with `GETKEY` inside a blank-based app |
-| `Num` | **11** | **measured**, same way. See the clash below |
-| `Help` | 3 | **inferred** from the position map |
+**A code is a position in a grid, five keys to a row.** The top three rows,
+measured key by key on a G2 with
+[examples/keymap/](../../examples/keymap/):
 
-**`[Num]` is 11, and 11 is also listed above as soft key 6.** Both numbers
-are real: the soft-key row comes from reading two working apps, and the 11
-was measured directly. The Prime has no separate F1-F6 keys -- the six labels
-at the bottom of the screen are touch targets, and apps drive them from
-physical keys -- so the likeliest reading is that what those apps call "soft
-key 6" *is* the `[Num]` key. That is a reading, not a measurement:
-**Unverified** until somebody presses what they believe is soft key 6 and
-reports the code. The probe in [examples/apptest/](../../examples/apptest/)
-prints it.
+| | col 0 | col 1 | col 2 | col 3 | col 4 |
+|---|---|---|---|---|---|
+| **row 0** | `Apps` **0** | `Symb` **1** | ▲ 2 | `Help` **3** | `Esc` 4 |
+| **row 1** | `Home` **5** | `Plot` **6** | ◄ 7 | ► 8 | `View` **9** |
+| **row 2** | `CAS` **10** | `Num` **11** | ▼ 12 | `Menu` **13** | 14 |
+
+Bold is measured directly. The arrows and `Esc` come from two working apps
+that agree, and they land exactly where the grid predicts -- which is the
+cross-check that makes the model worth trusting: nine measured keys and four
+read from other people's code fit the same numbering, and none of the
+thirteen contradicts it.
+
+The rest, from those same apps and consistent with the grid:
+
+| Key | Code |
+|---|---|
+| `Enter` | 30 (**measured** with a diagnostic program) |
+| Backspace | 19 |
+| `ON` | 46 |
+| Digits 1..9 | 42, 43, 44, 37, 38, 39, 32, 33, 34 |
+
+### The six on-screen labels are not keys
+
+Two published apps map "soft keys 1..6" to the codes **0, 5, 10, 1, 6, 11**.
+Now that those codes have names, that is `Apps`, `Home`, `CAS`, `Symb`,
+`Plot`, `Num`: the **top-left 3×2 block of physical keys**, taken column by
+column.
+
+They have to be physical keys, because of the other half of the measurement:
+
+> **Touching the six labels along the bottom of the screen reports nothing
+> through `GETKEY`.** Measured on a G2. They are touch targets, and touch
+> arrives through `MOUSE` (§6).
+
+So if your program wants those labels driven from the keyboard as well as by
+finger, you pick the physical keys yourself, and the block above is what
+other people picked.
 
 > **In a blank-based app, `[Num]` and `[View]` do reach your program** --
 > as ordinary key codes, through `GETKEY`. What does not happen is the
@@ -173,9 +192,9 @@ prints it.
 > the recommended workaround -- draw your own menu, read the keys yourself --
 > actually work. See [apps.md](apps.md#5-ppl-apps-the-hooks-and-the-blank-app-trap).
 
-Anything in that table marked inferred can be settled in one run:
-[examples/keymap/](../../examples/keymap/) prints the code of every key you
-press until you leave with `Esc`.
+Everything below row 2 is still second-hand. If you need one of those codes,
+[examples/keymap/](../../examples/keymap/) settles it in one run: it prints
+the code of every key you press until you leave with `Esc`.
 
 **Design to fail quietly**: send an unknown key code to the default case, and
 make that case something harmless like returning to the previous screen. A

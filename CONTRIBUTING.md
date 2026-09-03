@@ -80,12 +80,12 @@ In rough order of how much it would help:
 
 | | Why |
 |---|---|
-| **The key codes of the six on-screen soft-key positions** | `[Num]` measures 11, and 11 is also what two published apps use as soft key 6. One measurement settles which. `examples/apptest/` prints whatever you press |
+| **The key codes below the top three rows** | those three are measured key by key; the rest of the table is read out of other people's apps. `examples/keymap/` maps a whole region in one run |
 | **The string functions in the interpreter** (`LEFT`, `MID`, `INSTRING`, `SORT`) | left out on purpose: their edge behaviour is not measured. Measure one and it can go in |
 | **Anything measured on a G1** | everything here is a G2. Same firmware, different hardware |
 | **MicroPython speed, and an app's memory limit** | both listed as not measured, and both change what designs are possible |
 | **The compiled block's symbol records** | the number format is decoded; the grammar around it is not. This would let programs carrying data be generated whole |
-| **A key code confirmed by measurement** | several in the table are inferred from the position map, not measured |
+| **Anything the grid model would predict wrongly** | key codes are positions, five to a row. Thirteen keys fit that; a fourteenth that does not would be worth knowing |
 
 ## Sending it
 
