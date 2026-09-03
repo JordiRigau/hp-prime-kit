@@ -131,6 +131,17 @@ diff installed.txt ppl/MYPROG.txt
 (compares it with what a build would produce, which is how you catch the
 calculator having rewritten the wrappers).
 
+It works out which kind of app it is looking at, because the two are not
+compared the same way: a PPL app is built from the blank descriptor and its
+`.hpappprgm` is *supposed* to differ from the empty skeleton. Give it the
+sources too and it checks those as well -- otherwise it says which parts it
+did not compare:
+
+```bash
+hpprime verify MYAPP.hpappdir src/*.py     # a Python app
+hpprime verify MYAPP.hpappdir app.txt      # a PPL app, program included
+```
+
 ## build
 
 ```bash

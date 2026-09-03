@@ -80,7 +80,7 @@ In rough order of how much it would help:
 
 | | Why |
 |---|---|
-| **A PPL app built end to end by `hpprime build`, opened on hardware** | the one path in the kit whose pieces are validated separately but whose combination has never been run |
+| **A PPL app built end to end by `hpprime build`, opened on hardware** | the one path in the kit whose pieces are validated separately but whose combination has never been run. `examples/apptest/` is ready to install and reports what it finds on its own screen |
 | **The string functions in the interpreter** (`LEFT`, `MID`, `INSTRING`, `SORT`) | left out on purpose: their edge behaviour is not measured. Measure one and it can go in |
 | **Anything measured on a G1** | everything here is a G2. Same firmware, different hardware |
 | **MicroPython speed, and an app's memory limit** | both listed as not measured, and both change what designs are possible |

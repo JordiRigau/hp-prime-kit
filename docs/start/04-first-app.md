@@ -61,11 +61,14 @@ templates on **every** build. And you can check for the drift before the app
 tells you:
 
 ```bash
-hpprime verify CIRCLEAPP.hpappdir
+hpprime verify CIRCLEAPP.hpappdir CIRCLE.txt
 ```
 
 Exit code 1 if the folder has stopped being the one you would generate. Put
 it in whatever script you use and you will never chase this bug.
+
+Pass the source, as above, and it checks the program inside the app as well
+as the wrappers. Without it, it checks the wrappers and says so.
 
 ## If your app is PPL, read this before designing the screen
 
@@ -112,8 +115,12 @@ that never changes -- your data -- is not touched when you fix the interface.
 A **Python** app built by this tool starts in its own screen: the wrappers
 come from an app that runs on this calculator. A **PPL** app assembled end to
 end by the builder has **not been opened on hardware yet** -- its pieces are
-each validated separately, but the combination is not. If you try it, that is
-worth reporting.
+each validated separately, but the combination is not.
+
+If you have a calculator in front of you, closing that gap is a five-minute
+job and the single most useful thing you could contribute:
+[examples/apptest/](../../examples/apptest/) is an app that reports on its own
+screen what worked and what did not.
 
 ---
 

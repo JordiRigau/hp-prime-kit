@@ -1,0 +1,62 @@
+// ===================================================================
+// APPTEST - does an app built entirely on a PC open and run on a Prime?
+//
+// This is the one path in the kit whose pieces are each validated but
+// whose combination has never been opened on hardware: the blank
+// descriptor, the empty note, and a .hpappprgm with this source written
+// into it, all assembled by `hpprime build ... --ppl`.
+//
+// It is written to answer, on screen, everything that could go wrong:
+// whether the app opens at all, whether its own program is really
+// inside, whether it computes, whether accented text survives, and what
+// the keyboard does in an app that has no view to rest in.
+//
+// Build and check it:  see examples/apptest/README.md
+// ===================================================================
+
+// Pure arithmetic: must return 385. Testable with `hpprime run`.
+EXPORT ATSUM()
+BEGIN
+  LOCAL zi, zs;
+  zs := 0;
+  FOR zi FROM 1 TO 10 DO
+    zs := zs + zi * zi;
+  END;
+  RETURN zs;
+END;
+
+// Drain the pending key, then wait for a real one. Without the first
+// loop the key that opened the app counts as the answer.
+//
+// Do NOT call this from `hpprime run`: on the PC, GETKEY always reports
+// "no key", so the second loop never ends.
+EXPORT ATWAIT()
+BEGIN
+  LOCAL zk;
+  REPEAT zk := GETKEY; UNTIL zk < 0;
+  REPEAT zk := GETKEY; UNTIL zk >= 0;
+  RETURN zk;
+END;
+
+// The calculator calls this when the app opens.
+EXPORT START()
+BEGIN
+  LOCAL zs, zk;
+  RECT();
+  TEXTOUT_P("APPTEST", 4, 4, 4);
+  zs := ATSUM();
+  IF zs == 385 THEN
+    TEXTOUT_P("1. the program is inside, and computes: 385", 4, 40, 2);
+  ELSE
+    TEXTOUT_P("1. WRONG RESULT: " + STRING(zs), 4, 40, 2);
+  END;
+  TEXTOUT_P("2. accents: àèóç", 4, 62, 2);
+  TEXTOUT_P("3. press any key (Num and View included)", 4, 84, 2);
+  zk := ATWAIT();
+  RECT();
+  TEXTOUT_P("APPTEST", 4, 4, 4);
+  TEXTOUT_P("4. that key reported code " + STRING(zk), 4, 40, 2);
+  TEXTOUT_P("5. press again: the app should fall to Home", 4, 62, 2);
+  ATWAIT();
+  RETURN zs;
+END;

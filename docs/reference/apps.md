@@ -285,7 +285,7 @@ hpprime build MYAPP app.txt --ppl
 | The generated `.hpappprgm` reads back as the same source | **yes**, and the tool checks it before writing |
 | A program generated from Python **runs on an HP Prime** | **yes** -- see [deploy.md](deploy.md) |
 | The Python app wrappers start it in its own screen | **yes**: they come from an app that runs on this calculator |
-| A **PPL** app assembled end to end by the builder | **not tested on hardware.** Its pieces are, separately -- the descriptor comes from an app that works, and the program writer is validated -- but the combination has not been opened on a calculator yet |
+| A **PPL** app assembled end to end by the builder | **not tested on hardware.** Its pieces are, separately -- the descriptor comes from an app that works, and the program writer is validated -- but the combination has not been opened on a calculator yet. [examples/apptest/](../../examples/apptest/) exists to close this |
 
 And the thing worth doing before trusting any result obtained on the
 calculator: **pull the source back out and compare it with the repository**.

@@ -169,21 +169,67 @@ def build(name, modules, icon=None, base='.', quiet=False,
     return folder
 
 
-def check(folder, modules, icon=None, descriptor='python'):
-    """-> list of (file, what is wrong). Empty if the folder is current."""
-    folder = folder.rstrip('/\\')
-    name = os.path.basename(folder)
+def app_name(folder):
+    """The app's name, which is its folder's name without the suffix."""
+    name = os.path.basename(folder.rstrip('/\\'))
     if name.endswith('.hpappdir'):
         name = name[:-len('.hpappdir')]
+    return name
+
+
+def is_ppl_app(folder, name=None):
+    """True if the app's program carries a source, rather than being the
+    empty 1152-byte skeleton a Python app has.
+
+    This is how the kind of app is told apart without being told, and it
+    matters: a PPL app is built from the blank descriptor and its
+    .hpappprgm is expected to differ from the empty template. Checking it
+    against a Python app's parts reports two differences that are not
+    there.
+    """
+    from hpkit import program
+    path = os.path.join(folder.rstrip('/\\'),
+                        '%s.hpappprgm' % (name or app_name(folder)))
+    if not os.path.isfile(path):
+        return False
+    try:
+        program.read(_read(path))
+        return True
+    except Exception:
+        return False
+
+
+def check(folder, modules, icon=None, descriptor=None, ppl_source=None):
+    """-> list of (file, what is wrong). Empty if the folder is current.
+
+    `descriptor` defaults to the one the app's own shape implies. Pass
+    `ppl_source` to check a PPL app's program against the source it should
+    have been built from; without it that file is left alone, because the
+    only other thing to compare it with is the empty skeleton, which it is
+    correctly not equal to.
+    """
+    folder = folder.rstrip('/\\')
+    name = app_name(folder)
     if not os.path.isdir(folder):
         raise AppError('no such folder: %s' % folder)
+
+    ppl = is_ppl_app(folder, name)
+    if descriptor is None:
+        descriptor = 'blank' if ppl else 'python'
+    program_rel = '%s.hpappprgm' % name
 
     out = []
     for rel, src in sorted(_parts(name, modules, icon, descriptor).items()):
         path = os.path.join(folder, rel)
         if not os.path.isfile(path):
             out.append((rel, 'not in the app'))
-        elif _read(src) != _read(path):
+            continue
+        if rel == program_rel and ppl:
+            problem = _check_ppl_program(path, ppl_source)
+            if problem:
+                out.append((rel, problem))
+            continue
+        if _read(src) != _read(path):
             if rel.endswith(WRAPPERS):
                 out.append((rel, 'the calculator rewrote it: build the app '
                                  'again'))
@@ -192,6 +238,22 @@ def check(folder, modules, icon=None, descriptor='python'):
     if os.path.isdir(os.path.join(folder, '__pycache__')):
         out.append(('__pycache__', 'does not belong: CPython .pyc files'))
     return out
+
+
+def _check_ppl_program(path, ppl_source):
+    """-> what is wrong with an app's PPL program, or None."""
+    from hpkit import program
+    if not ppl_source:
+        return None
+    want = program.normalize_source(
+        io.open(ppl_source, encoding='utf-8-sig').read())
+    try:
+        got = program.read(_read(path))[0]
+    except program.UnexpectedFormat as e:
+        return 'is not readable as a program: %s' % e
+    if got != want:
+        return 'holds a different source from %s' % ppl_source
+    return None
 
 
 def put_ppl_program(folder, name, source, template):
@@ -254,9 +316,16 @@ def cli(argv):
     inputs = [a for a in args if a not in values]
 
     if '--check' in argv:
-        folder, modules = inputs[0], inputs[1:]
+        folder, rest = inputs[0], inputs[1:]
+        # A PPL source among the arguments is what the app's program should
+        # hold; .py files are modules. Without --base, the app's own shape
+        # says which descriptor to expect.
         try:
-            wrong = check(folder, modules, icon, descriptor)
+            wrong = check(folder,
+                          [m for m in rest if m.endswith('.py')],
+                          icon, opt('--base'),
+                          ([m for m in rest if not m.endswith('.py')] or
+                           [None])[0])
         except AppError as e:
             print('ERROR: %s' % e)
             return 1

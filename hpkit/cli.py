@@ -187,16 +187,25 @@ def _verify(argv):
     target = argv[0].rstrip('/\\')
     if os.path.isdir(target) or target.endswith('.hpappdir'):
         from hpkit import appdir
-        modules = [a for a in argv[1:] if not a.startswith('-')]
+        rest = [a for a in argv[1:] if not a.startswith('-')]
+        modules = [a for a in rest if a.endswith('.py')]
+        sources = [a for a in rest if not a.endswith('.py')]
+        ppl = appdir.is_ppl_app(target)
         try:
-            wrong = appdir.check(target, modules)
+            wrong = appdir.check(target, modules, None, None,
+                                 sources[0] if sources else None)
         except appdir.AppError as e:
             print('ERROR: %s' % e)
             return 1
         for f, why in wrong:
             print('%s: %s' % (f, why))
         print('\n%s: %d difference(s)' % (target, len(wrong)))
-        if not modules:
+        # Say what was NOT compared, so a clean result is not read as more
+        # than it is.
+        if ppl and not sources:
+            print("(a PPL app: pass its .txt source to check the program "
+                  "itself, not just the wrappers)")
+        elif not ppl and not modules:
             print('(no .py files given, so only the wrappers were compared)')
         return 1 if wrong else 0
     from hpkit import program

@@ -144,6 +144,44 @@ def main():
             ok(back == code,
                'the generated .hpappprgm gives back the same source')
 
+        # --------------------------------- checking a PPL app, which is a
+        # different shape: blank descriptor, and a program that is SUPPOSED
+        # to differ from the empty skeleton
+        ppl_src = os.path.join(tmp, 'pplapp.txt')
+        code = 'EXPORT START()\nBEGIN\n  RETURN 385;\nEND;'
+        put(ppl_src, code)
+        pf = A.build('PPLAPP', [], base=tmp, quiet=True, descriptor='blank')
+        A.put_ppl_program(pf, 'PPLAPP', ppl_src, P.default_template())
+
+        ok(A.is_ppl_app(pf), 'a PPL app is recognised by its program')
+        # A Python app's program is the empty skeleton, which has no source
+        # block. (Not `folder`: a PPL program was written into that one
+        # above, so by now it really is a PPL app.)
+        py_only = A.build('PYONLY', modules, base=tmp, quiet=True)
+        ok(not A.is_ppl_app(py_only), 'a Python app is not mistaken for one')
+        ok(A.check(pf, []) == [],
+           'a freshly built PPL app reports no differences',
+           str(A.check(pf, [])))
+        ok(A.check(pf, [], ppl_source=ppl_src) == [],
+           'and none when its source is given too',
+           str(A.check(pf, [], ppl_source=ppl_src)))
+
+        # the same two failures still have to be caught
+        other = os.path.join(tmp, 'other.txt')
+        put(other, 'EXPORT START()\nBEGIN\n  RETURN 1;\nEND;')
+        wrong = dict(A.check(pf, [], ppl_source=other))
+        ok('PPLAPP.hpappprgm' in wrong,
+           'a program holding a different source is caught',
+           str(wrong))
+
+        path = os.path.join(pf, 'PPLAPP.hpapp')
+        d = open(path, 'rb').read()
+        with open(path, 'wb') as f:
+            f.write(d[:-4] + b'\x03\x00\x00\x00')
+        wrong = dict(A.check(pf, []))
+        ok('rewrote' in wrong.get('PPLAPP.hpapp', ''),
+           'a rewritten wrapper is still caught on a PPL app', str(wrong))
+
         # the empty skeleton is NOT a usable template, and it must say so
         empty = os.path.join(A.TEMPLATES, 'program.hpappprgm')
         source = os.path.join(tmp, 'x.txt')
