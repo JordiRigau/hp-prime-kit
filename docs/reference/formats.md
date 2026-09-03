@@ -92,11 +92,20 @@ in the size:
 | a data program (43,796 numbers) | 632 KB | 1,001 KB | 367 KB |
 
 That block is what makes a data program open **instantly** on the calculator
-that receives it, with no compile wait. Generating one is not solved:
-`hpprime write` refuses a template that carries one, because changing its
-source would leave it out of step. In practice that does not get in the way:
-data is pasted once and never changes, while code, which does change, is
-generated and dragged over.
+that receives it, with no compile wait.
+
+**It is a cache, and the calculator rebuilds it.** Measured, in two steps: a
+small program with two matrices was generated here, installed, and brought
+back carrying the block the calculator had written. One number in that block
+was then changed -- 3 became 9 -- with the source left alone, and the file
+installed again. The program answered with the **source's** value, and the
+copy that came back from the mirror had the block rebuilt, with the 9 gone.
+
+So a program carrying data does not have to be pasted in by hand, and does
+not need a block generated for it either: write the matrices as literals in
+the source and build it like any other program. What is **not** measured is
+how long a large one takes to compile when it arrives -- that wait is the
+reason the block exists -- or whether there is a size past which it fails.
 
 ### Who writes what, and why it matters
 
@@ -268,20 +277,18 @@ PROG.hpprgm: 367405-byte block, 72 symbol(s), 56 matrix/matrices, 44718 numbers
   a program declaring one global of that type, installed and read back.
 - **The leading `flag`** of a matrix value, which is 1 in some symbols and 2
   in others. Both are 2-D real matrices, so it is not the rank.
-- **Where a new entry is spliced in, and what then has to grow.** Building
-  an entry is solved -- `numbers.symbol_entry()` does it and the tests read
-  them back -- but an entry inserted ahead of `Main` sits inside the table
-  record and outside the `Main` one, and which enclosing lengths that changes
-  is not established. `hpprime write` therefore does not offer it: a
-  half-understood container written to a calculator is how you get a file
-  that loads and is quietly wrong.
+- **Where a new entry would be spliced in.** Building an entry is solved --
+  `numbers.symbol_entry()` does it and the tests read them back -- but an
+  entry inserted ahead of `Main` sits inside the table record and outside the
+  `Main` one, and which enclosing lengths that changes is not established.
+  Since the calculator rebuilds the block anyway (§2), nobody needs this.
 - **The u32 at offset 44**, which is 0 in a program with no globals and
   varies (1, 2, 4, 5, 7, 8, 9, 11, 12) in ones that have them, with no
   relation to how many. Unknown.
-- **Whether the block matters at all.** The calculator writes one for every
-  program it saves, so it may simply be a cache it rebuilds. If it is,
-  generating one was never necessary. [examples/datagen/](../../examples/datagen/)
-  is the experiment that would tell.
+- **How large a generated data program can be.** The block exists to avoid a
+  compile on arrival, and a generated one has no block, so the calculator
+  compiles the literals when it receives the file. For a couple of small
+  matrices that is instant. For hundreds of kilobytes, nobody has timed it.
 
 ## 6. Other files on the calculator
 

@@ -23,13 +23,16 @@ declares large matrices also carries a COMPILED BLOCK before the source:
 the numbers already in the calculator's internal format, which is what makes
 such a file weigh about 3x its source and open without a compile wait.
 
-This module cannot generate that compiled block. What it does is replace the
-source inside an existing template and fix the length of every record that
-contains it. So:
+This module does not generate that compiled block, and does not need to: the
+calculator rebuilds it from the source when it receives the file (measured --
+see docs/reference/formats.md). What this does is replace the source inside
+an existing template and fix the length of every record that contains it:
 
   - on a code program it works directly;
-  - on one with a compiled block the block would no longer match the source,
-    so it is refused (--force to override, on your own head).
+  - on one that already carries a block, the block would no longer match the
+    new source, so it is refused (--force to override). That refusal may be
+    over-cautious now that the block is known to be rebuilt; nobody has
+    installed a file with a stale block to find out.
 
 Usage:
     hpprime read  PROG.hpprgm [-o out.txt]

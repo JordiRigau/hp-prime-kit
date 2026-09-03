@@ -12,7 +12,29 @@ turned that into a smaller question, and then into a different one:
 > file must carry. If it is, generating one was never necessary -- and
 > pasting was never necessary either.
 
-Nobody has measured which. This is how to find out, in two steps.
+**It is a cache.** Measured on a G2, in the two steps below.
+
+Step 1 built and installed an ordinary program with two matrices, and brought
+back the copy the calculator had written, block included. Step 2 changed one
+number in that block -- `DMA(2,1)`, 3 to 9 -- left the source alone, and
+installed it again.
+
+The program answered **37**: the source's value, not the block's. And the
+copy that came back had the block **rebuilt**, with the 9 gone. So the
+calculator does not merely ignore a block it disagrees with; it recompiles
+from the source and writes a new one.
+
+**What that means in practice**: a program carrying data does not have to be
+pasted into the Connectivity Kit by hand, and needs no block generated for
+it. Write the matrices as literals in the source and build it like any other
+program.
+
+What is still unmeasured is the cost: the block exists to avoid a compile
+when the file arrives, and a generated file has none, so the calculator
+compiles the literals on receipt. Two small matrices are instant. Nobody has
+timed hundreds of kilobytes.
+
+The steps below are kept because they are how anyone repeats it.
 
 ## Step 1 -- make a real data program, without generating anything
 
