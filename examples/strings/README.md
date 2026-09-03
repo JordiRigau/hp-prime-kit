@@ -103,9 +103,11 @@ raises on.
 - **`MID(s, start)` with a start below 1**, and **`SORT` of a list mixing
   numbers and strings**. Both raise as unsupported rather than pick an
   answer.
-- **The line Home leaves behind** when a program ends.
-  [RETMSG.txt](RETMSG.txt) is the probe: if a program that returns nothing
-  leaves nothing, the line is just the return value.
+- **Whether the line Home leaves behind can be suppressed.**
+  [RETMSG.txt](RETMSG.txt) answered half of it: the line is the return value,
+  and leaving `RETURN` out does not remove it, because a function with no
+  `RETURN` answers with its last bare expression instead. Ending on an
+  assignment is the next thing to try.
 
 ## What happens with the answers
 

@@ -326,6 +326,11 @@ EXPORT F() BEGIN LOCAL L; L := SORT({3,1,2}); RETURN L(1)*100+L(2)*10+L(3); END;
 EXPORT F() BEGIN LOCAL L; L := SORT({"b","a"}); RETURN L(1) + L(2); END;
 """, 'F()', 'ab'),
 
+    ('a function with no RETURN gives its last expression, not nothing', """
+EXPORT G() BEGIN RETURN 43; END;
+EXPORT F() BEGIN LOCAL z; z := 1; G(); END;
+""", 'F()', 43.0),
+
     ('nested lists: L(2)(1)', """
 EXPORT F() BEGIN LOCAL L; L := {{1,2},{3,4}}; RETURN L(2)(1); END;
 """, 'F()', 3.0),

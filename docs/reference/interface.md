@@ -248,12 +248,22 @@ program's name and the value it returned:
  (i)  SPROBE2 1
 ```
 
-**Unverified**: whether a program that returns nothing leaves nothing behind.
-The likely reading is that this line is not a message at all -- it is the
-return value, shown the way Home shows the value of anything you type, which
-would also mean it can be copied like any other history entry.
-[examples/strings/RETMSG.txt](../../examples/strings/RETMSG.txt) settles it:
-one function that returns 42 and one that returns nothing.
+It is not a message: **it is the return value**, shown the way Home shows the
+value of anything you type, and it behaves like any other history entry.
+
+Which means you cannot switch it off by leaving `RETURN` out. Measured: a
+function with no `RETURN` at all still put a number there -- the value of its
+last bare expression, which was a call to another function.
+
+**Where** it appears depends on how the program was started:
+
+| Started from | What you get |
+|---|---|
+| **Home** | a line in the history: the program's name and the value |
+| **the Program Catalog** | a modal pop-up with an information icon, saying the same |
+
+**Unverified**: whether any construct suppresses it. Ending on an assignment
+rather than an expression is the obvious thing to try next.
 
 ### Waiting for a key: drain the buffer first
 

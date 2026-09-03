@@ -596,15 +596,25 @@ class Machine(object):
                            % (name, len(params), len(args)))
         frame = dict(zip(params, [_copy(a) for a in args]))
         try:
-            self.run(body, frame)
+            last = self.run(body, frame)
         except _Return as d:
             return d.value
-        return 0.0
+        # A function that falls off the end returns the value of its last
+        # bare expression, not nothing. Measured on a G2: a function whose
+        # body ends in a call to another function came back with THAT
+        # function's value. Only this shape is measured; a body ending in an
+        # assignment or a loop still answers 0 here.
+        return last if last is not None else 0.0
 
     # ---------------------------------------------------------- execution
     def run(self, statements, frame):
+        """-> the value of the last bare expression, or None."""
+        last = None
         for s in statements:
-            self._stmt(s, frame)
+            v = self._stmt(s, frame)
+            if v is not None:
+                last = v
+        return last
 
     def _stmt(self, s, frame):
         kind = s[0]
@@ -615,7 +625,7 @@ class Machine(object):
         elif kind == 'assign':
             self._assign(s[1], self.evaluate(s[2], frame), frame)
         elif kind == 'expr':
-            self.evaluate(s[1], frame)
+            return self.evaluate(s[1], frame)
         elif kind == 'if':
             if _truth(self.evaluate(s[1], frame)):
                 self.run(s[2], frame)

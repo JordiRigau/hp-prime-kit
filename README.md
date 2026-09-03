@@ -136,7 +136,7 @@ Deliberately still open, and listed so nobody leans on them:
 | | |
 |---|---|
 | The **lower keyboard**'s key codes | the top three rows are measured key by key; everything below them is still taken from reading other people's apps |
-| The **line Home leaves** when a program ends | it shows the return value; whether a program returning nothing leaves nothing is unmeasured |
+| Whether the **line Home leaves** can be suppressed | it is the return value, and leaving `RETURN` out does not remove it: the function answers with its last expression instead |
 | **G1** | everything here is a G2. Same firmware, different hardware |
 | MicroPython **speed** and an app's **memory limit** | not measured. The bridge crossing is: 0.2 ms |
 

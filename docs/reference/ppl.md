@@ -122,6 +122,7 @@ WAIT(-1);                                // waits for a key, returns its code
 | **Compilation order** | a program only sees another's functions **if it was compiled afterwards**. Send data → engine → app |
 | **What an app's program exports** | is tied to that app. If the engine has to be reusable, put it in a catalogue program |
 | **Global state in a library** | if your library has an "active substance" or similar, a calculation mixing two has to reload before each query. Keep a global saying what is loaded and reload only on change |
+| **A function with no `RETURN` is not silent** | it answers with the value of its last bare expression. Measured: a function ending in a call to another came back with that function's value. So you cannot make a program return nothing by leaving `RETURN` out |
 | **`GETKEY` takes no parentheses in PPL** | `zk := GETKEY;`. From Python, across the bridge, it does: `eval('GETKEY()')` |
 | **On Home, a function with no arguments is called without parentheses** | `MYFUNC` runs it; `MYFUNC()` answers *syntax error*. Inside PPL source the parentheses are correct and required -- see below |
 
