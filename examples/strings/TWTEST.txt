@@ -1,0 +1,29 @@
+// ===================================================================
+// TWTEST - does the SHORT form of TEXTOUT_P take a width?
+//
+// The width argument is what stops text overflowing into the next
+// column, and its position is documented only for the grob form:
+//   TEXTOUT_P(txt, G0, x, y, font, colour [, width])
+//
+// Whether the short form takes one, and where, is not measured. The
+// linter therefore leaves the short form alone.
+//
+// Run TWTEST on Home (no parentheses). Three lines of W's:
+//   1. short form, no width      -> runs off to the right
+//   2. short form, 6th argument  -> clipped at 60 px, or a syntax error
+//   3. grob form, 7th argument   -> clipped at 60 px (the known-good one)
+//
+// If it will not compile, line 2 is the reason, and that is the answer.
+// ===================================================================
+
+EXPORT TWTEST()
+BEGIN
+  LOCAL zw;
+  zw := "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW";
+  RECT();
+  TEXTOUT_P("1 none / 2 short+w / 3 grob+w", 2, 2, 2);
+  TEXTOUT_P(zw, 2, 30, 2, RGB(0,0,0));
+  TEXTOUT_P(zw, 2, 60, 2, RGB(0,0,0), 60);
+  TEXTOUT_P(zw, G0, 2, 90, 2, RGB(0,0,0), 60);
+  RETURN 1;
+END;

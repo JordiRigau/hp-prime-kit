@@ -79,6 +79,13 @@ BEGIN
   RETURN EXPR(zs);
 END;
 """),
+    ('textout-width', """
+EXPORT F()
+BEGIN
+  TEXTOUT_P("a label that may not fit", G0, 4, 24, 2, RGB(0,0,0));
+  RETURN 1;
+END;
+"""),
 ]
 
 # -------------------------------------------------------------- controls
@@ -126,6 +133,28 @@ BEGIN
     RETURN EXPR(zs);
   END;
   RETURN 0;
+END;
+"""),
+    ('TEXTOUT_P with its width argument', """
+EXPORT F()
+BEGIN
+  TEXTOUT_P("a label", G0, 4, 24, 2, RGB(0,0,0), 70);
+  RETURN 1;
+END;
+"""),
+    ('TEXTOUT_P in the short form, whose width position is not measured', """
+EXPORT F()
+BEGIN
+  TEXTOUT_P("a label", 4, 24, 2, RGB(0,0,0));
+  RETURN 1;
+END;
+"""),
+    ('a TEXTOUT_P call spanning two lines', """
+EXPORT F()
+BEGIN
+  TEXTOUT_P("a label", G0, 4,
+            24, 2, RGB(0,0,0), 70);
+  RETURN 1;
 END;
 """),
     ('8 locals, the most seen to compile', """

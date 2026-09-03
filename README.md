@@ -78,7 +78,7 @@ anything unconfirmed marked as such:
 |---|---|
 | `hpprime doctor` | what works on this machine, and what to do about what does not |
 | `hpprime new` | a starter that already compiles and runs |
-| `hpprime lint` | eleven rules, every one from an error measured on a G2 |
+| `hpprime lint` | twelve rules, every one from an error measured on a G2 |
 | `hpprime run` | **runs PPL on your PC** -- the file you install, not a copy of it |
 | `hpprime write` / `read` | the `.hpprgm` binary, both directions |
 | `hpprime build` / `verify` | apps: build the folder, and catch it drifting |

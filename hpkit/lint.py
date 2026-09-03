@@ -105,6 +105,25 @@ def _split_top_level(s):
     return [p.strip() for p in parts if p.strip()]
 
 
+def _call_args(line, open_idx):
+    """The text between a call's parentheses, or None if they do not close on
+    this line.
+
+    Lines are judged one at a time, so a call spanning several of them is
+    left alone rather than guessed at: a false alarm teaches people to
+    ignore the linter."""
+    depth = 0
+    for i in range(open_idx, len(line)):
+        c = line[i]
+        if c == '(':
+            depth += 1
+        elif c == ')':
+            depth -= 1
+            if depth == 0:
+                return line[open_idx + 1:i]
+    return None
+
+
 def check_source(path, text):
     """-> (list of Finding, list of (exported name, line))."""
     found = []
@@ -200,6 +219,26 @@ def check_source(path, text):
                                      'EXPR(%s) without checking SIZE(%s) > 0 '
                                      'first: EXPR("") fails at run time'
                                      % (m.group(1), m.group(1))))
+
+        # ---- TEXTOUT_P without its width argument -------------------------
+        # The trap it guards: text that does not fit raises no error. It is
+        # painted over the next column and you never learn what it said.
+        #
+        # Only the grob form is judged, because only its shape is documented
+        # here: TEXTOUT_P(txt, G0, x, y, font, colour [, width]). Whether the
+        # short form takes a width, and in which position, is not measured --
+        # so the short form is left alone rather than guessed at.
+        for m in re.finditer(r'\bTEXTOUT_P\s*\(', raw, re.I):
+            args = _call_args(raw, m.end() - 1)
+            if args is None:
+                continue
+            parts = _split_top_level(args)
+            if (len(parts) > 1 and re.match(r'^G\d$', parts[1].strip(), re.I)
+                    and len(parts) < 7):
+                found.append(Finding(path, num, 'WARN', 'textout-width',
+                                     'TEXTOUT_P without its width argument: '
+                                     'text that does not fit is painted over '
+                                     'the next column, and raises no error'))
 
         # ---- block balance -------------------------------------------------
         if re.match(r'^BEGIN\b', up):
