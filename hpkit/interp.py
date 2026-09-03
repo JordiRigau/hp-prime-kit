@@ -981,56 +981,95 @@ def _b_left(m, a):
 
     Measured: LEFT("abcdef",3) = "abc", LEFT("abcdef",99) = "abcdef", and
     -- the trap -- **LEFT("abcdef",0) = "abcdef"**, not "". A count that
-    computes to zero gives you everything instead of nothing.
+    computes to zero gives you everything instead of nothing. A negative
+    count is an error on the calculator, so it is one here.
     """
     s = _as_string(a[0], 'LEFT')
     n = int(round(a[1]))
     if n < 0:
-        raise Unsupported('LEFT with a negative count is not measured')
+        raise PPLError('LEFT with a negative count')
     if n == 0 or n >= len(s):
         return s
     return s[:n]
 
 
 def _b_right(m, a):
-    """RIGHT(s, n) -> the last n characters. Measured for 1..SIZE(s)."""
+    """RIGHT(s, n) -> the last n characters.
+
+    Measured, and the same trap as LEFT: RIGHT("abcdef",0) and
+    RIGHT("abcdef",99) both give the whole string.
+    """
     s = _as_string(a[0], 'RIGHT')
     n = int(round(a[1]))
-    if n <= 0 or n > len(s):
-        raise Unsupported('RIGHT is only measured for a count of 1..SIZE(s); '
-                          'measure it with examples/strings/ and add the case')
+    if n < 0:
+        raise PPLError('RIGHT with a negative count')
+    if n == 0 or n >= len(s):
+        return s
     return s[-n:]
 
 
 def _b_mid(m, a):
-    """MID(s, start, count) -> count characters from start, 1-based.
+    """MID(s, start [, count]) -> count characters from start, 1-based.
 
-    Measured: MID("abcdef",2,3) = "bcd", so the third argument is a LENGTH,
-    not an end position. MID("abcdef",4,99) = "def": it stops at the end
-    instead of failing.
+    Measured, all of it:
+        MID("abcdef",2,3) = "bcd"   the third argument is a LENGTH
+        MID("abcdef",2)   = "bcdef" two arguments means "to the end"
+        MID("abcdef",4,99)= "def"   it stops at the end
+        MID("abcdef",7,2) = ""      a start past the end is empty
+        MID("abcdef",2,0) = ""      a count of zero is empty
+        MID("abcdef",0,2) = error   the start is 1-based and must be
+    Note the asymmetry with LEFT and RIGHT, where 0 means "all".
     """
-    if len(a) != 3:
+    if len(a) not in (2, 3):
         raise Unsupported('MID with %d arguments is not measured' % len(a))
     s = _as_string(a[0], 'MID')
-    start, count = int(round(a[1])), int(round(a[2]))
-    if start < 1 or start > len(s) or count <= 0:
-        raise Unsupported('MID is only measured for a start inside the string '
-                          'and a positive count')
+    start = int(round(a[1]))
+    if start < 1:
+        if len(a) == 2:
+            raise Unsupported('MID(s, start) with start below 1 is not '
+                              'measured')
+        raise PPLError('MID with a start below 1')
+    if len(a) == 2:
+        return s[start - 1:]
+    count = int(round(a[2]))
+    if count <= 0 or start > len(s):
+        return ''
     return s[start - 1:start - 1 + count]
 
 
 def _b_instring(m, a):
     """INSTRING(s, sub) -> 1-based position, or 0 if it is not there.
 
-    Measured: INSTRING("abcdef","cd") = 3, INSTRING("abcdef","a") = 1,
-    INSTRING("abcdef","zz") = 0.
+    Measured: "cd" in "abcdef" is 3, "a" is 1, "zz" is 0, and an empty
+    second argument is 1.
     """
     s = _as_string(a[0], 'INSTRING')
     sub = _as_string(a[1], 'INSTRING')
     if not sub:
-        raise Unsupported('INSTRING with an empty second argument is not '
-                          'measured')
+        return 1.0
     return float(s.find(sub) + 1)
+
+
+def _b_sort(m, a):
+    """SORT(list) -> the list in ascending order.
+
+    Measured: SORT({3,1,2}) = {1,2,3} and SORT({"b","a"}) = {"a","b"}.
+    SORT of a string is an error on the calculator. A list mixing numbers
+    and strings was not measured, so it raises rather than pick an order.
+    """
+    v = a[0]
+    if isinstance(v, str):
+        raise PPLError('SORT of a string')
+    if not isinstance(v, list):
+        raise Unsupported('SORT of anything but a list is not measured')
+    if not v:
+        return []
+    if all(isinstance(x, str) for x in v):
+        return sorted(v)
+    if all(isinstance(x, float) or isinstance(x, int) for x in v):
+        return sorted(v)
+    raise Unsupported('SORT of a list mixing numbers and strings is not '
+                      'measured')
 
 
 def _b_rref(m, a):
@@ -1154,6 +1193,7 @@ BUILTINS = {
     'RIGHT': _b_right,
     'MID': _b_mid,
     'INSTRING': _b_instring,
+    'SORT': _b_sort,
     # linear algebra. MAKEMAT and MAKELIST are not here: they are lazy and
     # handled in _call_node, because their first argument is a template.
     'RREF': _b_rref,

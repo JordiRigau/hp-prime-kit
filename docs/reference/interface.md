@@ -241,6 +241,20 @@ So anything meant to be read has to wait before it returns:
 This is the first thing that goes wrong with a diagnostic program, and it
 looks like the program did nothing at all.
 
+What you are left with instead is a framed line in the Home history, with the
+program's name and the value it returned:
+
+```
+ (i)  SPROBE2 1
+```
+
+**Unverified**: whether a program that returns nothing leaves nothing behind.
+The likely reading is that this line is not a message at all -- it is the
+return value, shown the way Home shows the value of anything you type, which
+would also mean it can be copied like any other history entry.
+[examples/strings/RETMSG.txt](../../examples/strings/RETMSG.txt) settles it:
+one function that returns 42 and one that returns nothing.
+
 ### Waiting for a key: drain the buffer first
 
 There is a measured contradiction here, worth knowing before you choose:

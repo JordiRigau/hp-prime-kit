@@ -79,14 +79,33 @@ linter's `textout-width` rule now judges both.
 All of it is in `BUILTINS` in `hpkit/interp.py`, with a case each in
 `tests/test_interp.py`, so a program using these can now be run on the PC.
 
+## And what SPROBE2 and MID2 answered
+
+A second run closed the edges, on the same G2:
+
+| Case | Result |
+|---|---|
+| `RIGHT(s,0)` / `RIGHT(s,99)` | `abcdef` -- the same trap as `LEFT` |
+| `MID(s,2)` | `bcdef` -- two arguments means "to the end" |
+| `MID(s,7,2)` / `MID(s,2,0)` | empty |
+| `LEFT(s,-1)` / `MID(s,0,2)` / `SORT("cba")` | error on the calculator |
+| `INSTRING(s,"")` | 1 |
+| `SORT({3,1,2})` / `SORT({"b","a"})` | `{1,2,3}` / `{"a","b"}` |
+
+The one worth carrying in your head is the **asymmetry**: a count of zero
+means *everything* to `LEFT` and `RIGHT`, and *nothing* to `MID`.
+
+All of it is implemented. What the calculator raises on, the interpreter
+raises on.
+
 ## What is still open
 
-- **`SORT`**, on lists and on strings. Nobody has measured it.
-- **The edges that were not in the probe**: `RIGHT` past the end,
-  `RIGHT(s,0)`, `MID` with two arguments, `MID` starting before 1, a negative
-  count, `INSTRING` with an empty second argument. The interpreter raises on
-  every one of them rather than extrapolating, and says which measurement is
-  missing. Any of them is one run away.
+- **`MID(s, start)` with a start below 1**, and **`SORT` of a list mixing
+  numbers and strings**. Both raise as unsupported rather than pick an
+  answer.
+- **The line Home leaves behind** when a program ends.
+  [RETMSG.txt](RETMSG.txt) is the probe: if a program that returns nothing
+  leaves nothing, the line is just the return value.
 
 ## What happens with the answers
 

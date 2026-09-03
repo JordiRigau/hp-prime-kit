@@ -294,6 +294,38 @@ EXPORT F() BEGIN RETURN LEFT("abcdef", 0); END;
 EXPORT F() BEGIN RETURN SIZE(LEFT("abcdef", 99)); END;
 """, 'F()', 6.0),
 
+    ('RIGHT(s,0) gives the whole string too', """
+EXPORT F() BEGIN RETURN RIGHT("abcdef", 0); END;
+""", 'F()', 'abcdef'),
+
+    ('RIGHT beyond the end gives the whole string', """
+EXPORT F() BEGIN RETURN RIGHT("abcdef", 99); END;
+""", 'F()', 'abcdef'),
+
+    ('MID with two arguments runs to the end', """
+EXPORT F() BEGIN RETURN MID("abcdef", 2); END;
+""", 'F()', 'bcdef'),
+
+    ('MID from past the end is empty', """
+EXPORT F() BEGIN RETURN SIZE(MID("abcdef", 7, 2)); END;
+""", 'F()', 0.0),
+
+    ('MID with a count of 0 is empty, unlike LEFT and RIGHT', """
+EXPORT F() BEGIN RETURN SIZE(MID("abcdef", 2, 0)); END;
+""", 'F()', 0.0),
+
+    ('INSTRING with an empty second argument is 1', """
+EXPORT F() BEGIN RETURN INSTRING("abcdef", ""); END;
+""", 'F()', 1.0),
+
+    ('SORT puts numbers in ascending order', """
+EXPORT F() BEGIN LOCAL L; L := SORT({3,1,2}); RETURN L(1)*100+L(2)*10+L(3); END;
+""", 'F()', 123.0),
+
+    ('SORT does the same for strings', """
+EXPORT F() BEGIN LOCAL L; L := SORT({"b","a"}); RETURN L(1) + L(2); END;
+""", 'F()', 'ab'),
+
     ('nested lists: L(2)(1)', """
 EXPORT F() BEGIN LOCAL L; L := {{1,2},{3,4}}; RETURN L(2)(1); END;
 """, 'F()', 3.0),
@@ -339,17 +371,17 @@ EXPORT F() BEGIN RETURN EXPR(""); END;
     # Edges of the string functions that were NOT measured. They raise
     # rather than extrapolate: an invented edge case is the divergence this
     # interpreter exists to catch.
-    ('RIGHT beyond the end, which is not measured', """
-EXPORT F() BEGIN RETURN RIGHT("abcdef", 99); END;
-""", 'F()'),
-    ('MID with two arguments, which is not measured', """
-EXPORT F() BEGIN RETURN MID("abcdef", 2); END;
-""", 'F()'),
-    ('MID from before the start, which is not measured', """
+    ('MID from before the start, an error on the calculator', """
 EXPORT F() BEGIN RETURN MID("abcdef", 0, 2); END;
 """, 'F()'),
-    ('LEFT with a negative count, which is not measured', """
+    ('LEFT with a negative count, an error on the calculator', """
 EXPORT F() BEGIN RETURN LEFT("abcdef", -1); END;
+""", 'F()'),
+    ('SORT of a string, an error on the calculator', """
+EXPORT F() BEGIN RETURN SORT("cba"); END;
+""", 'F()'),
+    ('SORT of a list mixing types, which is not measured', """
+EXPORT F() BEGIN RETURN SORT({1,"a"}); END;
 """, 'F()'),
     ('LEFT of something that is not a string', """
 EXPORT F() BEGIN RETURN LEFT(42, 2); END;
