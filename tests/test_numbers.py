@@ -190,6 +190,134 @@ def hpmat_files():
         ok(True, 'rejects rows of different lengths')
 
 
+def build_entry(name, matrix, flag=2):
+    """One symbol entry, built to the grammar in docs/reference/formats.md.
+
+    Building one here is what lets the walker be tested with no calculator
+    anywhere. It says nothing about whether a calculator would accept a
+    block built this way -- that is not measured.
+    """
+    rows, cols = len(matrix), len(matrix[0])
+    body = b''.join(N.encode(x) for r in matrix for x in r)
+    value = (struct.pack('<I', N.VALUE_TAG)
+             + struct.pack('<HHIII', flag, N.MATRIX_TYPE, 2, rows, cols)
+             + body)
+    name_rec = (struct.pack('<I', N.NAME_RECORD)
+                + struct.pack('<I', N.NAME_TAG)
+                + name.encode('utf-16-le').ljust(64, b'\x00'))
+    type_rec = struct.pack('<III', 8, N.TYPE_TAG, 9)
+    value_rec = struct.pack('<I', len(value)) + value
+    inner = name_rec + type_rec + value_rec
+    return struct.pack('<I', len(inner)) + inner
+
+
+def synthetic_block():
+    ok = bad = 0
+    a = [[1.0, -2.5], [0.0006, 123456.789]]
+    b = [[7.0, 8.0, 9.0]]
+    block = build_entry('ALPHA', a) + build_entry('BE_TA', b, flag=1)
+
+    syms = N.symbols(block, first=0, end=len(block))
+    ok_names = [s.name for s in syms] == ['ALPHA', 'BE_TA']
+    if ok_names:
+        ok += 1
+        print('  ok    both symbols are found, in order')
+    else:
+        bad += 1
+        print('  FAIL  got %r' % [s.name for s in syms])
+
+    if len(syms) == 2 and (syms[0].rows, syms[0].cols) == (2, 2) \
+            and (syms[1].rows, syms[1].cols) == (1, 3):
+        ok += 1
+        print('  ok    their dimensions survive')
+    else:
+        bad += 1
+        print('  FAIL  dimensions came back wrong')
+
+    if len(syms) == 2 and syms[0].value and all(
+            abs(g - w) <= 1e-11 * max(1.0, abs(w))
+            for gr, wr in zip(syms[0].value, a) for g, w in zip(gr, wr)):
+        ok += 1
+        print('  ok    the values decode back, negatives included')
+    else:
+        bad += 1
+        print('  FAIL  the values did not come back')
+
+    # A name shorter than the field, and one that fills more of it, both have
+    # to survive the 64-byte padding.
+    long_name = 'ABCDEFGHIJKLMNOP'
+    one = N.symbols(build_entry(long_name, b), first=0,
+                    end=len(build_entry(long_name, b)))
+    if len(one) == 1 and one[0].name == long_name:
+        ok += 1
+        print('  ok    a 16-character name survives the padded field')
+    else:
+        bad += 1
+        print('  FAIL  the long name came back as %r'
+              % (one[0].name if one else None))
+    return ok, bad
+
+
+def real_block():
+    """The same walk over your own files, if any of them carry a block."""
+    ok = bad = seen = 0
+    for calc in calculators():
+        for p in sorted(glob.glob(os.path.join(calc, '*.hpprgm'))):
+            data = open(p, 'rb').read()
+            try:
+                syms = N.symbols(data)
+            except Exception as e:
+                ok_ = False
+                print('  FAIL  %s: %s' % (os.path.basename(p), e))
+                bad += 1
+                continue
+            if not syms:
+                continue
+            seen += 1
+            src = P.read(data)[0]
+            # Comments are stripped first: an EXPORT inside one is not a
+            # declaration, and counting it made this check disagree with
+            # itself.
+            src = re.sub(r'/\*.*?\*/', '', re.sub(r'//[^\n]*', '', src),
+                         flags=re.S)
+            # One EXPORT can declare several names: EXPORT A, B, C; -- so the
+            # whole statement is taken and split, not just its first word.
+            declared = set()
+            for stmt in re.findall(r'EXPORT\s+([^;]+);', src):
+                for part in stmt.split(','):
+                    m = re.match(r'\s*(\w+)', part)
+                    if m:
+                        declared.add(m.group(1))
+            got = [s.name for s in syms]
+            missing = [n for n in got if n not in declared]
+            if not missing:
+                ok += 1
+                print('  ok    %s: %d symbol(s), every one of them declared '
+                      'in the source' % (os.path.basename(p), len(syms)))
+            else:
+                bad += 1
+                print('  FAIL  %s: %r are in the block but not in the source'
+                      % (os.path.basename(p), missing[:3]))
+
+            # In a program whose globals are all matrices, the block is in
+            # declaration order too.
+            mats = [s.name for s in syms if s.kind == 'matrix']
+            if len(mats) == len(syms) and len(mats) > 1:
+                order = [n for n in re.findall(r'EXPORT\s+(\w+)\s*:=', src)
+                         if n in set(mats)]
+                if order == mats:
+                    ok += 1
+                    print('  ok    %s: and in the order the source declares '
+                          'them' % os.path.basename(p))
+                else:
+                    bad += 1
+                    print('  FAIL  %s: the order differs'
+                          % os.path.basename(p))
+    if not seen:
+        print('  --    no program with a compiled block: skipping')
+    return ok, bad
+
+
 def main():
     print('-- the number, against known encodings')
     known_values()
@@ -197,6 +325,13 @@ def main():
     rosetta()
     print('\n-- .hpmat files')
     hpmat_files()
+    print('\n-- the compiled block, walked as symbol entries')
+    a, b = synthetic_block()
+    PASS[0] += a
+    FAIL[0] += b
+    a, b = real_block()
+    PASS[0] += a
+    FAIL[0] += b
     print('\nPASS: %d   FAIL: %d' % (PASS[0], FAIL[0]))
     return 1 if FAIL[0] else 0
 

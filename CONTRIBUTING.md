@@ -84,7 +84,7 @@ In rough order of how much it would help:
 | **The string functions in the interpreter** (`LEFT`, `MID`, `INSTRING`, `SORT`) | left out on purpose: their edge behaviour is not measured. Measure one and it can go in |
 | **Anything measured on a G1** | everything here is a G2. Same firmware, different hardware |
 | **MicroPython speed, and an app's memory limit** | both listed as not measured, and both change what designs are possible |
-| **The compiled block's symbol records** | the number format is decoded; the grammar around it is not. This would let programs carrying data be generated whole |
+| **A data program generated end to end** | the block's grammar is decoded and the tools can build entries; nobody has installed a generated one and run it |
 | **Anything the grid model would predict wrongly** | key codes are positions, five to a row. Thirteen keys fit that; a fourteenth that does not would be worth knowing |
 
 ## Sending it

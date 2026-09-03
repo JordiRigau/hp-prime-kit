@@ -151,6 +151,103 @@ def write_hpmat(matrix):
 
 
 # ------------------------------------------- a program's compiled block
+#
+# The block is a chain of SYMBOL ENTRIES, one per global the program
+# declares, in the order the source declares them. Each entry is three TLV
+# records, the same shape as the container around it:
+#
+#   [u32 total]                        everything below
+#     [u32 68][u32 NAME_TAG][name UTF-16LE, zero-padded to 64 bytes]
+#     [u32 8][u32 TYPE_TAG][u32 9]     9 in every entry measured
+#     [u32 len][u32 VALUE_TAG][value]
+#
+# and a real matrix value is
+#
+#   [u16 flag][u16 0x0014][u32 rank=2][u32 rows][u32 cols][rows*cols numbers]
+#
+# Verified by walking a 367 KB block whole: 72 entries, ending exactly where
+# the source record begins, recovering the same 72 names in the same order
+# the source declares them.
+NAME_TAG = 0x0040018B
+TYPE_TAG = 0x00800185
+VALUE_TAG = 0x00C0018C
+NAME_RECORD = 68          # 4 for the tag + 64 for the text
+MATRIX_TYPE = 0x0014
+
+
+class Symbol(object):
+    """One global in the compiled block."""
+
+    __slots__ = ('name', 'offset', 'kind', 'rows', 'cols', 'value')
+
+    def __init__(self, name, offset, kind, rows=0, cols=0, value=None):
+        self.name, self.offset, self.kind = name, offset, kind
+        self.rows, self.cols, self.value = rows, cols, value
+
+    def __repr__(self):
+        if self.kind == 'matrix':
+            return '<%s %dx%d>' % (self.name, self.rows, self.cols)
+        return '<%s %s>' % (self.name, self.kind)
+
+
+def _entry_start(data, limit):
+    """Where the first symbol entry begins, or None.
+
+    Found by shape rather than by a fixed offset: the first place whose
+    name-record length and tag both match. In the file measured it is 56,
+    but nothing says that is universal."""
+    for o in range(12, limit - 16):
+        if (struct.unpack_from('<I', data, o + 4)[0] == NAME_RECORD
+                and struct.unpack_from('<I', data, o + 8)[0] == NAME_TAG):
+            return o
+    return None
+
+
+def symbols(data, first=None, end=None):
+    """The globals in a program's compiled block, in declaration order.
+
+    Takes the whole .hpprgm: the block's end is where the source record
+    begins. Pass `first` and `end` to walk a bare block instead. Returns []
+    for a program with no block.
+
+    Matrix values are decoded. Other types are reported with their type word
+    and left alone: what is not measured is not guessed at.
+    """
+    if end is None:
+        from hpkit import program
+        _, _, src_start, _ = program.read(data)
+        end = src_start - 8                  # the source record's own header
+    o = _entry_start(data, end) if first is None else first
+    if o is None:
+        return []
+
+    u32 = lambda k: struct.unpack_from('<I', data, k)[0]
+    out = []
+    while o + 16 <= end:
+        total = u32(o)
+        if u32(o + 4) != NAME_RECORD or u32(o + 8) != NAME_TAG:
+            break                            # the Main record, or the end
+        if not 0 < total <= end - o:
+            break
+        name = data[o + 12:o + 8 + NAME_RECORD].decode('utf-16-le').rstrip(chr(0))
+        q = o + 8 + NAME_RECORD
+        v = q + 4 + u32(q)                   # past the type record
+        flag, kind = struct.unpack_from('<HH', data, v + 8)
+        if kind == MATRIX_TYPE:
+            rank, rows, cols = struct.unpack_from('<III', data, v + 12)
+            body = v + 24
+            try:
+                value = [[decode(data[body + 8 * (i * cols + j):
+                                      body + 8 * (i * cols + j) + 8])
+                          for j in range(cols)] for i in range(rows)]
+            except UnexpectedFormat:
+                value = None
+            out.append(Symbol(name, o, 'matrix', rows, cols, value))
+        else:
+            out.append(Symbol(name, o, 'type %04X' % kind))
+        o += 4 + total
+    return out
+
 
 def matrices_in_block(block, minimum=4):
     """The matrices that can be recognised inside a compiled block.
@@ -243,19 +340,24 @@ def cli(argv):
         from hpkit import program
         data = open(path, 'rb').read()
         _, _, start, _ = program.read(data)
-        block = data[program.HEADER_END:start]
-        if not block:
+        if start <= program.HEADER_END:
             print('%s carries no compiled block' % os.path.basename(path))
             return 0
-        ms = matrices_in_block(block)
-        print('%s: %d-byte block, %d matrices recognised, %d numbers'
-              % (os.path.basename(path), len(block), len(ms),
-                 sum(r * c for _, r, c, _ in ms)))
-        for o, r, c, m in ms[:12]:
-            print('  offset %-8d %5d x %-3d   starts with %s'
-                  % (o, r, c, ', '.join(repr(x) for x in m[0][:4])))
-        if len(ms) > 12:
-            print('  ... %d more matrices' % (len(ms) - 12))
+        syms = symbols(data)
+        mats = [s for s in syms if s.kind == 'matrix']
+        print('%s: %d-byte block, %d symbol(s), %d matrix/matrices, %d numbers'
+              % (os.path.basename(path), start - program.HEADER_END, len(syms),
+                 len(mats), sum(s.rows * s.cols for s in mats)))
+        for s in syms[:14]:
+            if s.kind == 'matrix':
+                head = ', '.join(repr(x) for x in (s.value[0][:4] if s.value
+                                                   else []))
+                print('  %-24s %5d x %-4d  starts with %s'
+                      % (s.name, s.rows, s.cols, head))
+            else:
+                print('  %-24s %s  (not decoded)' % (s.name, s.kind))
+        if len(syms) > 14:
+            print('  ... %d more' % (len(syms) - 14))
         return 0
 
     print('unknown command: %s' % cmd)

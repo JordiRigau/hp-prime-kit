@@ -183,9 +183,10 @@ hpprime matrix nums  PROG.hpprgm
 one. This lets a whole matrix reach the calculator **as a file**, with
 nothing pasted.
 
-`nums` looks inside a program's compiled block and reports the matrices it
-recognises. For looking, not for rewriting: generating that block is not
-solved. See [formats.md](reference/formats.md).
+`nums` walks a program's compiled block and reports every symbol in it, with
+the matrices decoded and other types named but not read. For looking, not for
+writing: whether a calculator accepts a block you generate is unmeasured. The
+grammar is in [formats.md](reference/formats.md#5-inside-the-block-the-symbol-entries).
 
 Complex matrices raise an explicit error rather than returning invented
 numbers.

@@ -1,0 +1,67 @@
+// ===================================================================
+// SPROBE2 - the edges SPROBE did not reach, and SORT.
+//
+// Every case is wrapped in IFERR, so one that fails at run time prints
+// ERROR instead of taking the program with it. What cannot be guarded
+// that way is a COMPILE error, which is why MID with two arguments
+// lives in its own file, MID2.txt.
+//
+// Run SPROBE2 on Home (no parentheses) and report the screen.
+// ===================================================================
+
+EXPORT S2S(zn, zv, zy)
+BEGIN
+  TEXTOUT_P(zn + " = [" + zv + "]", 2, zy, 2, RGB(0,0,0), 316);
+  RETURN zy + 17;
+END;
+
+EXPORT S2W()
+BEGIN
+  LOCAL zk;
+  REPEAT zk := GETKEY; UNTIL zk < 0;
+  REPEAT zk := GETKEY; UNTIL zk >= 0;
+  RETURN zk;
+END;
+
+EXPORT SPROBE2()
+BEGIN
+  LOCAL zs, zy, zr, zl;
+  zs := "abcdef";
+  RECT();
+  TEXTOUT_P("EDGES - s = abcdef", 2, 2, 3, RGB(0,0,0), 316);
+  zy := 26;
+
+  IFERR zr := RIGHT(zs, 0); THEN zr := "ERROR"; END;
+  zy := S2S("RIGHT(s,0)", zr, zy);
+
+  IFERR zr := RIGHT(zs, 99); THEN zr := "ERROR"; END;
+  zy := S2S("RIGHT(s,99)", zr, zy);
+
+  IFERR zr := LEFT(zs, -1); THEN zr := "ERROR"; END;
+  zy := S2S("LEFT(s,-1)", zr, zy);
+
+  IFERR zr := MID(zs, 0, 2); THEN zr := "ERROR"; END;
+  zy := S2S("MID(s,0,2)", zr, zy);
+
+  IFERR zr := MID(zs, 7, 2); THEN zr := "ERROR"; END;
+  zy := S2S("MID(s,7,2)", zr, zy);
+
+  IFERR zr := MID(zs, 2, 0); THEN zr := "ERROR"; END;
+  zy := S2S("MID(s,2,0)", zr, zy);
+
+  IFERR zr := STRING(INSTRING(zs, "")); THEN zr := "ERROR"; END;
+  zy := S2S("INSTRING(s,empty)", zr, zy);
+
+  IFERR zl := SORT({3,1,2}); zr := STRING(zl(1)) + STRING(zl(2)) + STRING(zl(3)); THEN zr := "ERROR"; END;
+  zy := S2S("SORT(3,1,2)", zr, zy);
+
+  IFERR zr := SORT("cba"); THEN zr := "ERROR"; END;
+  zy := S2S("SORT(cba)", zr, zy);
+
+  IFERR zl := SORT({"b","a"}); zr := zl(1) + zl(2); THEN zr := "ERROR"; END;
+  zy := S2S("SORT(b,a)", zr, zy);
+
+  TEXTOUT_P("press a key to leave", 2, 206, 2, RGB(0,0,0), 316);
+  S2W();
+  RETURN 1;
+END;

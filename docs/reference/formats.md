@@ -187,29 +187,60 @@ not covered.
 Verified: nine real `.hpmat` files from a G2 read and rewrite **byte for byte
 identical**, header included.
 
-## 5. What it does NOT open yet: generating the block
+## 5. Inside the block: the symbol entries
 
-The block is not only numbers. Between one matrix and the next it carries
-records with the **symbol name in UTF-16LE**. Right after the first matrix of
-one data program:
+The block is a chain of **symbol entries**, one per exported **variable**, in
+the order the source declares them. Functions are not in it.
+
+Each entry is three TLV records, the same shape as the container around them:
 
 ```
-54 13 00 00   44 00 00 00   8B 01 40 00   <one byte per character, then 00>
-[length]      [length]      [tag]         the global's name, UTF-16LE
+[u32 total]                                  everything below this field
+  [u32 68][u32 0040018B][name UTF-16LE, zero-padded to 64 bytes]
+  [u32 8][u32 00800185][u32 9]               9 in every entry measured
+  [u32 len][u32 00C0018C][value]
 ```
 
-So: the same kind of TLV container as on the outside, with the global's name
-and then its matrix. `matrices_in_block()` walks what it recognises -- the
-matrices -- and skips the rest, so it is for **looking inside**, not for
-rewriting:
+and a real matrix value is
+
+```
+[u16 flag][u16 0014][u32 rank=2][u32 rows][u32 cols][rows*cols numbers]
+```
+
+with each number in the 8-byte format of §3. The name field is fixed at 64
+bytes, so a name shorter than 32 characters is padded with zeros.
+
+**How this is verified.** The walk is run over a 367 KB block from end to
+end: 72 entries, finishing exactly where the source record begins, recovering
+the same 72 names the source declares, in the same order. A grammar that is
+wrong does not land on the last byte.
 
 ```bash
 hpprime matrix nums PROG.hpprgm
 ```
 
-Generating the block would need the grammar of those records. The number is
-no longer what stands in the way; what remains is a structure, and structures
-are read by measuring.
+reports every symbol, with the matrices decoded:
+
+```
+PROG.hpprgm: 367405-byte block, 72 symbol(s), 56 matrix/matrices, 44718 numbers
+  ST                          51 x 11    starts with 0.0, 0.0006, 0.0006, 0.001
+  IX                          44 x 4     starts with 0.01, 1.0, 35.0, 3.0
+  MD                       type FF16  (not decoded)
+```
+
+### What is still not decoded
+
+- **The other value types.** Matrices are `0014`. Lists, strings and numbers
+  come out as `0012`, `001F`, `0100` and `FF16` in the files measured, and
+  their payloads are reported but not read. Each is one Rosetta stone away:
+  a program declaring one global of that type, installed and read back.
+- **The leading `flag`** of a matrix value, which is 1 in some symbols and 2
+  in others. Both are 2-D real matrices, so it is not the rank.
+- **Whether the calculator accepts a block you generate.** The grammar is
+  enough to build one -- `tests/test_numbers.py` builds entries and reads
+  them back -- but nothing here has been installed on a calculator and run,
+  so generating a data program end to end stays **Unverified**. That is the
+  measurement that would close it.
 
 ## 6. Other files on the calculator
 

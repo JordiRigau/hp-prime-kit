@@ -108,9 +108,10 @@ python examples/conformance/conformance.py --break
   the calculator. What you can do is write the engine so the file that
   computes is *the same file* in both places -- see
   [micropython.md](docs/reference/micropython.md).
-- **It does not generate a program's compiled block.** Programs carrying
-  large matrices still get pasted once. The number format inside it *is*
-  decoded, so matrices can travel as `.hpmat` files instead.
+- **It does not generate a program's compiled block.** It reads one now --
+  the grammar is decoded, and `hpprime matrix nums` names every symbol in it
+  -- but whether a calculator accepts a block you build is unmeasured. In the
+  meantime matrices travel as `.hpmat` files.
 - **It does not install anything.** That last step is a drag onto the
   calculator in the CK window, and the mirror folder is not a mailbox.
 - **It does not replace testing on the calculator.** It cuts the round trips
