@@ -1,0 +1,23 @@
+// ===================================================================
+// RETBARE - does a bare RETURN, with no value, compile?
+//
+// Alone in its own file: if `RETURN;` is not valid PPL the calculator
+// refuses to COMPILE, and a compile error takes the whole file with
+// it. That is the same reason MID2.txt is on its own.
+//
+// Run RM3BARE on Home, no parentheses. Three outcomes:
+//   no line at all -> a bare RETURN is how you end quietly
+//   a line with a number -> it compiles and still answers something
+//   it will not compile -> `RETURN;` is not valid. Say what it said.
+// ===================================================================
+
+EXPORT RM3BARE()
+BEGIN
+  LOCAL zk;
+  RECT();
+  TEXTOUT_P("RM3BARE: ends in a bare RETURN", 2, 40, 3, RGB(0,0,0), 316);
+  TEXTOUT_P("press a key, then look at Home", 2, 80, 2, RGB(0,0,0), 316);
+  REPEAT zk := GETKEY; UNTIL zk < 0;
+  REPEAT zk := GETKEY; UNTIL zk >= 0;
+  RETURN;
+END;

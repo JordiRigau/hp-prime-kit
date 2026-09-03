@@ -331,6 +331,10 @@ EXPORT G() BEGIN RETURN 43; END;
 EXPORT F() BEGIN LOCAL z; z := 1; G(); END;
 """, 'F()', 43.0),
 
+    ('GETKEY without parentheses, which is how PPL writes it', """
+EXPORT F() BEGIN LOCAL zk; zk := GETKEY; RETURN zk; END;
+""", 'F()', -1.0),
+
     ('nested lists: L(2)(1)', """
 EXPORT F() BEGIN LOCAL L; L := {{1,2},{3,4}}; RETURN L(2)(1); END;
 """, 'F()', 3.0),

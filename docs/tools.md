@@ -99,8 +99,14 @@ locals, matrices passed **by value**, and the native matrix algebra --
 `MAKEMAT`, `MAKELIST`, `RREF`, `TRN`, `DET`, `INVERSE`, `IDENMAT`.
 
 **What it records instead of drawing**: `TEXTOUT_P`, `RECT`, `INPUT`,
-`CHOOSE`, `WAIT`, `MSGBOX`. Each goes into `machine.io` and returns a neutral
-value, so a program with an interface still runs end to end.
+`CHOOSE`, `WAIT`, `MSGBOX` and `GETKEY` -- including `GETKEY` written bare,
+without parentheses, which is how PPL writes it. Each goes into `machine.io`
+and returns a neutral value, so a program with an interface still runs end to
+end.
+
+`GETKEY`'s neutral value is "no key pressed", so **a loop that waits for one
+never ends here**. That is the shape of every wait helper in this kit, and it
+is why the probes in `examples/` say not to run them with `hpprime run`.
 
 **What it does not cover raises.** Never an invented result. If you need a
 command, add it to `BUILTINS` with its case in `tests/test_interp.py` -- and

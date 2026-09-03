@@ -745,6 +745,11 @@ class Machine(object):
                 return self.globals_[name]
             if name in self.funcs:            # a call without parentheses
                 return self.call(name)
+            if name.upper() in BARE_BUILTINS:
+                # GETKEY is written without parentheses in PPL -- it is in
+                # the reference and in every example here -- so a bare name
+                # has to reach the builtin, not read as a variable.
+                return BUILTINS[name.upper()](self, [])
             raise PPLError('undefined variable: %s' % name)
         if kind == 'seq':
             return [self.evaluate(x, frame) for x in e[1]]
@@ -1168,6 +1173,12 @@ def _b_inverse(m, a):
         if abs(R.rows[i][i] - 1.0) > 1e-9:
             raise PPLError('singular matrix: it has no inverse')
     return Matrix([row[f:] for row in R.rows])
+
+
+# Builtins that PPL is written WITHOUT parentheses. Only the ones measured
+# that way go here: a name that is not a call on the calculator must not
+# become one here.
+BARE_BUILTINS = set(['GETKEY'])
 
 
 def _record(name, ret=0.0):
