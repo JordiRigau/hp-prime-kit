@@ -20,6 +20,8 @@ SUITES = [
     ('test_appdir.py', 'apps: building, and what --check sees'),
     ('test_numbers.py', 'the internal number format and .hpmat'),
     ('test_cli.py', 'the hpprime command, end to end'),
+    ('test_examples.py', 'the starters and examples people copy first'),
+    ('test_docs.py', 'every link in the documentation resolves'),
 ]
 
 

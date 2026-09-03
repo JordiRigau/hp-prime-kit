@@ -1,0 +1,25 @@
+// ROOT - a square root by bisection, in PPL.
+//
+// This is the kind of code that is worth checking against a reference
+// implementation: an algorithm written twice, once for the calculator and
+// once for the PC, where both versions are self-consistent and no ordinary
+// test can tell you they have drifted apart.
+//
+// Run the comparison with:  python examples/conformance/conformance.py
+
+EXPORT ROOT(zc)
+BEGIN
+  LOCAL zlo, zhi, zmid, zi;
+  IF zc < 0 THEN RETURN -1; END;
+  zlo := 0;
+  zhi := IFTE(zc < 1, 1, zc);
+  FOR zi FROM 1 TO 60 DO
+    zmid := (zlo + zhi) / 2;
+    IF zmid * zmid <= zc THEN
+      zlo := zmid;
+    ELSE
+      zhi := zmid;
+    END;
+  END;
+  RETURN (zlo + zhi) / 2;
+END;

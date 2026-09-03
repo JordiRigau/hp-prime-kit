@@ -1,0 +1,38 @@
+// ===================================================================
+// SELFTEST - proof that a .hpprgm generated on a PC runs on a Prime.
+//
+// This file has never been written by the calculator or by the
+// Connectivity Kit: `hpprime write` generated the binary from a
+// template and put this text inside it.
+//
+// If you can see this on the calculator, with the accents intact
+// (a e o c with marks below) and the three functions returning what
+// they should, the writer works.
+// ===================================================================
+
+// Must return 385 (the sum of the squares from 1 to 10).
+EXPORT SELF1()
+BEGIN
+  LOCAL zi, zs;
+  zs := 0;
+  FOR zi FROM 1 TO 10 DO
+    zs := zs + zi * zi;
+  END;
+  RETURN zs;
+END;
+
+// Must return the whole string, accents included.
+EXPORT SELF2()
+BEGIN
+  RETURN "writer OK - àèóç - 4242";
+END;
+
+// Must return 1 if both of the above are right, 0 if not.
+// Run this one on the calculator: SELF3() on the Home screen.
+EXPORT SELF3()
+BEGIN
+  IF SELF1() == 385 AND SIZE(SELF2()) == 23 THEN
+    RETURN 1;
+  END;
+  RETURN 0;
+END;

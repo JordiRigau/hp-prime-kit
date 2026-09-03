@@ -1,308 +1,140 @@
-# hp-prime-kit — herramientas y documentación para programar la HP Prime en serio
+# hp-prime-kit
 
-Herramientas en Python para trabajar desde el PC con la **HP Prime**, y la
-documentación que a la calculadora le falta.
+Make your own programs and apps for the **HP Prime**, with an AI helping and
+without flying blind.
 
-Sin dependencias: Python 3.7+ y nada más.
+The Prime is programmable and badly documented. Its compiler answers `syntax
+error` and a line number; a Python app that does something it dislikes closes
+without a word. So people paste, compile, look, and repeat -- and an AI
+assistant, with almost no PPL to have learned from, guesses confidently and
+sends you back to the calculator.
 
-## ¿Nunca has programado una HP Prime?
+This kit removes that loop. **Write the code on your PC, lint it, run it, and
+build the binary** -- all without a calculator -- and keep the measured facts
+about the platform in front of both of you.
 
-Empieza por **[`references/empezar.md`](references/empezar.md)**. Explica qué es
-cada cosa —programa contra app, los dos lenguajes, el Connectivity Kit—, te
-lleva de un fichero de texto a un programa corriendo en la calculadora, y avisa
-de los ocho errores que te van a pasar el primer día.
+Python 3.7 or newer. No dependencies, nothing to install.
 
-El resto de documentos son **referencia**: están ordenados por lo que se ha
-medido, no por lo que hace falta saber primero.
+---
 
-Si ya conoces el terreno, el ciclo entero son tres comandos:
+## Start
 
 ```bash
-python scripts/lint_ppl.py mi.txt                    # lo que el compilador no explica
-python scripts/pplrun.py  mi.txt --call "F(10)"      # ejecutarlo aqui, sin calculadora
-python scripts/hpprgm.py  write mi.txt -t plantilla_codigo.hpprgm -o MIPROG.hpprgm
+git clone https://github.com/JordiRigau/hp-prime-kit
+cd hp-prime-kit
+python hpprime.py doctor          # is this machine ready?
 ```
 
-y arrastrar el `.hpprgm` a la calculadora en la ventana del Connectivity Kit.
+Then the whole cycle, four commands:
 
-## Qué hay aquí
+```bash
+hpprime new CIRCLE                     # a starter that already runs
+hpprime lint CIRCLE.txt                # what the compiler will not explain
+hpprime run  CIRCLE.txt --call "AREA(2)"   # run the real file, here
+hpprime write CIRCLE.txt -o CIRCLE.hpprgm  # build the binary
+```
 
-**Herramientas**
+and drag `CIRCLE.hpprgm` onto the calculator in the Connectivity Kit window.
+
+**Never done this before?** → **[The guided path](docs/start/01-setup.md)**.
+Six steps from an empty folder to something running on the calculator,
+including what will break on your first day and why.
+
+**Using an AI?** Point it at **[`AGENTS.md`](AGENTS.md)** (Cursor, Copilot,
+Codex, …) or **[`SKILL.md`](SKILL.md)** (Claude Code). Both load the same
+rules, so it stops inventing syntax. If your assistant cannot read files,
+paste [`docs/ai/prompts.md`](docs/ai/prompts.md) §1.
+
+## What is here
+
+**The path**, in order:
 
 | | |
 |---|---|
-| **`scripts/lint_ppl.py`** | caza antes de compilar los errores que el compilador de la Prime no sabe explicar |
-| **`scripts/hpprgm.py`** | lee y escribe `.hpprgm`, el formato binario de los programas |
-| **`scripts/pplrun.py`** | **ejecuta PPL en el PC**, para probar el fichero que se instala |
-| **`scripts/mkapp.py`** | construye y verifica una app (`.hpappdir`), con sus envoltorios binarios |
-| **`scripts/hpreal.py`** | el **formato de número interno**, descifrado: lee y escribe `.hpmat` |
+| [1. What you are getting into](docs/start/01-setup.md) | the machine, the two languages, program vs app, what to install |
+| [2. Your first program](docs/start/02-first-program.md) | empty file → running on the calculator, and the eight things that break |
+| [3. Asking for data and drawing](docs/start/03-input-screen.md) | `INPUT`, keys, text that fits |
+| [4. Wrapping it as an app](docs/start/04-first-app.md) | the icon, and the byte that opens the wrong screen |
+| [5. Moving to Python](docs/start/05-python.md) | the bridge to PPL, and the two traps that cost a day each |
+| [6. Working with an AI](docs/start/06-working-with-ai.md) | the loop, and what not to accept from a model |
 
-**Documentación.** La Prime está mal documentada, y de Python en la Prime **no
-hay documentación oficial ninguna**. Esto es lo que está **medido en una G2**,
-con la evidencia al lado y marcando lo que no está confirmado:
-
-| | |
-|---|---|
-| [`references/empezar.md`](references/empezar.md) | **de cero**: el mapa, el vocabulario, tu primer programa y el método |
-| [`references/ppl.md`](references/ppl.md) | el lenguaje: los límites que rompen, y **cuatro hipótesis que parecen razonables y son falsas** |
-| [`references/interfaz.md`](references/interfaz.md) | pantalla, teclado y táctil: `INPUT`, códigos de tecla, el toque que llega dos veces |
-| [`references/apps.md`](references/apps.md) | apps: la `.hpappdir`, los ganchos, y el byte que hace que la app abra donde no toca |
-| [`references/micropython.md`](references/micropython.md) | Python en la calculadora: el puente a PPL, y la llamada que **cierra la app** |
-| [`references/formato-hpprgm.md`](references/formato-hpprgm.md) | el contenedor binario, verificado por reconstrucción byte a byte |
-
-## El problema que resuelven
-
-PPL está mal documentado y su compilador dice `syntax error` señalando una
-línea, sin decir qué sobra. Todo se acaba comprobando a mano en el emulador:
-pegar, compilar, mirar, repetir. Un límite no documentado —el máximo de
-variables por sentencia `LOCAL`— costó **cinco rondas** de ese ciclo en el
-proyecto donde nació esto, porque el error no se movía y cada hipótesis
-parecía plausible.
-
-Lo que faltaba no era paciencia: era **poder comprobar cosas sin la
-calculadora**.
-
-## Qué hace cada una
-
-### Linter
-
-```bash
-python scripts/lint_ppl.py mi_programa.hpprgm
-python scripts/lint_ppl.py ppl/ --quiet          # solo errores
-python scripts/lint_ppl.py A.txt B.txt --set     # + choques de nombres entre ficheros
-```
-
-Nueve reglas, todas sacadas de errores reales medidos en una G2: pasarse de
-variables en un `LOCAL`, indexar el retorno de una llamada, `ENDIF`, comparar
-con `=`, índice 0, `LOCAL` a media función, bloques sin cerrar, `EXPR` sin
-guarda, nombres exportados duplicados. Sale con código 1 si hay errores, así
-que sirve de puerta en cualquier script.
-
-Igual de importante es lo que **no** marca: hay cuatro hipótesis que parecen
-razonables y son falsas —`RETURN` dentro de un `FOR` es legal, los locales
-tipo `L12` o `r2` son legales— y están anotadas para que nadie las vuelva a
-«arreglar». Las pruebas comprueban las dos direcciones.
-
-### Leer y escribir `.hpprgm`
-
-```bash
-python scripts/hpprgm.py read  PROG.hpprgm -o fuente.txt
-python scripts/hpprgm.py write fuente.txt -t plantilla.hpprgm -o PROG.hpprgm
-python scripts/hpprgm.py check PROG.hpprgm
-python scripts/hpprgm.py plantillas "…/HP Connectivity Kit/Calculators"
-```
-
-El `.hpprgm` es un contenedor TLV anidado con el fuente dentro **literal, en
-UTF-16LE**. Está documentado en
-[`references/formato-hpprgm.md`](references/formato-hpprgm.md) y verificado
-reconstruyendo programas byte a byte, incluido uno de 1 MB con datos
-compilados.
-
-Sirve para dos cosas: **generar el binario** en vez de crear el programa a
-mano y pegar el texto dentro —el último paso sigue siendo arrastrarlo dentro
-de la ventana del Connectivity Kit, ver abajo—, y **comparar lo instalado con
-el repositorio** para ver si la calculadora se ha quedado atrás.
-
-Está **validado contra hardware**: un programa generado desde Python se
-instaló en una HP Prime y se ejecutó allí dando el resultado correcto, con el
-fuente y los acentos intactos.
-
-Lo generado se instala **arrastrándolo a la calculadora** en la ventana del
-CK.
-
-> Dos avisos, los dos aprendidos por las malas: la carpeta
-> `Calculators\<tu calculadora>\` **no es un buzón** —es un espejo que el CK
-> sobrescribe—, y si el arrastre sale con el cursor de prohibido, mira si el
-> CK está puesto para ejecutarse **como administrador**: Windows no deja
-> arrastrar de un proceso sin elevar a uno elevado. Detalle en
-> [`references/formato-hpprgm.md`](references/formato-hpprgm.md).
-
-### Ejecutar PPL en el PC
-
-```bash
-python scripts/pplrun.py MOTOR.hpprgm DATOS.hpprgm --call "MIFUNC(3,350)"
-```
-
-```python
-import pplrun
-m = pplrun.Maquina()
-m.carga_fichero('ppl/TERMOLIB.hpprgm')
-r = m.llama('TPT', 3.0, 350.0)
-```
-
-Cubre el subconjunto de cálculo: números, cadenas, listas, matrices
-**1-based**, `IF`/`CASE`/`FOR`/`WHILE`/`REPEAT`/`IFERR`, funciones `EXPORT`,
-globales y locales, el paso de matrices **por valor**, y el álgebra
-matricial nativa —`MAKEMAT`, `MAKELIST`, `RREF`, `TRN`, `DET`, `INVERSE`—
-para que apoyarse en ella no cueste perder las pruebas. Lo de pantalla y
-teclado no se dibuja: se anota y devuelve un valor neutro, para que el cálculo
-corra sin interfaz.
-
-Lo que no está cubierto **da error**, nunca un resultado inventado.
-
-### Construir una app
-
-```bash
-python scripts/mkapp.py MIAPP src/*.py --icon icon.png    # app de Python
-python scripts/mkapp.py MIAPP app.txt --ppl -t plantilla.hpprgm
-python scripts/mkapp.py --check MIAPP.hpappdir src/*.py
-```
-
-Una app es una carpeta con tres envoltorios binarios y los ficheros que se
-lleva. Los envoltorios **no llevan el nombre de la app dentro**, así que un
-juego vale para todas: el kit trae dos, sacados de apps que arrancan en una G2.
-
-Lo que resuelve de verdad es un fallo que sólo se ve al abrir la app:
-
-> Al salir, **la calculadora reescribe los tres envoltorios** para guardar su
-> estado, incluida la vista en la que estabas. Si esa carpeta vuelve al PC, el
-> repositorio se queda con un `.hpapp` que hace que la app abra **la consola de
-> Python** en vez de su pantalla.
-
-Por eso se rehacen en cada construcción, y por eso `--check` sale con código 1
-cuando la carpeta ha dejado de ser la que generarías. De paso avisa de los
-`import` que MicroPython en la Prime no tiene —`time`, el primero— que si no se
-manifiestan como **la app cerrándose al arrancar, sin decir nada**.
-
-### El número interno, y meter datos sin pegarlos
-
-```bash
-python scripts/hpreal.py read  M1.hpmat -o datos.csv
-python scripts/hpreal.py write datos.csv -o M0.hpmat
-python scripts/hpreal.py nums  PROG.hpprgm      # mirar dentro de un bloque
-```
-
-El formato de número de la Prime —el que llena el bloque compilado y los
-ficheros `.hpmat`— estaba sin documentar. Son **8 bytes**: exponente decimal de
-12 bits, 12 dígitos BCD de mantisa, y el signo en el nibble de arriba (0 o 9).
-
-Se descifró con una **piedra de Rosetta**, no adivinando: un programa de datos
-lleva el bloque compilado *delante* del fuente, y el fuente son los mismos
-números escritos en decimal. Un solo fichero da 44.718 parejas (bytes, valor)
-que nadie ha elegido.
+**The reference** -- what is measured on a G2, with the evidence beside it and
+anything unconfirmed marked as such:
 
 | | |
 |---|---|
-| Números decodificados y comparados con el fuente | **44.718, exactos** |
-| Vueltos a codificar y comparados **byte a byte** | **44.718 de 44.718** |
-| Negativos dentro de la comparación | **1.616** |
-| Ficheros `.hpmat` reales leídos y reescritos idénticos | **9 de 9** |
+| [ppl.md](docs/reference/ppl.md) | the language: the limits that really break, and four hypotheses that look reasonable and are false |
+| [interface.md](docs/reference/interface.md) | screen, keyboard, touch: `INPUT`, key codes, the touch that arrives twice |
+| [apps.md](docs/reference/apps.md) | the `.hpappdir`, the hooks, the startup-view byte |
+| [micropython.md](docs/reference/micropython.md) | Python on the calculator, the bridge to PPL, and the call that closes the app |
+| [formats.md](docs/reference/formats.md) | the binary container and the internal number format, both decoded |
+| [deploy.md](docs/reference/deploy.md) | getting it onto the calculator, which has two traps of its own |
 
-Los negativos son los que valieron: el primer intento puso un `1` en el nibble
-de signo y falló en exactamente los 1.482 negativos de la muestra. Es un `9`.
-
-**Lo que abre**: una matriz entera se lleva a la calculadora **como fichero**,
-sin pegar nada. **Lo que no**: generar el bloque compilado entero, que además
-de números lleva registros de símbolo. Lo que se sabe de esa estructura queda
-documentado, que es la mitad del trabajo para quien siga.
-
-## Para qué sirve de verdad el intérprete
-
-Si tienes el mismo cálculo escrito dos veces —en PPL para la calculadora y en
-Python para desarrollar— ninguna prueba normal puede decirte si divergen: cada
-implementación es coherente consigo misma y las dos pasan sus propios tests.
-Ejecutando el PPL de verdad y comparando, la divergencia sale sola.
-
-En el primer proyecto donde se usó, un barrido de 2.162 comparaciones sacadas
-de los propios datos dio **2.060 coincidencias y 102 fallos, todos la misma
-causa**: la búsqueda inversa por presión no contemplaba la región
-supercrítica, mientras que la de (P,T) sí. En la calculadora eso significaba
-que el agua a 25 MPa se podía consultar por (P,T) pero no por (P,h) ni por
-(P,s) —que es justo la expansión isentrópica de un ciclo Rankine
-supercrítico—. Tres bancadas de pruebas, 1.599 comprobaciones, y ninguna podía
-verlo.
-
-El barrido está en [`examples/conformidad.py`](examples/conformidad.py) como
-plantilla para adaptar.
-
-## Probar
-
-```bash
-python tests/test_lint.py      # 16: que caza, y que no da falsas alarmas
-python tests/test_pplrun.py    # 58: el subconjunto, y que falla donde debe
-python tests/test_hpprgm.py    # round-trip sobre TUS binarios del CK
-python tests/test_mkapp.py     # 29: la app se construye, y --check ve
-python tests/test_hpreal.py    # el numero interno, contra 44.718 casos reales
-```
-
-`test_hpprgm.py`, `test_mkapp.py` y `test_hpreal.py` buscan la carpeta del
-Connectivity Kit y se saltan lo que no encuentren, así que en una máquina sin
-calculadora no fallan: avisan y siguen.
-
-## Usarlo como skill de Claude Code
-
-El repositorio **es** una skill: tiene `SKILL.md` en la raíz. Clonándolo
-dentro de `~/.claude/skills/` queda activo, y cualquier sesión que toque
-ficheros `.hpprgm` o código PPL tiene delante las reglas medidas en vez de
-improvisar sintaxis.
-
-```bash
-git clone <url> ~/.claude/skills/hp-prime
-```
-
-## Lo que no hace
-
-- **No genera el bloque compilado entero** de un programa de datos, así que los
-  programas con matrices grandes se siguen pegando una vez a mano. No estorba:
-  los datos no cambian, el código sí. Lo que **sí** está resuelto es el formato
-  de sus números; lo que falta es la gramática de los registros de símbolo que
-  van entre matriz y matriz, y lo que se sabe de ella está escrito.
-- **No dibuja la interfaz.** `INPUT`, `CHOOSE`, `TEXTOUT_P` y compañía se
-  anotan pero no se pintan: eso sigue necesitando ojos en el emulador. Lo que
-  sí se puede sacar del dibujo —selección, ventana, qué hace cada tecla, y que
-  cada texto quepa en su columna— se prueba en el PC, y cómo hacerlo está en
-  [`references/interfaz.md`](references/interfaz.md).
-- **No ejecuta MicroPython.** El puente `hpprime.eval` sólo existe en la
-  calculadora. Lo que se puede hacer es escribir el motor de forma que el
-  fichero que calcula sea **el mismo** en los dos sitios, con una sola capa
-  sustituible debajo — ver
-  [`references/micropython.md`](references/micropython.md).
-- **No genera el `.hpapp` desde cero.** Se copia el de una app que funcione, y
-  el kit trae dos. Su gramática interna no está descifrada más allá del byte de
-  la vista de arranque, y no hace falta que lo esté.
-- **No sustituye a probar en la calculadora.** Reduce mucho las vueltas, pero
-  el último paso sigue siendo una G2 de verdad.
-
-### Y lo que falta a propósito
-
-No por no poder, sino porque meterlo a ojo sería peor que no tenerlo:
-
-- **Las funciones de cadena del intérprete** (`LEFT`, `MID`, `INSTRING`,
-  `SORT`…). Sus detalles de borde no están medidos, y una semántica inventada
-  daría un número donde la calculadora da otro — la divergencia exacta que este
-  kit existe para cazar. Mídelas y añádelas con su caso en las pruebas.
-- **Una regla de linter para indexar un global declarado en otro programa.** Es
-  un error de compilación real y está documentado, pero no se puede decidir
-  mirando un fichero: `TS1(1)` y `TPT(3,350)` se escriben igual. Marcarlo daría
-  una falsa alarma por cada llamada entre programas.
-- **`.hplist`, las matrices complejas y la gramática del `.hpapp`.** Se sabe
-  dónde empiezan y en qué se diferencian; nadie los ha necesitado todavía.
-
-## Lo que sigue sin estar medido
-
-Lo honesto, para que nadie se apoye en ello:
+**The tools** -- one command, [documented here](docs/tools.md):
 
 | | |
 |---|---|
-| La velocidad de PPL en la calculadora | un solo ancla: 60 iteraciones de bisección «por debajo del segundo» |
-| La velocidad de MicroPython | sin medir. Del puente sí: **0,2 ms** por cruce |
-| Una app de **PPL** construida entera por `mkapp.py` | sus piezas están validadas por separado; la combinación no se ha abierto en hardware |
-| El límite de memoria de una app de Python | sin medir |
-| **G1** | todo esto es de una **G2**. El firmware es el mismo; el hardware, no |
+| `hpprime doctor` | what works on this machine, and what to do about what does not |
+| `hpprime new` | a starter that already compiles and runs |
+| `hpprime lint` | nine rules, every one from an error measured on a G2 |
+| `hpprime run` | **runs PPL on your PC** -- the file you install, not a copy of it |
+| `hpprime write` / `read` | the `.hpprgm` binary, both directions |
+| `hpprime build` / `verify` | apps: build the folder, and catch it drifting |
+| `hpprime matrix` | `.hpmat` files: a whole matrix as a file, nothing pasted |
 
-## Método
+## Why running PPL on the PC matters
 
-Lo que resuelve los problemas de PPL no es razonar sobre la sintaxis: es
-**medir programas que ya funcionan en esa misma calculadora** y comparar
-métricas. Un error que no se mueve después de un arreglo significa que la
-hipótesis es falsa, no que el arreglo fuera insuficiente.
+If you have the same calculation written twice -- in PPL for the calculator
+and in Python to develop against -- no ordinary test can tell you they have
+drifted apart: each one is consistent with itself and both pass their own
+tests. Running the real PPL and comparing is what makes the divergence
+appear, and the failures cluster around the region one side forgot.
 
-Cuando aparezca un límite nuevo, va a [`references/ppl.md`](references/ppl.md)
-**con la evidencia** —qué programa, qué firmware— y con su regla en el linter
-y su caso en las pruebas. Lo que no está medido no se apunta como cierto.
+There is a runnable example, with a mode that shows what a real divergence
+looks like:
 
-Firmware de referencia: **G2, 2.4 revisión 15515 (2025-09-15)**.
+```bash
+python examples/conformance/conformance.py --break
+```
 
-## Licencia
+## What it does not do
 
-MIT — ver [`LICENSE`](LICENSE).
+- **It does not draw the interface.** `INPUT`, `CHOOSE`, `TEXTOUT_P` and the
+  rest are recorded, not painted, so a program with a screen still runs end
+  to end here. Seeing it still needs the emulator.
+- **It does not run MicroPython.** The `hpprime.eval` bridge only exists on
+  the calculator. What you can do is write the engine so the file that
+  computes is *the same file* in both places -- see
+  [micropython.md](docs/reference/micropython.md).
+- **It does not generate a program's compiled block.** Programs carrying
+  large matrices still get pasted once. The number format inside it *is*
+  decoded, so matrices can travel as `.hpmat` files instead.
+- **It does not install anything.** That last step is a drag onto the
+  calculator in the CK window, and the mirror folder is not a mailbox.
+- **It does not replace testing on the calculator.** It cuts the round trips
+  down a lot; the last one is still a real Prime.
+
+## Status
+
+Reference firmware: **G2, 2.4 revision 15515 (2025-09-15)**.
+
+```bash
+python tests/run_all.py     # eight suites, none of them needs a calculator
+```
+
+Deliberately still open, and listed so nobody leans on them:
+
+| | |
+|---|---|
+| A **PPL app** built end to end by this kit | its pieces are validated separately; the combination has not been opened on hardware |
+| The interpreter's **string functions** | left out: their edge behaviour is not measured, and guessing would defeat the purpose |
+| **G1** | everything here is a G2. Same firmware, different hardware |
+| MicroPython **speed** and an app's **memory limit** | not measured. The bridge crossing is: 0.2 ms |
+
+Measured something new, or built something with this? See
+[CONTRIBUTING.md](CONTRIBUTING.md) -- a fact with its evidence is welcome even
+if the prose needs work.
+
+## Licence
+
+MIT -- see [LICENSE](LICENSE).
