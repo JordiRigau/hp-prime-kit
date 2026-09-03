@@ -39,7 +39,7 @@ hpprime write CIRCLE.txt -o CIRCLE.hpprgm  # build the binary
 and drag `CIRCLE.hpprgm` onto the calculator in the Connectivity Kit window.
 
 **Never done this before?** → **[The guided path](docs/start/01-setup.md)**.
-Six steps from an empty folder to something running on the calculator,
+Seven steps from an empty folder to something running on the calculator,
 including what will break on your first day and why.
 
 **Using an AI?** Point it at **[`AGENTS.md`](AGENTS.md)** (Cursor, Copilot,
@@ -54,7 +54,7 @@ paste [`docs/ai/prompts.md`](docs/ai/prompts.md) §1.
 | | |
 |---|---|
 | [1. What you are getting into](docs/start/01-setup.md) | the machine, the two languages, program vs app, what to install |
-| [2. Your first program](docs/start/02-first-program.md) | empty file → running on the calculator, and the eight things that break |
+| [2. Your first program](docs/start/02-first-program.md) | empty file → running on the calculator, and the nine things that break |
 | [3. Asking for data and drawing](docs/start/03-input-screen.md) | `INPUT`, keys, text that fits |
 | [4. Wrapping it as an app](docs/start/04-first-app.md) | the icon, and the byte that opens the wrong screen |
 | [5. Moving to Python](docs/start/05-python.md) | the bridge to PPL, and the two traps that cost a day each |
@@ -78,7 +78,7 @@ anything unconfirmed marked as such:
 |---|---|
 | `hpprime doctor` | what works on this machine, and what to do about what does not |
 | `hpprime new` | a starter that already compiles and runs |
-| `hpprime lint` | nine rules, every one from an error measured on a G2 |
+| `hpprime lint` | eleven rules, every one from an error measured on a G2 |
 | `hpprime run` | **runs PPL on your PC** -- the file you install, not a copy of it |
 | `hpprime write` / `read` | the `.hpprgm` binary, both directions |
 | `hpprime build` / `verify` | apps: build the folder, and catch it drifting |

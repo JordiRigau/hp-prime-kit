@@ -53,10 +53,14 @@ Catches, before you compile, what the Prime's compiler will not explain.
 Output is compiler-shaped -- `file:line: level: rule: message` -- and it
 exits 1 if there is any error.
 
-Nine rules, each from an error measured on a G2: too many variables in one
-`LOCAL`, indexing the result of a call, `ENDIF`, comparing with `=`, index 0,
-a `LOCAL` after code, unclosed blocks, `EXPR` without a guard, and duplicate
-exported names.
+Eleven rules, each from an error measured on a G2: too many variables in one
+`LOCAL` (`local-limit`), indexing the result of a call (`index-call`),
+`ENDIF` and friends (`single-end`), comparing with `=` (`equality`), index 0
+(`one-based`), a `LOCAL` after code (`local-first`), several initialised
+variables in one `EXPORT` (`export-multiple`), a function's `END` without its
+semicolon (`end-semicolon`), unclosed blocks (`unbalanced`), `EXPR` without a
+guard (`expr-empty`), and duplicate exported names (`export-clash`, with
+`--set`).
 
 Just as important is what it does **not** flag. `RETURN` inside a `FOR` is
 legal; locals like `L12` or `r2` are legal; several locals with initial

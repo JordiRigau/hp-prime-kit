@@ -1,7 +1,7 @@
 # 2. Your first program
 
-From an empty folder to a function running on the calculator. Six steps, and
-five of them happen on your PC.
+From an empty folder to a function running on the calculator. Seven steps,
+and five of them happen on your PC.
 
 ---
 
