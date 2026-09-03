@@ -965,6 +965,74 @@ def _as_matrix(v, who):
     return v
 
 
+def _as_string(v, who):
+    if not isinstance(v, str):
+        raise PPLError('%s needs a string' % who)
+    return v
+
+
+# The string functions, measured on a G2 with examples/strings/SPROBE.txt.
+# What is NOT in that measurement raises rather than being extrapolated: a
+# guessed edge case would return a value where the calculator returns
+# another, which is the divergence this interpreter exists to catch.
+
+def _b_left(m, a):
+    """LEFT(s, n) -> the first n characters.
+
+    Measured: LEFT("abcdef",3) = "abc", LEFT("abcdef",99) = "abcdef", and
+    -- the trap -- **LEFT("abcdef",0) = "abcdef"**, not "". A count that
+    computes to zero gives you everything instead of nothing.
+    """
+    s = _as_string(a[0], 'LEFT')
+    n = int(round(a[1]))
+    if n < 0:
+        raise Unsupported('LEFT with a negative count is not measured')
+    if n == 0 or n >= len(s):
+        return s
+    return s[:n]
+
+
+def _b_right(m, a):
+    """RIGHT(s, n) -> the last n characters. Measured for 1..SIZE(s)."""
+    s = _as_string(a[0], 'RIGHT')
+    n = int(round(a[1]))
+    if n <= 0 or n > len(s):
+        raise Unsupported('RIGHT is only measured for a count of 1..SIZE(s); '
+                          'measure it with examples/strings/ and add the case')
+    return s[-n:]
+
+
+def _b_mid(m, a):
+    """MID(s, start, count) -> count characters from start, 1-based.
+
+    Measured: MID("abcdef",2,3) = "bcd", so the third argument is a LENGTH,
+    not an end position. MID("abcdef",4,99) = "def": it stops at the end
+    instead of failing.
+    """
+    if len(a) != 3:
+        raise Unsupported('MID with %d arguments is not measured' % len(a))
+    s = _as_string(a[0], 'MID')
+    start, count = int(round(a[1])), int(round(a[2]))
+    if start < 1 or start > len(s) or count <= 0:
+        raise Unsupported('MID is only measured for a start inside the string '
+                          'and a positive count')
+    return s[start - 1:start - 1 + count]
+
+
+def _b_instring(m, a):
+    """INSTRING(s, sub) -> 1-based position, or 0 if it is not there.
+
+    Measured: INSTRING("abcdef","cd") = 3, INSTRING("abcdef","a") = 1,
+    INSTRING("abcdef","zz") = 0.
+    """
+    s = _as_string(a[0], 'INSTRING')
+    sub = _as_string(a[1], 'INSTRING')
+    if not sub:
+        raise Unsupported('INSTRING with an empty second argument is not '
+                          'measured')
+    return float(s.find(sub) + 1)
+
+
 def _b_rref(m, a):
     """Gauss-Jordan with partial pivoting, the one the Prime ships.
 
@@ -1081,6 +1149,11 @@ BUILTINS = {
     'MOD': lambda m, a: math.fmod(a[0], a[1]),
     'RGB': lambda m, a: float(int(a[0]) * 65536 + int(a[1]) * 256 + int(a[2])),
     'CONCAT': lambda m, a: list(a[0]) + list(a[1]),
+    # strings, measured -- see examples/strings/
+    'LEFT': _b_left,
+    'RIGHT': _b_right,
+    'MID': _b_mid,
+    'INSTRING': _b_instring,
     # linear algebra. MAKEMAT and MAKELIST are not here: they are lazy and
     # handled in _call_node, because their first argument is a template.
     'RREF': _b_rref,

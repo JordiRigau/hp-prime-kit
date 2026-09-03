@@ -27,14 +27,14 @@ END;
 // A string result, in brackets so an empty one is visible.
 EXPORT SPS(zn, zv, zy)
 BEGIN
-  TEXTOUT_P(zn + " = [" + zv + "]", 2, zy, 2);
+  TEXTOUT_P(zn + " = [" + zv + "]", 2, zy, 2, RGB(0,0,0), 316);
   RETURN zy + 17;
 END;
 
 // A numeric result.
 EXPORT SPN(zn, zv, zy)
 BEGIN
-  TEXTOUT_P(zn + " = " + STRING(zv), 2, zy, 2);
+  TEXTOUT_P(zn + " = " + STRING(zv), 2, zy, 2, RGB(0,0,0), 316);
   RETURN zy + 17;
 END;
 
@@ -43,7 +43,7 @@ BEGIN
   LOCAL zy, zs;
   zs := "abcdef";
   RECT();
-  TEXTOUT_P("s = abcdef", 2, 2, 3);
+  TEXTOUT_P("s = abcdef", 2, 2, 3, RGB(0,0,0), 316);
   zy := 26;
   zy := SPS("LEFT(s,3)", LEFT(zs, 3), zy);
   zy := SPS("RIGHT(s,3)", RIGHT(zs, 3), zy);
@@ -55,7 +55,7 @@ BEGIN
   zy := SPS("LEFT(s,99)", LEFT(zs, 99), zy);
   zy := SPN("SIZE(LEFT(s,99))", SIZE(LEFT(zs, 99)), zy);
   zy := SPS("MID(s,4,99)", MID(zs, 4, 99), zy);
-  TEXTOUT_P("press a key to leave", 2, 206, 2);
+  TEXTOUT_P("press a key to leave", 2, 206, 2, RGB(0,0,0), 316);
   SPW();
   RETURN 1;
 END;

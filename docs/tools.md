@@ -92,7 +92,8 @@ m.load_file('ppl/LIB.hpprgm')
 r = m.call('F', 3.0, 350.0)
 ```
 
-**What it covers**: numbers, strings, lists, **1-based** matrices,
+**What it covers**: numbers, strings and the string functions, lists,
+**1-based** matrices,
 `IF`/`CASE`/`FOR`/`WHILE`/`REPEAT`/`IFERR`, `EXPORT` functions, globals and
 locals, matrices passed **by value**, and the native matrix algebra --
 `MAKEMAT`, `MAKELIST`, `RREF`, `TRN`, `DET`, `INVERSE`, `IDENMAT`.
@@ -105,10 +106,11 @@ value, so a program with an interface still runs end to end.
 command, add it to `BUILTINS` with its case in `tests/test_interp.py` -- and
 measure it on the calculator first.
 
-Deliberately still missing: the string functions (`LEFT`, `MID`, `INSTRING`,
-`SORT`…). Their edge behaviour is not measured here, and a guessed semantics
-would return a number where the calculator returns another -- exactly the
-divergence this exists to catch.
+`LEFT`, `RIGHT`, `MID` and `INSTRING` are covered, with their semantics
+measured on a G2 -- including the trap that `LEFT(s,0)` returns the **whole**
+string. Their unmeasured edges (`RIGHT` past the end, `MID` with two
+arguments, a negative count) raise rather than extrapolate, and say so.
+`SORT` is still not covered: nobody has measured it.
 
 One fidelity gap worth knowing: `M := GZ` (assigning a global matrix to a
 local) **aliases here and copies on the Prime**. The way never to be bitten

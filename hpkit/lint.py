@@ -224,17 +224,20 @@ def check_source(path, text):
         # The trap it guards: text that does not fit raises no error. It is
         # painted over the next column and you never learn what it said.
         #
-        # Only the grob form is judged, because only its shape is documented
-        # here: TEXTOUT_P(txt, G0, x, y, font, colour [, width]). Whether the
-        # short form takes a width, and in which position, is not measured --
-        # so the short form is left alone rather than guessed at.
+        # Both forms are judged. Measured on a G2, drawing one long string
+        # three times: with no width it runs off the screen, and these two
+        # clip it identically --
+        #     TEXTOUT_P(txt, x, y, font, colour, width)        6 arguments
+        #     TEXTOUT_P(txt, G0, x, y, font, colour, width)    7 arguments
+        # so the width is the last argument of whichever form is in use.
         for m in re.finditer(r'\bTEXTOUT_P\s*\(', raw, re.I):
             args = _call_args(raw, m.end() - 1)
             if args is None:
                 continue
             parts = _split_top_level(args)
-            if (len(parts) > 1 and re.match(r'^G\d$', parts[1].strip(), re.I)
-                    and len(parts) < 7):
+            grob = len(parts) > 1 and re.match(r'^G\d$', parts[1].strip(),
+                                               re.I)
+            if len(parts) < (7 if grob else 6):
                 found.append(Finding(path, num, 'WARN', 'textout-width',
                                      'TEXTOUT_P without its width argument: '
                                      'text that does not fit is painted over '

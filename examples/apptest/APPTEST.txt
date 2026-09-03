@@ -43,20 +43,20 @@ EXPORT START()
 BEGIN
   LOCAL zs, zk;
   RECT();
-  TEXTOUT_P("APPTEST", 4, 4, 4);
+  TEXTOUT_P("APPTEST", 4, 4, 4, RGB(0,0,0), 314);
   zs := ATSUM();
   IF zs == 385 THEN
-    TEXTOUT_P("1. the program is inside, and computes: 385", 4, 40, 2);
+    TEXTOUT_P("1. the program is inside, and computes: 385", 4, 40, 2, RGB(0,0,0), 314);
   ELSE
-    TEXTOUT_P("1. WRONG RESULT: " + STRING(zs), 4, 40, 2);
+    TEXTOUT_P("1. WRONG RESULT: " + STRING(zs), 4, 40, 2, RGB(0,0,0), 314);
   END;
-  TEXTOUT_P("2. accents: àèóç", 4, 62, 2);
-  TEXTOUT_P("3. press any key (Num and View included)", 4, 84, 2);
+  TEXTOUT_P("2. accents: àèóç", 4, 62, 2, RGB(0,0,0), 314);
+  TEXTOUT_P("3. press any key (Num and View included)", 4, 84, 2, RGB(0,0,0), 314);
   zk := ATWAIT();
   RECT();
-  TEXTOUT_P("APPTEST", 4, 4, 4);
-  TEXTOUT_P("4. that key reported code " + STRING(zk), 4, 40, 2);
-  TEXTOUT_P("5. press again: the app should fall to Home", 4, 62, 2);
+  TEXTOUT_P("APPTEST", 4, 4, 4, RGB(0,0,0), 314);
+  TEXTOUT_P("4. that key reported code " + STRING(zk), 4, 40, 2, RGB(0,0,0), 314);
+  TEXTOUT_P("5. press again: the app should fall to Home", 4, 62, 2, RGB(0,0,0), 314);
   ATWAIT();
   RETURN zs;
 END;

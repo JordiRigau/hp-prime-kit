@@ -73,11 +73,17 @@ Three things close the hole:
    so a PC test can read it and check screen by screen that each string fits
    where it goes.
 
-`hpprime lint` catches the missing width for you (`textout-width`), but only
-in the grob form -- `TEXTOUT_P(txt, G0, x, y, font, colour [, width])` --
-because that is the shape documented here. **Unverified**: whether the short
-form takes a width at all, and in which position. Until somebody measures it,
-the linter leaves the short form alone rather than guessing.
+**The width is the last argument of whichever form you use**, measured on a
+G2 by drawing one long string three times:
+
+```ppl
+TEXTOUT_P(txt, x, y, font, colour, width)          // clips at width
+TEXTOUT_P(txt, G0, x, y, font, colour, width)      // clips at width
+TEXTOUT_P(txt, x, y, font, colour)                 // runs off the screen
+```
+
+`hpprime lint` catches the missing one for you, in both forms
+(`textout-width`).
 
 Character widths in such a test should be **deliberate over-estimates**: take
 the widest character, so that when the test says it fits, it fits. The

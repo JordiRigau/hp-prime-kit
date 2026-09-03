@@ -110,6 +110,7 @@ WAIT(-1);                                // waits for a key, returns its code
 |---|---|
 | **Matrices are passed by value** | handing a big matrix to a function **copies** it. With large data, reach for a global instead of passing an argument |
 | **`EXPR("")` fails** | always check `SIZE(s) > 0` before evaluating what came out of a field |
+| **`LEFT(s, 0)` returns the WHOLE string** | measured on a G2. A count that computes to zero gives you everything instead of nothing, silently. `MID(s, start, count)` takes a **length**, not an end position, and `INSTRING` answers **0** when it finds nothing |
 | **Global names** | exported names share one namespace with Home: prefix them so they do not collide |
 | **Decimal point in source** | always `.`, even on a calculator that displays `,` |
 | **Dynamic access** | `EXPR("NAME")` gives the variable whose name you built on the fly; do it once at load time, never per element |

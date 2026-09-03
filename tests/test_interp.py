@@ -253,6 +253,47 @@ EXPORT F() BEGIN LOCAL I; I := INVERSE([[4,7],[2,6]]);
 RETURN I(1,1)*1000 + I(2,2)*100; END;
 """, 'F()', 640.0),
 
+    # --- the string functions, every case measured on a G2 ---------------
+    ('LEFT', """
+EXPORT F() BEGIN RETURN LEFT("abcdef", 3); END;
+""", 'F()', 'abc'),
+
+    ('RIGHT', """
+EXPORT F() BEGIN RETURN RIGHT("abcdef", 3); END;
+""", 'F()', 'def'),
+
+    ('MID takes a LENGTH, not an end position', """
+EXPORT F() BEGIN RETURN MID("abcdef", 2, 3); END;
+""", 'F()', 'bcd'),
+
+    ('MID stops at the end instead of failing', """
+EXPORT F() BEGIN RETURN MID("abcdef", 4, 99); END;
+""", 'F()', 'def'),
+
+    ('INSTRING is 1-based', """
+EXPORT F() BEGIN RETURN INSTRING("abcdef", "cd"); END;
+""", 'F()', 3.0),
+
+    ('INSTRING on the first character', """
+EXPORT F() BEGIN RETURN INSTRING("abcdef", "a"); END;
+""", 'F()', 1.0),
+
+    ('INSTRING not found is 0', """
+EXPORT F() BEGIN RETURN INSTRING("abcdef", "zz"); END;
+""", 'F()', 0.0),
+
+    ('LEFT beyond the end gives the whole string', """
+EXPORT F() BEGIN RETURN LEFT("abcdef", 99); END;
+""", 'F()', 'abcdef'),
+
+    ('LEFT(s,0) gives the WHOLE string, not an empty one', """
+EXPORT F() BEGIN RETURN LEFT("abcdef", 0); END;
+""", 'F()', 'abcdef'),
+
+    ('and its size confirms it', """
+EXPORT F() BEGIN RETURN SIZE(LEFT("abcdef", 99)); END;
+""", 'F()', 6.0),
+
     ('nested lists: L(2)(1)', """
 EXPORT F() BEGIN LOCAL L; L := {{1,2},{3,4}}; RETURN L(2)(1); END;
 """, 'F()', 3.0),
@@ -294,6 +335,24 @@ EXPORT F() BEGIN RETURN WHATSIT(1); END;
 """, 'F()'),
     ('EXPR of an empty string', """
 EXPORT F() BEGIN RETURN EXPR(""); END;
+""", 'F()'),
+    # Edges of the string functions that were NOT measured. They raise
+    # rather than extrapolate: an invented edge case is the divergence this
+    # interpreter exists to catch.
+    ('RIGHT beyond the end, which is not measured', """
+EXPORT F() BEGIN RETURN RIGHT("abcdef", 99); END;
+""", 'F()'),
+    ('MID with two arguments, which is not measured', """
+EXPORT F() BEGIN RETURN MID("abcdef", 2); END;
+""", 'F()'),
+    ('MID from before the start, which is not measured', """
+EXPORT F() BEGIN RETURN MID("abcdef", 0, 2); END;
+""", 'F()'),
+    ('LEFT with a negative count, which is not measured', """
+EXPORT F() BEGIN RETURN LEFT("abcdef", -1); END;
+""", 'F()'),
+    ('LEFT of something that is not a string', """
+EXPORT F() BEGIN RETURN LEFT(42, 2); END;
 """, 'F()'),
 ]
 

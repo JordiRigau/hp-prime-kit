@@ -5,15 +5,18 @@
 // column, and its position is documented only for the grob form:
 //   TEXTOUT_P(txt, G0, x, y, font, colour [, width])
 //
-// Whether the short form takes one, and where, is not measured. The
-// linter therefore leaves the short form alone.
+// MEASURED on a G2: the short form takes one too, as its 6th argument.
+// Lines 2 and 3 below clip identically at 60 px, and line 1 runs off the
+// screen. So the width is the last argument of whichever form you use, and
+// the linter now judges both.
 //
-// Run TWTEST on Home (no parentheses). Three lines of W's:
+// Three lines of W's:
 //   1. short form, no width      -> runs off to the right
-//   2. short form, 6th argument  -> clipped at 60 px, or a syntax error
-//   3. grob form, 7th argument   -> clipped at 60 px (the known-good one)
+//   2. short form, 6th argument  -> clipped at 60 px
+//   3. grob form, 7th argument   -> clipped at 60 px
 //
-// If it will not compile, line 2 is the reason, and that is the answer.
+// This file warns on `textout-width`, once, and on purpose: the first of
+// the three lines has no width because overflowing is what it is for.
 // ===================================================================
 
 // Drain what is pending, then wait for a real key. Without this the program
@@ -31,11 +34,11 @@ BEGIN
   LOCAL zw;
   zw := "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW";
   RECT();
-  TEXTOUT_P("1 none / 2 short+w / 3 grob+w", 2, 2, 2);
-  TEXTOUT_P(zw, 2, 30, 2, RGB(0,0,0));
+  TEXTOUT_P("1 none / 2 short+w / 3 grob+w", 2, 2, 2, RGB(0,0,0), 316);
+  TEXTOUT_P(zw, 2, 30, 2, RGB(0,0,0));   // no width, on purpose
   TEXTOUT_P(zw, 2, 60, 2, RGB(0,0,0), 60);
   TEXTOUT_P(zw, G0, 2, 90, 2, RGB(0,0,0), 60);
-  TEXTOUT_P("press a key to leave", 2, 206, 2);
+  TEXTOUT_P("press a key to leave", 2, 206, 2, RGB(0,0,0), 316);
   TWW();
   RETURN 1;
 END;

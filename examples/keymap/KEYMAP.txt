@@ -20,18 +20,18 @@ EXPORT KEYMAP()
 BEGIN
   LOCAL zk, zn, zy;
   RECT();
-  TEXTOUT_P("KEYMAP - press keys one at a time. Esc leaves.", 4, 2, 2);
+  TEXTOUT_P("KEYMAP - press keys one at a time. Esc leaves.", 4, 2, 2, RGB(0,0,0), 314);
   zn := 0;
   zy := 26;
   REPEAT
     REPEAT zk := GETKEY; UNTIL zk < 0;      // drain what is pending
     REPEAT zk := GETKEY; UNTIL zk >= 0;     // and now wait for a real one
     zn := zn + 1;
-    TEXTOUT_P(STRING(zn) + ")   code = " + STRING(zk), 4, zy, 3);
+    TEXTOUT_P(STRING(zn) + ")   code = " + STRING(zk), 4, zy, 3, RGB(0,0,0), 314);
     zy := zy + 24;
     IF zy > 186 THEN
       RECT();
-      TEXTOUT_P("KEYMAP - press keys one at a time. Esc leaves.", 4, 2, 2);
+      TEXTOUT_P("KEYMAP - press keys one at a time. Esc leaves.", 4, 2, 2, RGB(0,0,0), 314);
       zy := 26;
     END;
   UNTIL zk == 4;

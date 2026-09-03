@@ -135,7 +135,7 @@ Deliberately still open, and listed so nobody leans on them:
 | | |
 |---|---|
 | The **lower keyboard**'s key codes | the top three rows are measured key by key; everything below them is still taken from reading other people's apps |
-| The interpreter's **string functions** | left out: their edge behaviour is not measured, and guessing would defeat the purpose |
+| `SORT`, and the **edges** of the string functions | `LEFT`, `RIGHT`, `MID` and `INSTRING` are measured and covered; what was not measured raises instead of guessing |
 | **G1** | everything here is a G2. Same firmware, different hardware |
 | MicroPython **speed** and an app's **memory limit** | not measured. The bridge crossing is: 0.2 ms |
 

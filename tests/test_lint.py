@@ -86,6 +86,13 @@ BEGIN
   RETURN 1;
 END;
 """),
+    ('textout-width', """
+EXPORT F()
+BEGIN
+  TEXTOUT_P("a label that may not fit", 4, 24, 2, RGB(0,0,0));
+  RETURN 1;
+END;
+"""),
 ]
 
 # -------------------------------------------------------------- controls
@@ -142,10 +149,10 @@ BEGIN
   RETURN 1;
 END;
 """),
-    ('TEXTOUT_P in the short form, whose width position is not measured', """
+    ('TEXTOUT_P in the short form, with its width', """
 EXPORT F()
 BEGIN
-  TEXTOUT_P("a label", 4, 24, 2, RGB(0,0,0));
+  TEXTOUT_P("a label", 4, 24, 2, RGB(0,0,0), 70);
   RETURN 1;
 END;
 """),
