@@ -262,8 +262,11 @@ last bare expression, which was a call to another function.
 | **Home** | a line in the history: the program's name and the value |
 | **the Program Catalog** | a modal pop-up with an information icon, saying the same |
 
-**Unverified**: whether any construct suppresses it. Ending on an assignment
-rather than an expression is the obvious thing to try next.
+**Nothing suppresses it.** Measured, five endings: an assignment, a loop, an
+`IF` that does not run, a call, and a bare `RETURN;`. Every one of them
+answers with a number, so every one of them leaves a line. What you choose is
+what the number says, not whether it appears --
+[ppl.md](ppl.md#a-function-always-answers-something).
 
 ### Waiting for a key: drain the buffer first
 

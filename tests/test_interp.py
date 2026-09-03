@@ -326,10 +326,28 @@ EXPORT F() BEGIN LOCAL L; L := SORT({3,1,2}); RETURN L(1)*100+L(2)*10+L(3); END;
 EXPORT F() BEGIN LOCAL L; L := SORT({"b","a"}); RETURN L(1) + L(2); END;
 """, 'F()', 'ab'),
 
-    ('a function with no RETURN gives its last expression, not nothing', """
+    # A function that falls off the end answers with the last statement
+    # that produced a value. One case per ending, all measured on a G2.
+    ('no RETURN, ending in a call', """
 EXPORT G() BEGIN RETURN 43; END;
 EXPORT F() BEGIN LOCAL z; z := 1; G(); END;
 """, 'F()', 43.0),
+
+    ('no RETURN, ending in an assignment', """
+EXPORT F() BEGIN LOCAL z; z := 1; END;
+""", 'F()', 1.0),
+
+    ('no RETURN, ending in a FOR: the last value the body produced', """
+EXPORT F() BEGIN LOCAL z, zi; z := 0; FOR zi FROM 1 TO 2 DO z := zi; END; END;
+""", 'F()', 2.0),
+
+    ('no RETURN, ending in an IF that does not run', """
+EXPORT F() BEGIN LOCAL z; z := 0; IF z == 1 THEN z := 2; END; END;
+""", 'F()', 0.0),
+
+    ('a bare RETURN compiles, and answers 0', """
+EXPORT F() BEGIN LOCAL z; z := 5; RETURN; END;
+""", 'F()', 0.0),
 
     ('GETKEY without parentheses, which is how PPL writes it', """
 EXPORT F() BEGIN LOCAL zk; zk := GETKEY; RETURN zk; END;

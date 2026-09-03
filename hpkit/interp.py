@@ -599,11 +599,14 @@ class Machine(object):
             last = self.run(body, frame)
         except _Return as d:
             return d.value
-        # A function that falls off the end returns the value of its last
-        # bare expression, not nothing. Measured on a G2: a function whose
-        # body ends in a call to another function came back with THAT
-        # function's value. Only this shape is measured; a body ending in an
-        # assignment or a loop still answers 0 here.
+        # A function that falls off the end answers with the value of the
+        # last statement that produced one, and nothing suppresses that.
+        # Measured on a G2, one function per ending:
+        #     ends in z := 1;                        -> 1
+        #     ends in FOR zi FROM 1 TO 2 DO z := zi;  -> 2
+        #     ends in an IF that does not run         -> 0, the value before
+        #     ends in a call                          -> what the call gave
+        #     ends in a bare RETURN;                  -> 0
         return last if last is not None else 0.0
 
     # ---------------------------------------------------------- execution
@@ -623,54 +626,68 @@ class Machine(object):
                 frame[name] = (self.evaluate(init, frame) if init is not None
                                  else 0.0)
         elif kind == 'assign':
-            self._assign(s[1], self.evaluate(s[2], frame), frame)
+            # An assignment produces a value: the one assigned. Measured on
+            # a G2 -- a function whose body ends in `z := 1;` answers 1.
+            value = self.evaluate(s[2], frame)
+            self._assign(s[1], value, frame)
+            return value
         elif kind == 'expr':
             return self.evaluate(s[1], frame)
         elif kind == 'if':
             if _truth(self.evaluate(s[1], frame)):
-                self.run(s[2], frame)
-            else:
-                self.run(s[3], frame)
+                return self.run(s[2], frame)
+            return self.run(s[3], frame)
         elif kind == 'case':
             for cond, body in s[1]:
                 if _truth(self.evaluate(cond, frame)):
-                    self.run(body, frame)
-                    return
+                    return self.run(body, frame)
             if s[2]:
-                self.run(s[2], frame)
+                return self.run(s[2], frame)
         elif kind == 'for':
             _, var, init, enders, step, direction, body = s
             i = self.evaluate(init, frame)
             limit = self.evaluate(enders, frame)
             inc = self.evaluate(step, frame) if step is not None else 1.0
             inc = abs(inc) * direction
+            last = None
             while (inc > 0 and i <= limit) or (inc < 0 and i >= limit):
                 frame[var] = i
                 try:
-                    self.run(body, frame)
+                    v = self.run(body, frame)
+                    if v is not None:
+                        last = v
                 except _Break:
                     break
                 except _Continue:
                     pass
                 i = frame[var] + inc   # the body may change the variable
+            return last
         elif kind == 'while':
+            last = None
             while _truth(self.evaluate(s[1], frame)):
                 try:
-                    self.run(s[2], frame)
+                    v = self.run(s[2], frame)
+                    if v is not None:
+                        last = v
                 except _Break:
                     break
                 except _Continue:
                     continue
+            return last
         elif kind == 'repeat':
+            last = None
             while True:
                 try:
-                    self.run(s[1], frame)
+                    v = self.run(s[1], frame)
+                    if v is not None:
+                        last = v
                 except _Break:
                     break
                 except _Continue:
                     pass
                 if _truth(self.evaluate(s[2], frame)):
                     break
+            return last
         elif kind == 'iferr':
             try:
                 self.run(s[1], frame)
@@ -686,7 +703,7 @@ class Machine(object):
             raise _Return(self.evaluate(s[1], frame) if s[1] is not None
                             else 0.0)
         elif kind == 'block':
-            self.run(s[1], frame)
+            return self.run(s[1], frame)
         else:
             raise Unsupported('statement %s' % kind)
 

@@ -137,7 +137,7 @@ Deliberately still open, and listed so nobody leans on them:
 | | |
 |---|---|
 | The **lower keyboard**'s key codes | the top three rows are measured key by key; everything below them is still taken from reading other people's apps |
-| Whether the **line Home leaves** can be suppressed | it is the return value, and leaving `RETURN` out does not remove it: the function answers with its last expression instead |
+| **`MID(s, start)`** with a start below 1, and **`SORT`** of a list mixing numbers and strings | the two cases the string probes did not cover; the interpreter raises on both rather than pick an answer |
 | **G1** | everything here is a G2. Same firmware, different hardware |
 | MicroPython **speed** and an app's **memory limit** | not measured. The bridge crossing is: 0.2 ms |
 

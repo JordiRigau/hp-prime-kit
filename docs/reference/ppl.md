@@ -122,9 +122,27 @@ WAIT(-1);                                // waits for a key, returns its code
 | **Compilation order** | a program only sees another's functions **if it was compiled afterwards**. Send data → engine → app |
 | **What an app's program exports** | is tied to that app. If the engine has to be reusable, put it in a catalogue program |
 | **Global state in a library** | if your library has an "active substance" or similar, a calculation mixing two has to reload before each query. Keep a global saying what is loaded and reload only on change |
-| **A function with no `RETURN` is not silent** | it answers with the value of its last bare expression. Measured: a function ending in a call to another came back with that function's value. So you cannot make a program return nothing by leaving `RETURN` out |
+| **A function with no `RETURN` is not silent** | it answers with the value of **the last statement that produced one**, and an assignment produces the value assigned. Nothing makes a function silent: see below |
 | **`GETKEY` takes no parentheses in PPL** | `zk := GETKEY;`. From Python, across the bridge, it does: `eval('GETKEY()')` |
 | **On Home, a function with no arguments is called without parentheses** | `MYFUNC` runs it; `MYFUNC()` answers *syntax error*. Inside PPL source the parentheses are correct and required -- see below |
+
+### A function always answers something
+
+Measured on a G2, one function per ending, with no `RETURN` in any of them
+except the last:
+
+| The body ends in | It answers |
+|---|---|
+| `z := 1;` | **1** -- an assignment produces the value assigned |
+| `FOR zi FROM 1 TO 2 DO z := zi; END;` | **2** -- the last value the body produced |
+| an `IF` whose condition is false | **0** -- the value from before it, unchanged |
+| a call to another function | what **that** function answered |
+| `RETURN;`, bare and with no value | **0** -- and it does compile |
+
+So there is no way to write a function that returns nothing. That matters
+because Home prints what a program answers, and people go looking for a way
+to stop it: there is not one. You choose what the number is, not whether
+there is one.
 
 ### Calling a function from Home
 

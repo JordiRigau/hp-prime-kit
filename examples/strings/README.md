@@ -11,6 +11,8 @@ changing one line in one of them is how the next question gets answered.
 | `MID2.txt` | does `MID` take two arguments | yes -- and it is alone in a file because a bad signature is a COMPILE error, which would take every other case with it |
 | `TWTEST.txt` | where the `TEXTOUT_P` width goes | yes |
 | `RETMSG.txt` | what the line Home leaves behind is | yes |
+| `RETMSG2.txt` | whether any ending avoids leaving one | yes -- none does |
+| `RETBARE.txt` | does a bare `RETURN;` compile | yes, and it answers 0 |
 
 Nothing here is guessed: what the interpreter does not know, it raises on.
 
@@ -109,11 +111,12 @@ raises on.
 - **`MID(s, start)` with a start below 1**, and **`SORT` of a list mixing
   numbers and strings**. Both raise as unsupported rather than pick an
   answer.
-- **Whether the line Home leaves behind can be suppressed.**
-  [RETMSG.txt](RETMSG.txt) answered half of it: the line is the return value,
-  and leaving `RETURN` out does not remove it, because a function with no
-  `RETURN` answers with its last bare expression instead. Ending on an
-  assignment is the next thing to try.
+- Nothing here. The line Home leaves behind cannot be suppressed: five
+  different endings were tried and every one answers with a number. The rule
+  turned out to be broader than "the last expression" -- an assignment
+  produces the value assigned, a loop the last one its body produced, and a
+  bare `RETURN;` compiles and answers 0. It is in
+  [ppl.md](../../docs/reference/ppl.md#a-function-always-answers-something).
 
 ## What happens with the answers
 
