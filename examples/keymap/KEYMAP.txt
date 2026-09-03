@@ -1,0 +1,39 @@
+// ===================================================================
+// KEYMAP - what code does each key report?
+//
+// GETKEY returns a key POSITION, not a character, and the table in
+// docs/reference/interface.md is part measured and part inferred from
+// reading other people's apps. This settles any of it in one run: press
+// keys one at a time and read the codes off the screen.
+//
+//   hpprime write examples/keymap/KEYMAP.txt -o KEYMAP.hpprgm
+//   drag it over, then on Home type:  KEYMAP
+//   (no parentheses: Home rejects KEYMAP())
+//
+// Esc leaves, and its own code (4) is printed on the way out.
+//
+// Do NOT run this with `hpprime run`: on the PC GETKEY always reports
+// "no key", so the wait loop never ends.
+// ===================================================================
+
+EXPORT KEYMAP()
+BEGIN
+  LOCAL zk, zn, zy;
+  RECT();
+  TEXTOUT_P("KEYMAP - press keys one at a time. Esc leaves.", 4, 2, 2);
+  zn := 0;
+  zy := 26;
+  REPEAT
+    REPEAT zk := GETKEY; UNTIL zk < 0;      // drain what is pending
+    REPEAT zk := GETKEY; UNTIL zk >= 0;     // and now wait for a real one
+    zn := zn + 1;
+    TEXTOUT_P(STRING(zn) + ")   code = " + STRING(zk), 4, zy, 3);
+    zy := zy + 24;
+    IF zy > 186 THEN
+      RECT();
+      TEXTOUT_P("KEYMAP - press keys one at a time. Esc leaves.", 4, 2, 2);
+      zy := 26;
+    END;
+  UNTIL zk == 4;
+  RETURN zn;
+END;

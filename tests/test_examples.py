@@ -90,6 +90,20 @@ def main():
     calls(rt, 'conformance', {'ROOT(4)': 2.0, 'ROOT(0.25)': 0.5,
                               'ROOT(-1)': -1.0})
 
+    print('\n-- examples/apptest')
+    at = os.path.join(ROOT, 'examples', 'apptest', 'APPTEST.txt')
+    lints_clean(at, 'APPTEST.txt')
+    calls(at, 'apptest', {'ATSUM()': 385.0})
+
+    print('\n-- examples/keymap')
+    km = os.path.join(ROOT, 'examples', 'keymap', 'KEYMAP.txt')
+    lints_clean(km, 'KEYMAP.txt')
+    # Not called here on purpose: on the PC GETKEY always reports "no key",
+    # so its wait loop would never end. Loading it still has to work.
+    m = interp.Machine()
+    m.load_file(km)
+    ok('KEYMAP' in m.funcs, 'KEYMAP parses and loads')
+
     print('\n-- examples/probe')
     probe = os.path.join(ROOT, 'examples', 'probe', 'main.py')
     bad = appdir.check_imports([probe], [])

@@ -173,6 +173,10 @@ prints it.
 > the recommended workaround -- draw your own menu, read the keys yourself --
 > actually work. See [apps.md](apps.md#5-ppl-apps-the-hooks-and-the-blank-app-trap).
 
+Anything in that table marked inferred can be settled in one run:
+[examples/keymap/](../../examples/keymap/) prints the code of every key you
+press until you leave with `Esc`.
+
 **Design to fail quietly**: send an unknown key code to the default case, and
 make that case something harmless like returning to the previous screen. A
 three-line program tells you the code of whatever you press:
