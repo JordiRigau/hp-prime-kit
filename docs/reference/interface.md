@@ -152,8 +152,26 @@ not 13. And the same code means different things in different modes -- 42 is
 | `ON` | 46 | same |
 | Soft keys 1..6 | 0, 5, 10, 1, 6, 11 | same, and in use |
 | Digits 1..9 | 42, 43, 44, 37, 38, 39, 32, 33, 34 | same, and in use |
+| `View` | **9** | **measured**, read with `GETKEY` inside a blank-based app |
+| `Num` | **11** | **measured**, same way. See the clash below |
 | `Help` | 3 | **inferred** from the position map |
-| `View` | 9 | **inferred** |
+
+**`[Num]` is 11, and 11 is also listed above as soft key 6.** Both numbers
+are real: the soft-key row comes from reading two working apps, and the 11
+was measured directly. The Prime has no separate F1-F6 keys -- the six labels
+at the bottom of the screen are touch targets, and apps drive them from
+physical keys -- so the likeliest reading is that what those apps call "soft
+key 6" *is* the `[Num]` key. That is a reading, not a measurement:
+**Unverified** until somebody presses what they believe is soft key 6 and
+reports the code. The probe in [examples/apptest/](../../examples/apptest/)
+prints it.
+
+> **In a blank-based app, `[Num]` and `[View]` do reach your program** --
+> as ordinary key codes, through `GETKEY`. What does not happen is the
+> `Num()` and `View()` hooks being called, because `START()` is holding the
+> keyboard. Measured on a G2 in an app built by this kit. It is what makes
+> the recommended workaround -- draw your own menu, read the keys yourself --
+> actually work. See [apps.md](apps.md#5-ppl-apps-the-hooks-and-the-blank-app-trap).
 
 **Design to fail quietly**: send an unknown key code to the default case, and
 make that case something harmless like returning to the previous screen. A

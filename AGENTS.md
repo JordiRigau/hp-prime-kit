@@ -144,6 +144,6 @@ Say so plainly when you reach these, instead of implying you have done them:
 
 - installing anything on the calculator;
 - confirming a program runs **on hardware** (the last mile: the emulator is
-  close, not identical, and a PPL app built end to end by this kit has not
-  been opened on hardware yet);
+  close, not identical, and everything in `docs/reference/` that is marked
+  `Unverified` is waiting for exactly this);
 - timing anything, and judging whether an interface is usable in practice.

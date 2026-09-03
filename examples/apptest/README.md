@@ -1,17 +1,20 @@
 # Verifying a PPL app on hardware
 
-Everything else in this kit is validated: the linter's rules are measured,
-the interpreter is tested against its subset, and a program built from
-`templates/code.hpprgm` has been loaded onto a G2 and computed correctly.
+This app exists to check, on the calculator itself, the one thing no PC can
+check: that an app assembled entirely on a PC really opens and runs.
 
-One path is not. **A PPL app assembled end to end by `hpprime build --ppl`
-has never been opened on a calculator.** Its pieces are each validated
-separately -- the blank descriptor comes from an app that works, and the
-program writer is proven -- but the combination is not, and this repository
-says so wherever it matters.
+**It has been run.** On a G2, an app built by `hpprime build --ppl` appeared
+under `[Apps]`, ran `START()`, reported `385` from the program inside it and
+drew `àèóç` correctly. Two key codes came out of the same run: `[View]` is
+**9** and `[Num]` is **11**, and both reach the program through `GETKEY` even
+in a blank-based app that has no view of its own -- which corrected what this
+repository used to say.
 
-Closing that gap takes about five minutes and a calculator. If you do it,
-please report what happened.
+So this is no longer a gap to close. It is still worth running if you have a
+**G1**, or if you want to settle the one number that is still ambiguous: 11
+is both `[Num]` and what two published apps use as soft key 6. Press the six
+on-screen soft-key positions in step 3 and the app will tell you what they
+return.
 
 ---
 
@@ -49,15 +52,14 @@ The app prints them in order, numbered, so you only have to read the screen.
 | **0** | `APPTEST` appears in the `[Apps]` list, and opening it draws a screen | the calculator accepts a `.hpappdir` built entirely on a PC, and `START()` is called |
 | **1** | `the program is inside, and computes: 385` | the source really is inside the `.hpappprgm`, and it compiled |
 | **2** | `accents: àèóç`, all four correct | UTF-16LE survived the container, the transfer and the app wrapper |
-| **3-4** | press a key, and it reports a code | the keyboard reaches an app with no view of its own |
+| **3-4** | press a key, and it reports a code | the keyboard reaches an app with no view of its own. Measured this way: `[View]` 9, `[Num]` 11 |
 | **5** | press again: the app leaves and you land on **Home** | the documented blank-app behaviour: `START()` returning drops you to Home |
 
-Two things worth trying while you are there, because they are documented as
-traps and nobody has confirmed them for an app built this way:
+Two things worth trying while you are there:
 
-- **Press `[Num]` and `[View]` at step 3.** They are expected *not* to reach
-  the program: a blank app has no view to rest in. If one of them does
-  something, that is a finding.
+- **Press the six on-screen soft-key positions at step 3.** That is the open
+  question: `[Num]` returns 11, and 11 is also what two published apps use as
+  soft key 6. One measurement settles whether they are the same key.
 - **Leave the app and reopen it.** It should draw its own screen again, not
   something else. Then, if the CK brings the folder back to your PC, run
   `hpprime verify APPTEST.hpappdir` -- it should report that the calculator
@@ -73,11 +75,12 @@ saying:
 - what `[Num]` and `[View]` did;
 - if it failed: what the screen said, word for word.
 
-A failure here is more valuable than a pass, because it is the last unproven
-link in the chain. If it passes, the two places that currently say "not
-tested on hardware" -- [`docs/reference/apps.md`](../../docs/reference/apps.md)
-§8 and [`docs/start/04-first-app.md`](../../docs/start/04-first-app.md) -- get
-to say something better.
+A failure is more valuable than a pass. The G2 run above says this works on
+one machine and one firmware; anything that contradicts it -- a G1, a
+different firmware, a different key code -- is a real finding, and
+[`docs/reference/apps.md`](../../docs/reference/apps.md) §8 and
+[`docs/reference/interface.md`](../../docs/reference/interface.md) §5 are
+where it would go.
 
 ## Note for testing on the PC
 

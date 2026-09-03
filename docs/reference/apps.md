@@ -137,16 +137,21 @@ And here is the trap:
 > An app created with **Base App: None** has no view to rest in.
 >
 > - If `START()` **returns**, the calculator falls back to Home, and then
->   `[Num]` and `[View]` no longer reach the app.
-> - If `START()` **does not return** (it sits in a loop), it holds the
->   keyboard and those keys do not answer either.
+>   `[Num]` and `[View]` no longer reach the app at all.
+> - If `START()` **does not return** (it sits in a loop), the `Num()` and
+>   `View()` hooks are never called: the loop is holding the keyboard.
 >
-> You cannot have both.
+> Either way, **the hooks are no use to a blank app**.
 
-So **do not rely on the view keys for navigation**. The way out is to draw
-the menu on screen and read the keys yourself: put a footer like
-`key=form  View=menu  Help=help  Esc=exit` and let the program decide what
-each one does. See [interface.md](interface.md).
+What does work, and it is what makes the whole thing tractable: while
+`START()` is polling `GETKEY`, **both keys arrive as ordinary key codes**.
+Measured on a G2, in an app built end to end by this kit: `[View]` is **9**
+and `[Num]` is **11**.
+
+So do not treat the view keys as hooks -- treat them as keys. Draw the menu
+on screen, put a footer like `key=form  View=menu  Help=help  Esc=exit`, and
+let the program decide what each code does. See
+[interface.md](interface.md#5-the-keyboard).
 
 ### The launcher pattern
 
@@ -285,7 +290,7 @@ hpprime build MYAPP app.txt --ppl
 | The generated `.hpappprgm` reads back as the same source | **yes**, and the tool checks it before writing |
 | A program generated from Python **runs on an HP Prime** | **yes** -- see [deploy.md](deploy.md) |
 | The Python app wrappers start it in its own screen | **yes**: they come from an app that runs on this calculator |
-| A **PPL** app assembled end to end by the builder | **not tested on hardware.** Its pieces are, separately -- the descriptor comes from an app that works, and the program writer is validated -- but the combination has not been opened on a calculator yet. [examples/apptest/](../../examples/apptest/) exists to close this |
+| A **PPL** app assembled end to end by the builder | **yes**, on a G2: it appears under `[Apps]`, `START()` runs, the program inside computes correctly and its accented text is intact. The app that was used is [examples/apptest/](../../examples/apptest/) |
 
 And the thing worth doing before trusting any result obtained on the
 calculator: **pull the source back out and compare it with the repository**.

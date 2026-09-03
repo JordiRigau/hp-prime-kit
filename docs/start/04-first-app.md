@@ -76,13 +76,15 @@ An app created with base *None* -- which is what a PPL app is -- has no view
 to rest in:
 
 - if `START()` **returns**, the calculator falls back to Home, and `[Num]`
-  and `[View]` no longer reach your app;
-- if `START()` **does not return**, it holds the keyboard and those keys do
-  not answer either.
+  and `[View]` no longer reach your app at all;
+- if `START()` **does not return**, the `Num()` and `View()` hooks are never
+  called, because your loop is holding the keyboard.
 
-You cannot have both. So do not navigate with the view keys: draw a menu on
-screen, put a footer like `key=form  View=menu  Esc=exit`, and let your
-program decide what each key does.
+So the hooks are no use here. But the keys themselves are: while your loop
+polls `GETKEY`, `[View]` arrives as **9** and `[Num]` as **11** (measured on
+a G2). Draw a menu on screen, put a footer like
+`key=form  View=menu  Esc=exit`, and let your program decide what each code
+does.
 
 The hooks the calculator will call for you, if you export them:
 
@@ -112,15 +114,14 @@ that never changes -- your data -- is not touched when you fix the interface.
 
 ## Honest status
 
-A **Python** app built by this tool starts in its own screen: the wrappers
-come from an app that runs on this calculator. A **PPL** app assembled end to
-end by the builder has **not been opened on hardware yet** -- its pieces are
-each validated separately, but the combination is not.
+Both kinds have now been opened on a G2. A **Python** app starts in its own
+screen, and a **PPL** app built end to end by this tool appears under
+`[Apps]`, runs `START()`, computes correctly and keeps its accented text.
 
-If you have a calculator in front of you, closing that gap is a five-minute
-job and the single most useful thing you could contribute:
-[examples/apptest/](../../examples/apptest/) is an app that reports on its own
-screen what worked and what did not.
+What is still worth reporting, if you try it: whether the same holds on a
+**G1**, and what the six on-screen soft-key positions return as key codes --
+[one of those numbers is still ambiguous](../reference/interface.md#5-the-keyboard).
+[examples/apptest/](../../examples/apptest/) prints whatever you press.
 
 ---
 
