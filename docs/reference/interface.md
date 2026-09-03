@@ -218,14 +218,32 @@ BEGIN
 END;
 ```
 
+### A program that draws and returns loses its screen
+
+Measured on a G2: run a program from Home, have it draw with `TEXTOUT_P` and
+then `RETURN`, and what you are left looking at is **Home, with the return
+value**. The drawing does not survive the program ending.
+
+So anything meant to be read has to wait before it returns:
+
+```ppl
+  TEXTOUT_P("press a key to leave", 2, 206, 2);
+  MYWAIT();          // drain, then wait -- see below
+  RETURN 1;
+```
+
+This is the first thing that goes wrong with a diagnostic program, and it
+looks like the program did nothing at all.
+
 ### Waiting for a key: drain the buffer first
 
 There is a measured contradiction here, worth knowing before you choose:
 
 > **In one program, `WAIT(-1)` did not wait.** A results screen flashed past
 > and the form came straight back. It looked like it was waiting, because
-> when the program ended the screen stayed drawn until something was
-> pressed; once a loop was added, it was clear it had not.
+> that program was called from another one and the screen survived until the
+> next redraw; once a loop was added, it was clear it had not. (Returning to
+> **Home** is different: there the screen is gone at once, see above.)
 >
 > **In two published apps, `WAIT(-1)` is the event loop**: it returns a
 > number (key) or a list (touch), and returns −1 every 60 s.

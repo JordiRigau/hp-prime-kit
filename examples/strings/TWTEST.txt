@@ -16,6 +16,16 @@
 // If it will not compile, line 2 is the reason, and that is the answer.
 // ===================================================================
 
+// Drain what is pending, then wait for a real key. Without this the program
+// returns, Home redraws over the screen, and all you see is the result.
+EXPORT TWW()
+BEGIN
+  LOCAL zk;
+  REPEAT zk := GETKEY; UNTIL zk < 0;
+  REPEAT zk := GETKEY; UNTIL zk >= 0;
+  RETURN zk;
+END;
+
 EXPORT TWTEST()
 BEGIN
   LOCAL zw;
@@ -25,5 +35,7 @@ BEGIN
   TEXTOUT_P(zw, 2, 30, 2, RGB(0,0,0));
   TEXTOUT_P(zw, 2, 60, 2, RGB(0,0,0), 60);
   TEXTOUT_P(zw, G0, 2, 90, 2, RGB(0,0,0), 60);
+  TEXTOUT_P("press a key to leave", 2, 206, 2);
+  TWW();
   RETURN 1;
 END;

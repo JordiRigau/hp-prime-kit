@@ -14,6 +14,16 @@
 // answer to part of the question.
 // ===================================================================
 
+// Drain what is pending, then wait for a real key. Without this the program
+// returns, Home redraws over the screen, and all you see is the result.
+EXPORT SPW()
+BEGIN
+  LOCAL zk;
+  REPEAT zk := GETKEY; UNTIL zk < 0;
+  REPEAT zk := GETKEY; UNTIL zk >= 0;
+  RETURN zk;
+END;
+
 // A string result, in brackets so an empty one is visible.
 EXPORT SPS(zn, zv, zy)
 BEGIN
@@ -45,6 +55,7 @@ BEGIN
   zy := SPS("LEFT(s,99)", LEFT(zs, 99), zy);
   zy := SPN("SIZE(LEFT(s,99))", SIZE(LEFT(zs, 99)), zy);
   zy := SPS("MID(s,4,99)", MID(zs, 4, 99), zy);
-  TEXTOUT_P("press a key", 2, 206, 2);
+  TEXTOUT_P("press a key to leave", 2, 206, 2);
+  SPW();
   RETURN 1;
 END;

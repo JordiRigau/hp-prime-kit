@@ -153,6 +153,7 @@ All of this is measured, and each one costs at least one round trip:
 | `n := SIZE(M)(1);` | *syntax error* | `d := DIM(M);` then `d(1)` |
 | declaring a `LOCAL` half way down | *syntax error* | all of them at the top, together |
 | `MYFUNC()` on Home | *syntax error* | no parentheses on Home when there are no arguments |
+| a program that draws, then returns | you see Home and the result, not the drawing | wait for a key before returning |
 | copying the file into the mirror | nothing gets installed | drag it in the CK window |
 | passing a big matrix to a function | crawls | it is copied **by value**: use a global |
 
@@ -160,7 +161,7 @@ And one ordering rule that surprises people: **a program only sees another's
 functions if it was compiled afterwards.** If you have data, engine and app,
 install them in that order.
 
-`hpprime lint` catches the first six before you ever open the CK.
+`hpprime lint` catches the first six before you ever open the CK. The last four are things it cannot see from a file.
 
 ## When something does not add up: the method
 
