@@ -53,7 +53,18 @@ with the executable path as the value name, but if the box is ticked on a
 particular shortcut it will not appear there -- you have to look at the
 `.lnk` you actually launch it from, which need not be the one on the desktop.
 
-## 3. Do not trust that you installed it: read it back
+## 3. You do not have to compile it
+
+Drag a program over and you can run it straight away: type its name on Home,
+or open it from the catalogue. Measured on a G2 with half a dozen programs
+transferred and run in one sitting, none of them compiled by hand first.
+
+> **Reported, not measured**: that a very large program may need compiling
+> explicitly before it will run. If that happens to you, the compile action
+> is in the Program Catalogue, and it is worth reporting -- it would mean
+> there is a size where the rule above stops holding.
+
+## 4. Do not trust that you installed it: read it back
 
 The source can be pulled out of the installed binary, so it can be compared
 with your repository:
@@ -68,7 +79,7 @@ is easy to fix something on the PC and forget to send it over -- that is how
 you discover an installed app has been two commits behind the code you were
 trusting.
 
-## 4. The writer, validated against hardware
+## 5. The writer, validated against hardware
 
 A program generated on a PC -- a template's header, the source put in by the
 kit, never touched by the CK or by the calculator -- has been **loaded,
@@ -103,7 +114,7 @@ can repeat the experiment on your own calculator with one command:
 hpprime write examples/selftest/SELFTEST.txt -o SELFTEST.hpprgm
 ```
 
-## 5. Getting a template, which is not as easy as it sounds
+## 6. Getting a template, which is not as easy as it sounds
 
 **The kit ships one**, at `templates/code.hpprgm`, and every tool picks it up
 on its own. You only need your own if that one ever fails you -- or if you
@@ -135,7 +146,7 @@ calculator, which is exactly what is needed.
 `hpprime write` refuses a template with a compiled block on its own, so the
 mistake cannot slip through silently.
 
-## 6. Which calculator is which
+## 7. Which calculator is which
 
 When there are several folders under `Calculators\`, the `settings` file in
 each one carries its identifier -- for a physical calculator, its serial

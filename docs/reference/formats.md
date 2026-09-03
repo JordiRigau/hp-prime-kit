@@ -107,10 +107,10 @@ the source and build it like any other program.
 
 Two things that run does **not** establish:
 
-- **When** the rebuild happens -- on arrival, when the program is compiled
-  from the catalogue, or on the first run. The block's 9 never reached the
-  answer either way, so what is measured holds; the timing is simply not
-  known.
+- **When** the rebuild happens -- on arrival, or on the first run. It is not
+  a manual compile: nothing was compiled by hand at any point in that
+  session. The block's 9 never reached the answer either way, so what is
+  measured holds; the timing is simply not known.
 - **How long** a large one takes to compile. That wait is the reason the
   block exists, and a generated file has none, so the calculator does the
   work on receipt. Two small matrices are instant; hundreds of kilobytes

@@ -124,7 +124,7 @@ Reference firmware: **G2, 2.4 revision 15515 (2025-09-15)**.
 
 Both paths have been run on a real G2: a program built from the template this
 repository ships
-([evidence](docs/reference/deploy.md#4-the-writer-validated-against-hardware)),
+([evidence](docs/reference/deploy.md#5-the-writer-validated-against-hardware)),
 and an app built end to end by `hpprime build --ppl`
 ([evidence](docs/reference/apps.md#8-generating-and-checking-it-from-the-pc)).
 

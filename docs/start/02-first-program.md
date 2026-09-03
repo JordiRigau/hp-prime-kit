@@ -102,6 +102,8 @@ and the ten-second test in [deploy.md](../reference/deploy.md).
 
 ## Step 6 — run it there
 
+Nothing to compile: a program you have just dragged over runs as it is.
+
 On the **Home** screen, type the function name and its arguments:
 
 ```
