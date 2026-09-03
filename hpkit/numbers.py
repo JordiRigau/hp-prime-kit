@@ -168,11 +168,15 @@ def write_hpmat(matrix):
 # Verified by walking a 367 KB block whole: 72 entries, ending exactly where
 # the source record begins, recovering the same 72 names in the same order
 # the source declares them.
-NAME_TAG = 0x0040018B
+NAME_TAG = 0x0040018B          # a variable
+FUNCTION_TAG = 0x0040020B      # a function, wrapped in one more record
+PROGRAM_TAG = 0x0040008B       # Main, whose value holds the source
 TYPE_TAG = 0x00800185
 VALUE_TAG = 0x00C0018C
 NAME_RECORD = 68          # 4 for the tag + 64 for the text
-MATRIX_TYPE = 0x0014
+MATRIX_TYPE = 0x14        # ONE byte: the one beside it is uninitialised
+                          # memory (0xCD in a file measured), so reading the
+                          # pair as a 16-bit type rejects real matrices
 
 
 class Symbol(object):
@@ -252,14 +256,29 @@ def symbols(data, first=None, end=None):
     out = []
     while o + 16 <= end:
         total = u32(o)
-        if u32(o + 4) != NAME_RECORD or u32(o + 8) != NAME_TAG:
-            break                            # the Main record, or the end
         if not 0 < total <= end - o:
             break
-        name = data[o + 12:o + 8 + NAME_RECORD].decode('utf-16-le').rstrip(chr(0))
-        q = o + 8 + NAME_RECORD
+        # A variable's entry starts with its name record. A function's is
+        # wrapped in one more record first, so the name record is 8 bytes
+        # further in. Both are followed the same way after that.
+        head = o + 4
+        if u32(head) != NAME_RECORD:
+            head = o + 12
+            if u32(head) != NAME_RECORD:
+                break
+        tag = u32(head + 4)
+        if tag not in (NAME_TAG, FUNCTION_TAG, PROGRAM_TAG):
+            break
+        name = data[head + 8:head + 4 + NAME_RECORD].decode(
+            'utf-16-le').rstrip(chr(0))
+        if tag != NAME_TAG:
+            out.append(Symbol(name, o, 'function' if tag == FUNCTION_TAG
+                              else 'program'))
+            o += 4 + total
+            continue
+        q = head + 4 + NAME_RECORD
         v = q + 4 + u32(q)                   # past the type record
-        flag, kind = struct.unpack_from('<HH', data, v + 8)
+        kind = data[v + 10]
         if kind == MATRIX_TYPE:
             rank, rows, cols = struct.unpack_from('<III', data, v + 12)
             body = v + 24
@@ -271,7 +290,7 @@ def symbols(data, first=None, end=None):
                 value = None
             out.append(Symbol(name, o, 'matrix', rows, cols, value))
         else:
-            out.append(Symbol(name, o, 'type %04X' % kind))
+            out.append(Symbol(name, o, 'type %02X' % kind))
         o += 4 + total
     return out
 

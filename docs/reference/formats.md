@@ -207,8 +207,19 @@ just the globals coming before `Main` in that table. Measured: in a code
 program the source record ends exactly where the `Main` entry ends, and both
 end where the table's own record does.
 
-The entries themselves are one per exported **variable**, in the order the
-source declares them. Functions other than `Main` are not in the table.
+The entries are in the order the source declares them, and there are three
+shapes, told apart by the tag in their name record:
+
+| Tag | What it is | Shape |
+|---|---|---|
+| `0040018B` | a variable | the name record comes first |
+| `0040020B` | a function | wrapped in one more record, so the name record is 8 bytes further in |
+| `0040008B` | `Main` | like a variable's, and its value holds the source |
+
+A matrix value's type is the **single byte** at offset 2 of the value,
+`0x14`. The byte beside it is not part of it: one file measured has `0xCD`
+there, which is uninitialised memory, so reading the two as a 16-bit type
+rejects perfectly good matrices.
 
 Each entry is three TLV records, the same shape as the container around them:
 
