@@ -25,7 +25,9 @@ cd hp-prime-kit
 python hpprime.py doctor          # is this machine ready?
 ```
 
-Then the whole cycle, four commands:
+Then the whole cycle, four commands -- run from that folder, and written the
+short way (`.\hpprime` in PowerShell, `./hpprime` on macOS and Linux, or
+`python hpprime.py` anywhere):
 
 ```bash
 hpprime new CIRCLE                     # a starter that already runs

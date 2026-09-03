@@ -7,8 +7,10 @@ install.
 hpprime <command> [arguments]
 ```
 
-On Windows, run it from the repository folder; `hpprime.cmd` finds Python for
-you. On macOS and Linux, `./hpprime`. Anywhere else, `python hpprime.py`.
+Run it from the repository folder. How you type `hpprime` depends on your
+shell: `.\hpprime` in PowerShell (the `.\` is required), `hpprime` in
+cmd.exe, `./hpprime` on macOS and Linux. `python hpprime.py` works
+everywhere and is the one to fall back on.
 
 Every command exits **0 on success and non-zero on failure**, so they all
 work as gates in a script.

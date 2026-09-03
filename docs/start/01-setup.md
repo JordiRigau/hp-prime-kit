@@ -78,9 +78,18 @@ python hpprime.py doctor
 `doctor` tells you what works on your machine and what to do about anything
 that does not. It should end with *"Everything the kit needs is in place."*
 
-On Windows you can drop the `python`: `hpprime doctor` works from the
-repository folder. On macOS and Linux, `./hpprime doctor`. The rest of these
-pages write it the short way.
+**Where to run these.** In a terminal, with the repository folder as your
+current directory -- the `cd` above. Every command in these pages is written
+the short way, `hpprime doctor`, and how you type that depends on your shell:
+
+| Shell | Type |
+|---|---|
+| Windows PowerShell | `.\hpprime doctor` — the leading `.\` is required |
+| Windows cmd.exe | `hpprime doctor` |
+| macOS, Linux | `./hpprime doctor` |
+| anywhere, always works | `python hpprime.py doctor` |
+
+If in doubt, use the last one. It is the same program either way.
 
 ## The vocabulary you need
 
