@@ -18,14 +18,41 @@ page is reference, not a tutorial.
 | `EXPORT A:=1, B:=2, …;` | failed with 7 initialised variables on one line | one declaration per line |
 | `LOCAL` half way down a function | every local goes together at the top of the `BEGIN` | declare them all first |
 | `ENDIF`, `ENDFOR`, `ENDWHILE` | they do not exist | `END` closes everything |
-| **Indexing a global declared in ANOTHER program** | the compiler does not know it is a list, so it reads `NAMES(1)` as **a call to a function** called `NAMES` | copy it to a local first: `zn := NAMES;` then `zn(1)` |
 
-That last one is easy to miss, because the same code compiles when the
-declaration is in the same file.
+**Indexing a global declared in another program** used to be in that table.
+It is not, any more: see below.
 
 **Evidence for the `LOCAL` limit**, measured against programs that compile on
 that same calculator: one that declares **8** compiles; three others stop at
 **7**. The functions that failed declared **13, 16 and 18**.
+
+### Indexing a global from another program: not a rule
+
+This kit used to state, as a compile error, that indexing a global declared
+in a different program fails because the compiler reads `NAMES(1)` as a call
+to a function called `NAMES`. **That is too broad, and a counter-example was
+found in code that runs.**
+
+| | |
+|---|---|
+| It **failed** | a list declared `EXPORT L:={};` -- **empty** -- in one program, indexed from another |
+| It **works** | a list declared `EXPORT L:={"a","b",...}` -- **with contents** -- in one program, indexed and passed to `SIZE` from another, on a G2, in an app in daily use |
+
+Both are on the same calculator. What separates them is **not established**.
+Two hypotheses, neither measured:
+
+- **The declaration's contents.** An empty list may leave the compiler
+  nothing to infer a type from, while a filled one does.
+- **The order they were installed in.** A program only sees another's
+  functions if it was compiled afterwards, which is measured; the same may
+  hold for knowing a global's type.
+
+Four small programs would settle it: a global declared empty and one
+declared full, each indexed from a second program, installed in both orders.
+
+Until somebody runs that, **copying to a local first is the safe move** --
+`zn := NAMES;` then `zn(1)` -- because it costs one line and works in both
+cases. It is a precaution, not a rule, and this page will not call it one.
 
 `hpprime lint` catches all of these except the last one, which cannot be
 decided by looking at one file: `TS1(1)` and `AREA(3,350)` are written the

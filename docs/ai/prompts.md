@@ -25,8 +25,10 @@ not BASIC. These are measured facts, not preferences:
   statement holds at most 7-8 variables. Use groups of 6.
 - You cannot index the result of a call: SIZE(M)(1) does not compile.
   Use d := DIM(M); then d(1).
-- You cannot index a global declared in another program directly; copy it to
-  a local first.
+- Indexing a global declared in another program has been seen both to fail
+  and to work on the same calculator; what separates the cases is not known.
+  Copying it to a local first (zn := NAMES; then zn(1)) works either way, so
+  prefer that, but do not state it as a rule.
 - EXPORT makes a function visible outside its file. Exported names are
   global and collide with each other, so prefix them.
 - Matrices and lists are passed BY VALUE: passing a large one copies it.

@@ -32,6 +32,10 @@ Three habits that make this work:
 
 - **An error that does not move after a fix means the hypothesis is false.**
   Do not record the fix; go back and find the real cause.
+- **One failure is not a rule.** A thing that broke once and a thing that
+  cannot work are different claims, and this kit has already written the
+  first as the second. If you have one observation, say what you saw; a rule
+  needs the case that fails and a case that does not.
 - **A round trip is not a proof.** Reading and writing with the same mistake
   gives a perfect round trip and a wrong answer. Verify against something
   that did not come from your own code.
