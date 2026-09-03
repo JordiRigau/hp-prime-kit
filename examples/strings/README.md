@@ -1,14 +1,12 @@
 # Measuring the string functions
 
-The interpreter covers arithmetic, lists, matrices and control flow, and
-deliberately does **not** cover `LEFT`, `RIGHT`, `MID`, `INSTRING` or `SORT`.
-Their edge behaviour is not measured here, and a guessed semantics would
-return a value where the calculator returns another -- which is exactly the
-divergence [`hpprime run`](../../docs/tools.md#run) exists to catch. Anything
-not covered raises instead.
+These two probes are how the string functions came to be covered by the
+interpreter, and how the `TEXTOUT_P` width was settled. Both were run on a
+G2; the results are below.
 
-That is a real cost: today, a program using `MID` cannot be run on the PC at
-all. These two probes are what turns that around.
+They are kept because the same two files answer the questions that are still
+open -- `SORT`, and the edges nobody has measured -- with one line changed.
+Nothing here is guessed: what the interpreter does not know, it raises on.
 
 ```bash
 hpprime write examples/strings/SPROBE.txt -o SPROBE.hpprgm
@@ -45,9 +43,8 @@ its position is documented only for the grob form:
 TEXTOUT_P(txt, G0, x, y, font, colour [, width])
 ```
 
-Whether the **short** form takes one is not measured, which is why the
-linter's `textout-width` rule judges the grob form only. TWTEST draws three
-lines of W's:
+The question was whether the **short** form takes one too. TWTEST draws
+three lines of W's:
 
 1. short form, no width -- should run off to the right;
 2. short form, a 6th argument of 60 -- clipped at 60 px, or a syntax error;
