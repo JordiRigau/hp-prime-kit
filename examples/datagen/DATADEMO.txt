@@ -1,0 +1,30 @@
+// ===================================================================
+// DATADEMO - the first half of the data-program experiment.
+//
+// This is an ordinary code program: two small matrices declared as
+// literals, and a function that reads them back. Nothing generated,
+// nothing clever. `hpprime write` builds it today.
+//
+// What it is for: the calculator adds its own compiled block to
+// whatever it saves, so once this is installed, the copy that comes
+// back from the Connectivity Kit mirror is a REAL data program -- small
+// enough to read end to end, with contents we chose.
+//
+// Step 1  install it, and run DCHECK on Home (no parentheses).
+//         It must answer 37. If it does not, stop and say so.
+// Step 2  bring the file back from
+//         Documents\HP Connectivity Kit\Calculators\<yours>\DATADEMO.hpprgm
+//         and hand it over.
+//
+// Then the question worth answering becomes reachable: change one
+// number in the block only, leave the source alone, install it again,
+// and DCHECK says which of the two the calculator believes.
+// ===================================================================
+
+EXPORT DMA:=[[1,2],[3,4]];
+EXPORT DMB:=[[5,6,7]];
+
+EXPORT DCHECK()
+BEGIN
+  RETURN DMA(2,1) * 10 + DMB(1,3);
+END;

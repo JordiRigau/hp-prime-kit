@@ -190,6 +190,33 @@ class Symbol(object):
         return '<%s %s>' % (self.name, self.kind)
 
 
+def symbol_entry(name, matrix, flag=2):
+    """One symbol entry, built to the grammar above. -> bytes.
+
+    Building one is not the same as the calculator accepting it. Nothing
+    here has been installed and run, so a program you assemble this way is
+    an experiment, not a product. See examples/datagen/.
+    """
+    if len(name.encode('utf-16-le')) > 64:
+        raise UnexpectedFormat('a symbol name is at most 32 characters')
+    rows, cols = len(matrix), len(matrix[0])
+    if any(len(r) != cols for r in matrix):
+        raise UnexpectedFormat('the rows are not all the same length')
+    body = b''.join(encode(x) for r in matrix for x in r)
+    value = (struct.pack('<I', VALUE_TAG)
+             + struct.pack('<HHIII', flag, MATRIX_TYPE, 2, rows, cols) + body)
+    inner = (struct.pack('<II', NAME_RECORD, NAME_TAG)
+             + name.encode('utf-16-le').ljust(64, bytes(1))
+             + struct.pack('<III', 8, TYPE_TAG, 9)
+             + struct.pack('<I', len(value)) + value)
+    return struct.pack('<I', len(inner)) + inner
+
+
+def build_block(items):
+    """[(name, matrix), ...] -> the bytes of a compiled block."""
+    return b''.join(symbol_entry(n, m) for n, m in items)
+
+
 def _entry_start(data, limit):
     """Where the first symbol entry begins, or None.
 

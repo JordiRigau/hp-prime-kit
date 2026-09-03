@@ -177,7 +177,15 @@ def write(template, source):
     """Put `source` into `template` (bytes), fixing the record lengths.
 
     The text is stored verbatim: call normalize_source() first if you want
-    Connectivity-Kit-style line endings."""
+    Connectivity-Kit-style line endings.
+
+    This cannot add a compiled block. The block is not a slab in front of the
+    source: it is the program's SYMBOL TABLE, and the program itself is one
+    entry in it -- `Main`, with the source record nested inside its value. So
+    adding globals means splicing entries into that table ahead of `Main`,
+    and which enclosing records then have to grow is not established. See
+    docs/reference/formats.md.
+    """
     _old, lens, start, end = read(template)
     blob = (source + '\0').encode('utf-16-le')
     delta = len(blob) - (end - start)

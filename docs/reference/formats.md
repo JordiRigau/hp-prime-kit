@@ -189,8 +189,26 @@ identical**, header included.
 
 ## 5. Inside the block: the symbol entries
 
-The block is a chain of **symbol entries**, one per exported **variable**, in
-the order the source declares them. Functions are not in it.
+**The block is the program's symbol table**, and the program itself is an
+entry in it. That is the thing to hold on to, because it explains the rest:
+
+```
+[u32 len][u32 tag]                 the symbol table
+   [entry]  a global               name tag 0040018B
+   [entry]  a global
+   ...
+   [entry]  Main                   name tag 0040008B
+              its value contains [u32 len][u32 tag][source UTF-16LE][NUL]
+```
+
+So the source record is nested inside the `Main` entry, a code program's
+table has one entry, and what looks like "a block in front of the source" is
+just the globals coming before `Main` in that table. Measured: in a code
+program the source record ends exactly where the `Main` entry ends, and both
+end where the table's own record does.
+
+The entries themselves are one per exported **variable**, in the order the
+source declares them. Functions other than `Main` are not in the table.
 
 Each entry is three TLV records, the same shape as the container around them:
 
@@ -236,11 +254,20 @@ PROG.hpprgm: 367405-byte block, 72 symbol(s), 56 matrix/matrices, 44718 numbers
   a program declaring one global of that type, installed and read back.
 - **The leading `flag`** of a matrix value, which is 1 in some symbols and 2
   in others. Both are 2-D real matrices, so it is not the rank.
-- **Whether the calculator accepts a block you generate.** The grammar is
-  enough to build one -- `tests/test_numbers.py` builds entries and reads
-  them back -- but nothing here has been installed on a calculator and run,
-  so generating a data program end to end stays **Unverified**. That is the
-  measurement that would close it.
+- **Where a new entry is spliced in, and what then has to grow.** Building
+  an entry is solved -- `numbers.symbol_entry()` does it and the tests read
+  them back -- but an entry inserted ahead of `Main` sits inside the table
+  record and outside the `Main` one, and which enclosing lengths that changes
+  is not established. `hpprime write` therefore does not offer it: a
+  half-understood container written to a calculator is how you get a file
+  that loads and is quietly wrong.
+- **The u32 at offset 44**, which is 0 in a program with no globals and
+  varies (1, 2, 4, 5, 7, 8, 9, 11, 12) in ones that have them, with no
+  relation to how many. Unknown.
+- **Whether the block matters at all.** The calculator writes one for every
+  program it saves, so it may simply be a cache it rebuilds. If it is,
+  generating one was never necessary. [examples/datagen/](../../examples/datagen/)
+  is the experiment that would tell.
 
 ## 6. Other files on the calculator
 
