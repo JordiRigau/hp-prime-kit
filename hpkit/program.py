@@ -24,8 +24,8 @@ the numbers already in the calculator's internal format, which is what makes
 such a file weigh about 3x its source and open without a compile wait.
 
 This module does not generate that compiled block, and does not need to: the
-calculator rebuilds it from the source when it receives the file (measured --
-see docs/reference/formats.md). What this does is replace the source inside
+calculator rebuilds it from the source (measured -- see
+docs/reference/formats.md). What this does is replace the source inside
 an existing template and fix the length of every record that contains it:
 
   - on a code program it works directly;

@@ -103,9 +103,22 @@ copy that came back from the mirror had the block rebuilt, with the 9 gone.
 
 So a program carrying data does not have to be pasted in by hand, and does
 not need a block generated for it either: write the matrices as literals in
-the source and build it like any other program. What is **not** measured is
-how long a large one takes to compile when it arrives -- that wait is the
-reason the block exists -- or whether there is a size past which it fails.
+the source and build it like any other program.
+
+Two things that run does **not** establish:
+
+- **When** the rebuild happens -- on arrival, when the program is compiled
+  from the catalogue, or on the first run. The block's 9 never reached the
+  answer either way, so what is measured holds; the timing is simply not
+  known.
+- **How long** a large one takes to compile. That wait is the reason the
+  block exists, and a generated file has none, so the calculator does the
+  work on receipt. Two small matrices are instant; hundreds of kilobytes
+  have not been timed.
+
+One detail worth having: the same source compiled twice gives blocks that are
+identical except for the padding byte beside a matrix's type, which came out
+`CD` once and `00` the other time. Do not compare blocks byte for byte.
 
 ### Who writes what, and why it matters
 
