@@ -81,7 +81,7 @@ In rough order of how much it would help:
 | | Why |
 |---|---|
 | **The key codes below the top three rows** | those three are measured key by key; the rest of the table is read out of other people's apps. `examples/keymap/` maps a whole region in one run |
-| **The string functions in the interpreter** (`LEFT`, `MID`, `INSTRING`, `SORT`) | left out on purpose: their edge behaviour is not measured. Measure one and it can go in |
+| **The interpreter's remaining gaps** | `M := GZ` aliases here and copies on the Prime; a function whose body ends in an assignment answers 0 here and nobody has measured what it answers there |
 | **Anything measured on a G1** | everything here is a G2. Same firmware, different hardware |
 | **MicroPython speed, and an app's memory limit** | both listed as not measured, and both change what designs are possible |
 | **How large a generated data program can be** | the block that avoids a compile on arrival is a cache the calculator rebuilds, so data programs generate like any other -- but nobody has timed one with hundreds of kilobytes of literals |

@@ -1,11 +1,17 @@
 # Measuring the string functions
 
-These two probes are how the string functions came to be covered by the
-interpreter, and how the `TEXTOUT_P` width was settled. Both were run on a
-G2; the results are below.
+Five probes, all of them run on a G2, and all of their questions answered.
+The results are below and in the reference pages; the files stay because
+changing one line in one of them is how the next question gets answered.
 
-They are kept because the same two files answer the questions that are still
-open -- `SORT`, and the edges nobody has measured -- with one line changed.
+| File | Its question | Answered |
+|---|---|---|
+| `SPROBE.txt` | what `LEFT`, `RIGHT`, `MID`, `INSTRING` return | yes |
+| `SPROBE2.txt` | their edges, and `SORT` | yes |
+| `MID2.txt` | does `MID` take two arguments | yes -- and it is alone in a file because a bad signature is a COMPILE error, which would take every other case with it |
+| `TWTEST.txt` | where the `TEXTOUT_P` width goes | yes |
+| `RETMSG.txt` | what the line Home leaves behind is | yes |
+
 Nothing here is guessed: what the interpreter does not know, it raises on.
 
 ```bash

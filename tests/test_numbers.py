@@ -201,32 +201,11 @@ def hpmat_files():
         ok(True, 'rejects rows of different lengths')
 
 
-def build_entry(name, matrix, flag=2):
-    """One symbol entry, built to the grammar in docs/reference/formats.md.
-
-    Building one here is what lets the walker be tested with no calculator
-    anywhere. It says nothing about whether a calculator would accept a
-    block built this way -- that is not measured.
-    """
-    rows, cols = len(matrix), len(matrix[0])
-    body = b''.join(N.encode(x) for r in matrix for x in r)
-    value = (struct.pack('<I', N.VALUE_TAG)
-             + struct.pack('<HHIII', flag, N.MATRIX_TYPE, 2, rows, cols)
-             + body)
-    name_rec = (struct.pack('<I', N.NAME_RECORD)
-                + struct.pack('<I', N.NAME_TAG)
-                + name.encode('utf-16-le').ljust(64, b'\x00'))
-    type_rec = struct.pack('<III', 8, N.TYPE_TAG, 9)
-    value_rec = struct.pack('<I', len(value)) + value
-    inner = name_rec + type_rec + value_rec
-    return struct.pack('<I', len(inner)) + inner
-
-
 def synthetic_block():
     ok = bad = 0
     a = [[1.0, -2.5], [0.0006, 123456.789]]
     b = [[7.0, 8.0, 9.0]]
-    block = build_entry('ALPHA', a) + build_entry('BE_TA', b, flag=1)
+    block = N.symbol_entry('ALPHA', a) + N.symbol_entry('BE_TA', b, flag=1)
 
     syms = N.symbols(block, first=0, end=len(block))
     ok_names = [s.name for s in syms] == ['ALPHA', 'BE_TA']
@@ -257,8 +236,8 @@ def synthetic_block():
     # A name shorter than the field, and one that fills more of it, both have
     # to survive the 64-byte padding.
     long_name = 'ABCDEFGHIJKLMNOP'
-    one = N.symbols(build_entry(long_name, b), first=0,
-                    end=len(build_entry(long_name, b)))
+    one = N.symbols(N.symbol_entry(long_name, b), first=0,
+                    end=len(N.symbol_entry(long_name, b)))
     if len(one) == 1 and one[0].name == long_name:
         ok += 1
         print('  ok    a 16-character name survives the padded field')

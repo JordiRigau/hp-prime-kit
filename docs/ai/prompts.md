@@ -32,6 +32,12 @@ not BASIC. These are measured facts, not preferences:
 - Matrices and lists are passed BY VALUE: passing a large one copies it.
 - EXPR("") fails at run time. Check SIZE(s) > 0 first.
 - GETKEY returns a key position, not a character. Enter is 30.
+- LEFT(s,0) and RIGHT(s,0) return the WHOLE string, not an empty one, and
+  so does asking for more characters than there are. MID(s,start,0) returns
+  an EMPTY one. MID's third argument is a length, not an end position, and
+  with two arguments it runs to the end.
+- A function with no RETURN is not silent: it answers with the value of its
+  last bare expression. You cannot make one return nothing by omitting it.
 - On the Home screen a function with no arguments is called WITHOUT
   parentheses: MYFUNC, not MYFUNC(). Inside PPL source the parentheses
   are correct. Tell the user the right form when you tell them to test.

@@ -223,11 +223,6 @@ def symbol_entry(name, matrix, flag=2):
     return struct.pack('<I', len(inner)) + inner
 
 
-def build_block(items):
-    """[(name, matrix), ...] -> the bytes of a compiled block."""
-    return b''.join(symbol_entry(n, m) for n, m in items)
-
-
 def _entry_start(data, limit):
     """Where the first symbol entry begins, or None.
 
@@ -299,37 +294,6 @@ def symbols(data, first=None, end=None):
         else:
             out.append(Symbol(name, o, 'type %02X' % kind))
         o += 4 + total
-    return out
-
-
-def matrices_in_block(block, minimum=4):
-    """The matrices that can be recognised inside a compiled block.
-
-    It looks for [rank=2][rows][cols] headers whose data decodes as valid
-    BCD. This is a sweep, not a grammar: the block also carries symbol
-    records that are not interpreted here. Use it to look at what is inside,
-    not to rewrite it.
-
-    -> list of (offset, rows, cols, matrix)
-    """
-    out, o, n = [], 0, len(block)
-    while o + 12 <= n:
-        rank, rows, cols = struct.unpack_from('<III', block, o)
-        fits = o + 12 + rows * cols * 8 <= n
-        if (rank == 2 and rows >= minimum and cols >= 1
-                and rows < 100000 and cols < 1000 and fits):
-            try:
-                m = []
-                for i in range(rows):
-                    m.append([decode(block[o + 12 + 8 * (i * cols + j):
-                                           o + 20 + 8 * (i * cols + j)])
-                              for j in range(cols)])
-                out.append((o, rows, cols, m))
-                o += 12 + rows * cols * 8
-                continue
-            except UnexpectedFormat:
-                pass
-        o += 4
     return out
 
 
