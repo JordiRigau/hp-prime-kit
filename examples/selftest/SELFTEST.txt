@@ -28,7 +28,8 @@ BEGIN
 END;
 
 // Must return 1 if both of the above are right, 0 if not.
-// Run this one on the calculator: SELF3() on the Home screen.
+// Run this one on the calculator: type SELF3 on the Home screen --
+// with no parentheses, or Home answers syntax error.
 EXPORT SELF3()
 BEGIN
   IF SELF1() == 385 AND SIZE(SELF2()) == 23 THEN

@@ -32,6 +32,9 @@ not BASIC. These are measured facts, not preferences:
 - Matrices and lists are passed BY VALUE: passing a large one copies it.
 - EXPR("") fails at run time. Check SIZE(s) > 0 first.
 - GETKEY returns a key position, not a character. Enter is 30.
+- On the Home screen a function with no arguments is called WITHOUT
+  parentheses: MYFUNC, not MYFUNC(). Inside PPL source the parentheses
+  are correct. Tell the user the right form when you tell them to test.
 - TEXTOUT_P takes a 7th argument, the max width in pixels. Without it, text
   that does not fit is painted over its neighbour with no error.
 - There is no debugger and no console. The compiler says "syntax error" and

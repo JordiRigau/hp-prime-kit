@@ -70,26 +70,38 @@ trusting.
 
 ## 4. The writer, validated against hardware
 
-A program generated from Python -- a template's header, the source put in by
-the kit, never touched by the CK or by the calculator -- was **loaded and
-compiled on an HP Prime**:
+A program generated on a PC -- a template's header, the source put in by the
+kit, never touched by the CK or by the calculator -- has been **loaded,
+compiled and run on an HP Prime G2**, twice: once with a template taken from
+the machine it was built on, and once with `templates/code.hpprgm`, the one
+this repository ships.
+
+Measured on the second run, which is the one that matters to you, because it
+is the file you get when you clone:
 
 | | |
 |---|---|
-| What was generated | 3,134 bytes, no compiled block |
-| What ended up on the calculator | 3,406 bytes, with **272 of compiled block** |
+| What was generated | 3,326 bytes, no compiled block |
 | The source inside | identical to the original `.txt` |
-| The accented characters | intact |
-| **Run on the calculator** | the self-check function returned **1** |
+| `SELF1` (sum of squares 1..10) | **385** |
+| `SELF2` (an accented string) | `writer OK - àèóç - 4242`, accents intact |
+| `SELF3` (checks both internally) | **1** |
 
-The compiled block is written by the calculator when it loads the program, so
-its presence alone says the program was understood. But the real proof is the
-last row: the self-check verifies internally that a loop sums to 385 and that
-an accented string is 26 characters long. **The program generated from Python
-computes correctly on the calculator.**
+The calculator adds its own compiled block when it loads a program, so the
+program simply being accepted says it was understood. But the proof is
+`SELF3`: it verifies inside the calculator that the loop sums to 385 and that
+the accented string is 23 characters long. **A program generated from the
+shipped template computes correctly on a real G2.**
 
-The test program is in [examples/selftest/](../../examples/selftest/), so the
-experiment can be repeated with one command.
+> Type `SELF3`, not `SELF3()`. On Home a function with no arguments takes no
+> parentheses -- [ppl.md](ppl.md#calling-a-function-from-home).
+
+The test program is in [examples/selftest/](../../examples/selftest/), so you
+can repeat the experiment on your own calculator with one command:
+
+```bash
+hpprime write examples/selftest/SELFTEST.txt -o SELFTEST.hpprgm
+```
 
 ## 5. Getting a template, which is not as easy as it sounds
 

@@ -118,6 +118,10 @@ python examples/conformance/conformance.py --break
 
 Reference firmware: **G2, 2.4 revision 15515 (2025-09-15)**.
 
+A program built from the template this repository ships has been run on a
+real G2: it compiles, computes and keeps its accented text
+([the evidence](docs/reference/deploy.md#4-the-writer-validated-against-hardware)).
+
 ```bash
 python tests/run_all.py     # eight suites, none of them needs a calculator
 ```

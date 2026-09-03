@@ -110,7 +110,20 @@ AREA(2)
 
 and `[Enter]`. You should get 12.566…
 
-Then run `MAIN()` the same way, to see the form and the message box.
+Then run the interface half, and note the missing parentheses:
+
+```
+MAIN
+```
+
+> **On Home, a function with no arguments is called without parentheses.**
+> `MAIN()` answers *syntax error*; `MAIN` runs it. Inside your source the
+> parentheses are correct -- `AREA(zr)` is called normally from `MAIN` --
+> so this is a Home rule, not a PPL rule.
+> ([Detail and evidence](../reference/ppl.md#calling-a-function-from-home).)
+
+That is the first "why is this failing" of most people's first day, and it is
+not your program.
 
 ## Step 7 — check you installed what you think you did
 
@@ -139,6 +152,7 @@ All of this is measured, and each one costs at least one round trip:
 | `ENDIF`, `ENDFOR` | *syntax error* | `END` for everything |
 | `n := SIZE(M)(1);` | *syntax error* | `d := DIM(M);` then `d(1)` |
 | declaring a `LOCAL` half way down | *syntax error* | all of them at the top, together |
+| `MYFUNC()` on Home | *syntax error* | no parentheses on Home when there are no arguments |
 | copying the file into the mirror | nothing gets installed | drag it in the CK window |
 | passing a big matrix to a function | crawls | it is copied **by value**: use a global |
 

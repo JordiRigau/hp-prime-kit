@@ -39,6 +39,9 @@ The non-negotiables, as a checklist -- the full list with its evidence is in
 - All `LOCAL`s at the top of the `BEGIN`, at most 7-8 per statement.
 - You cannot index the result of a call: `SIZE(M)(1)` does not compile.
 - Exported names are global and collide. Prefix them.
+- On Home, a zero-argument function is called without parentheses:
+  `MYFUNC`, not `MYFUNC()`. In source, the parentheses are right. Get
+  this right whenever you tell somebody how to test on the calculator.
 
 ## 2. The workflow you must follow
 

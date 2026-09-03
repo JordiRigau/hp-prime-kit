@@ -120,6 +120,27 @@ WAIT(-1);                                // waits for a key, returns its code
 | **What an app's program exports** | is tied to that app. If the engine has to be reusable, put it in a catalogue program |
 | **Global state in a library** | if your library has an "active substance" or similar, a calculation mixing two has to reload before each query. Keep a global saying what is loaded and reload only on change |
 | **`GETKEY` takes no parentheses in PPL** | `zk := GETKEY;`. From Python, across the bridge, it does: `eval('GETKEY()')` |
+| **On Home, a function with no arguments is called without parentheses** | `MYFUNC` runs it; `MYFUNC()` answers *syntax error*. Inside PPL source the parentheses are correct and required -- see below |
+
+### Calling a function from Home
+
+The empty argument list is the one place where Home and PPL source disagree,
+and it bites on the very first thing you do after installing a program.
+
+| Where | With no arguments | With arguments |
+|---|---|---|
+| **Home** | `MYFUNC` — `MYFUNC()` is a *syntax error* | `AREA(2)` |
+| **Inside PPL source** | `MYFUNC()` | `AREA(2)` |
+
+**Evidence**, measured on a G2 (firmware 2.4.15515): typing `SELF3()` on Home
+answers *syntax error*; `SELF3` returns 1. That same program's source
+contains `IF SELF1() == 385 AND SIZE(SELF2()) == 23`, and it compiled and
+returned 1 -- so the parentheses are right in source and wrong on Home, not
+wrong everywhere.
+
+It is the same convention the built-in `GETKEY` follows in PPL, generalised
+to your own functions: an empty pair of parentheses is not how the Home
+parser reads a call.
 
 The screen and keyboard traps -- `WAIT(-1)`, touch, key codes, text that
 overflows -- have their own page: [interface.md](interface.md).
