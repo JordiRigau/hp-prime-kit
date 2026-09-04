@@ -91,6 +91,11 @@ r = ev('MYFUNC(1.0)')                             # calls YOUR PPL library
 **It returns numbers and lists of numbers.** That is all you need to call a
 well-written PPL library.
 
+**Unverified**: whether the parentheses matter on this side. The examples here
+write `ticks()` and `GETKEY()`, and a published library writes `eval('ticks')`
+bare. In PPL itself both of those are written without parentheses, so one form
+may be tolerated rather than required. Nobody has run the two side by side.
+
 ### The trap that closes the app
 
 This is measured, and it is not a precaution: it is the difference between

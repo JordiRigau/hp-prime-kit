@@ -99,6 +99,37 @@ cramming six unreadable labels.
 Sasa, HP Museum forum, version 1.1, 2018. A text display utility: what to use
 when the answer is a paragraph rather than a number.
 
+### PrimeLibs -- widgets, touch and a keyboard, in Python
+
+José Felten, version 1.0 alpha. The only Python toolkit here, and the one to
+know about if your app is on the [Python side](micropython.md).
+
+| Module | What it is |
+|---|---|
+| `gui.py` | widget classes: `Component`, `Frame`, `Window`, `TextBox`, `Button`, `CloseButton`, `TextButton`, `Titlebar`, `TextField`, `InfoBar` |
+| `pointer.py` | touch, offered as a better alternative to `hpprime.mouse()` |
+| `kbd.py` | the keyboard, with shift and alpha layers -- **and a USB keyboard**, through `eval('uopen()')` and `usbrecv` |
+| `palette.py` | colours that follow the calculator's light or dark theme |
+| `time.py` | elapsed time and frames per second, built on `eval('ticks')` |
+| `filebrowser.py` | open and save dialogs |
+| `utils.py`, `base64.py`, `zlib.py`, `spellcheck.py` | the rest |
+
+Every widget derives from `Component`, which carries position and size and
+answers `isPressed()` and `isTapped()`; each one has a `draw()` and an
+`update()`, so an app is a loop that updates and draws a tree of them. That
+is a different shape from the PPL libraries above, and a much more familiar
+one if you have written a GUI anywhere else.
+
+Two things in it are worth having even if you write your own:
+
+- **`time.py` is the missing module.** MicroPython on the Prime has no
+  `time`, and this is what a replacement looks like: `eval('ticks')` for
+  milliseconds, a `dt` between updates, `get_fps()`.
+- **The keyboard reaches beyond the calculator's own.** `uopen()` and
+  `usbrecv` read a **USB keyboard**, with control, alt and shift layers.
+  Nothing in this kit has measured that, and it is not in HP's documentation
+  either.
+
 ### SkeletonApp -- an app to start from
 
 Andreas Möller. An app skeleton with a complete event loop: drags, long

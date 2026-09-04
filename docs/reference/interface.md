@@ -52,6 +52,51 @@ the help line underneath.
 `TEXTOUT_P` fonts: 1 small, 2 normal, 3 large (up to 7). Colours with
 `RGB(r,g,b)` in PPL, `0xRRGGBB` integers from Python.
 
+### Drawing without flicker
+
+Painting straight onto the screen shows the work: rows appear one at a time,
+and a redraw blinks. The way round it is to draw into an **off-screen grob**
+and copy the finished picture across in one go.
+
+```ppl
+DIMGROB_P(G1, 320, 240, 0);     // a canvas the size of the screen
+// ... draw into G1 ...
+BLIT_P(G0, G1);                 // one copy, one visible change
+```
+
+From Python the same two calls are `dimgrob(1, 320, 240, 0)` and
+`blit(0, 0, 0, 1)`. *Read from a working Python toolkit, which creates that
+grob once when it loads and blits every frame; not measured here.*
+
+You have `G0` through `G9`. `G0` is the screen; the rest are yours.
+
+### Colours, and the two themes
+
+`RGB(r, g, b)` in PPL, plain `0xRRGGBB` integers from Python. The calculator
+has a light theme and a dark one, and an app with black hard-coded on white
+looks broken in the other. The way published apps handle it is to keep two
+sets of colours and pick one at startup -- background, foreground, selection,
+and a colour per state.
+
+### What makes it interactive: update, then draw
+
+Every app that feels responsive has the same loop -- read the inputs, move
+the state, draw the result -- rather than drawing where the input is handled.
+Read from a working Python toolkit, the pieces it keeps are:
+
+| | |
+|---|---|
+| touch | `x`, `y`, the event type, `dx`/`dy` for a drag, whether it is down, and whether this is a fresh tap |
+| keyboard | the key, plus the shift and alpha layers, since one code means different things in each |
+| time | milliseconds from `ticks`, and the gap since the last update |
+
+The third one matters more than it looks: MicroPython on the Prime has no
+`time` module, so anything that animates or times out has to ask PPL. See
+[micropython.md](micropython.md).
+
+For the widget toolkits and menu libraries that already do all of this, see
+[libraries.md](libraries.md).
+
 ## 3. `TEXTOUT_P` clips -- and without being asked, it overflows
 
 The seventh argument of `TEXTOUT_P` is the **maximum width in pixels**.
