@@ -84,7 +84,7 @@ In rough order of how much it would help:
 
 | | Why |
 |---|---|
-| **The key codes below the top three rows** | those three are measured key by key; the rest of the table is read out of other people's apps. `examples/keymap/` maps a whole region in one run |
+| **The shape of the keyboard's last row** | the codes run 0 to 50 in reading order, five to a row, but 50 is the last one and sits at the bottom right, where a five-wide grid would not put it |
 | **The interpreter's remaining gaps** | `M := GZ` aliases here and copies on the Prime; a function whose body ends in an assignment answers 0 here and nobody has measured what it answers there |
 | **Anything measured on a G1** | everything here is a G2. Same firmware, different hardware |
 | **MicroPython speed, and an app's memory limit** | both listed as not measured, and both change what designs are possible |

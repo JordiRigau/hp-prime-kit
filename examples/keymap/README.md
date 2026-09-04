@@ -45,11 +45,21 @@ Two things came out of that, both now in
   at all. So the codes two apps use for "soft keys 1..6" -- 0, 5, 10, 1, 6,
   11 -- are physical keys: `Apps`, `Home`, `CAS`, `Symb`, `Plot`, `Num`.
 
-## What is still second-hand
+## And then the rest of it
 
-Everything below row 2. `Enter` (30) is measured; backspace, `ON` and the
-digits come from reading apps and happen to fit the grid. If you need one of
-them for real, this program settles it in one run.
+A second run carried the numbering past the top three rows: `Vars` is **14**,
+and the codes rise left to right, row by row, to the last key at the bottom
+right -- `+`, which is **50**. So the whole keyboard is one grid, 0 to 50.
+
+That is also what confirms the model rather than merely fitting it. The
+digits were only ever read from other people's apps, and under this numbering
+`7 8 9`, `4 5 6` and `1 2 3` land on columns 2, 3 and 4 of three consecutive
+rows. A wrong row width would have scattered them.
+
+What is still open is small: which key carries each code that nobody has
+named yet, and the shape of the last row -- 50 sits at the bottom right,
+where a strictly five-wide grid would not put it. Both are one run away with
+this program.
 
 ## What to do with an answer
 

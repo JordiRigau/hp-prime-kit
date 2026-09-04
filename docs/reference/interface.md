@@ -171,14 +171,30 @@ cross-check that makes the model worth trusting: nine measured keys and four
 read from other people's code fit the same numbering, and none of the
 thirteen contradicts it.
 
-The rest, from those same apps and consistent with the grid:
+**The grid covers the whole keyboard, 0 to 50.** Measured: the numbering
+carries on in reading order past the top three rows -- `Vars` is 14, and it
+rises left to right, row by row, to the last key at the bottom right, `+`,
+which is **50**.
 
-| Key | Code |
-|---|---|
-| `Enter` | 30 (**measured** with a diagnostic program) |
-| Backspace | 19 |
-| `ON` | 46 |
-| Digits 1..9 | 42, 43, 44, 37, 38, 39, 32, 33, 34 |
+Everything that was previously only read from other people's apps lands in
+that grid without contradicting it:
+
+| Row | Codes | Keys known in it |
+|---|---|---|
+| 3 | 15-19 | backspace 19 |
+| 6 | 30-34 | `Enter` **30**, and `7 8 9` = 32, 33, 34 |
+| 7 | 35-39 | `4 5 6` = 37, 38, 39 |
+| 8 | 40-44 | `1 2 3` = 42, 43, 44 |
+| 9 | 45-49 | `ON` 46 |
+
+The three digit rows falling on columns 2, 3 and 4 of three consecutive rows
+is the check that matters: a wrong row width would scatter them.
+
+One loose end: 50 is the last code, and a strictly five-wide grid would put
+it at the start of an eleventh row rather than at the bottom right. So the
+bottom row is probably short, or not five wide. It does not affect reading a
+code -- press the key and `examples/keymap/` tells you -- but the shape of
+that last row is not established.
 
 ### The six on-screen labels are not keys
 
@@ -204,9 +220,10 @@ other people picked.
 > the recommended workaround -- draw your own menu, read the keys yourself --
 > actually work. See [apps.md](apps.md#5-ppl-apps-the-hooks-and-the-blank-app-trap).
 
-Everything below row 2 is still second-hand. If you need one of those codes,
-[examples/keymap/](../../examples/keymap/) settles it in one run: it prints
-the code of every key you press until you leave with `Esc`.
+Which physical key carries which code below row 2 has been measured only for
+the ones named above. [examples/keymap/](../../examples/keymap/) prints any
+of them in one run: it shows the code of every key you press until you leave
+with `Esc`.
 
 **Design to fail quietly**: send an unknown key code to the default case, and
 make that case something harmless like returning to the previous screen. A
