@@ -540,6 +540,13 @@ def _copy(v):
     return v
 
 
+def _endless(word):
+    return ('a %s has run %d times without finishing. If it is waiting for a '
+            'key it never will here: GETKEY always reports "no key pressed" '
+            'on the PC, which is what makes a wait loop endless. Run that '
+            'part on the calculator.' % (word, LOOP_LIMIT))
+
+
 def _truth(v):
     if isinstance(v, bool):
         return v
@@ -645,12 +652,16 @@ class Machine(object):
                 return self.run(s[2], frame)
         elif kind == 'for':
             _, var, init, enders, step, direction, body = s
+            turns = 0
             i = self.evaluate(init, frame)
             limit = self.evaluate(enders, frame)
             inc = self.evaluate(step, frame) if step is not None else 1.0
             inc = abs(inc) * direction
             last = None
             while (inc > 0 and i <= limit) or (inc < 0 and i >= limit):
+                turns += 1
+                if turns > LOOP_LIMIT:
+                    raise Unsupported(_endless('FOR'))
                 frame[var] = i
                 try:
                     v = self.run(body, frame)
@@ -663,8 +674,11 @@ class Machine(object):
                 i = frame[var] + inc   # the body may change the variable
             return last
         elif kind == 'while':
-            last = None
+            last, turns = None, 0
             while _truth(self.evaluate(s[1], frame)):
+                turns += 1
+                if turns > LOOP_LIMIT:
+                    raise Unsupported(_endless('WHILE'))
                 try:
                     v = self.run(s[2], frame)
                     if v is not None:
@@ -675,8 +689,11 @@ class Machine(object):
                     continue
             return last
         elif kind == 'repeat':
-            last = None
+            last, turns = None, 0
             while True:
+                turns += 1
+                if turns > LOOP_LIMIT:
+                    raise Unsupported(_endless('REPEAT'))
                 try:
                     v = self.run(s[1], frame)
                     if v is not None:
@@ -1196,6 +1213,12 @@ def _b_inverse(m, a):
 # that way go here: a name that is not a call on the calculator must not
 # become one here.
 BARE_BUILTINS = set(['GETKEY'])
+
+# A loop that never ends would hang the tool with no message, and the usual
+# way to write one here is not a mistake: a wait loop is correct PPL, and
+# GETKEY on the PC always reports "no key pressed", so it can never leave.
+# Stopping with a message that names the cause beats spinning.
+LOOP_LIMIT = 1000000
 
 
 def _record(name, ret=0.0):

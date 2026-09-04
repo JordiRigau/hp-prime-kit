@@ -105,8 +105,10 @@ and returns a neutral value, so a program with an interface still runs end to
 end.
 
 `GETKEY`'s neutral value is "no key pressed", so **a loop that waits for one
-never ends here**. That is the shape of every wait helper in this kit, and it
-is why the probes in `examples/` say not to run them with `hpprime run`.
+can never finish here**. That is the shape of every wait helper in this kit.
+Rather than spin, a loop that has run a million times stops with a message
+naming the cause -- a tool that hangs with no output is worse than one that
+refuses.
 
 **What it does not cover raises.** Never an invented result. If you need a
 command, add it to `BUILTINS` with its case in `tests/test_interp.py` -- and

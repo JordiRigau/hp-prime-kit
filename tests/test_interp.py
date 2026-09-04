@@ -431,6 +431,26 @@ def same(a, b):
     return isinstance(a, float) and abs(a - b) < 1e-9
 
 
+def endless_loop_check():
+    """A wait loop is correct PPL and can never finish here, because GETKEY
+    reports "no key pressed". It has to stop with a message, not spin."""
+    limit = P.LOOP_LIMIT
+    P.LOOP_LIMIT = 2000                  # the mechanism, not the patience
+    try:
+        m = P.Machine()
+        m.load('EXPORT F() BEGIN LOCAL zk; '
+               'REPEAT zk := GETKEY; UNTIL zk >= 0; RETURN zk; END;')
+        try:
+            m.call('F')
+            return False, 'it returned instead of stopping'
+        except P.Unsupported as e:
+            if 'GETKEY' not in str(e):
+                return False, 'the message does not name the cause: %s' % e
+            return True, ''
+    finally:
+        P.LOOP_LIMIT = limit
+
+
 def bom_check():
     """A source saved by a Windows editor starts with a byte order mark, and
     the lexer has no rule for that character: load_file has to strip it."""
@@ -460,6 +480,14 @@ def main():
             bad += 1
             print('  FAIL  %-44s gave %r, expected %r'
                   % (name, got, expected))
+
+    good, why = endless_loop_check()
+    if good:
+        ok += 1
+        print('  ok    a loop that waits for a key stops, and says why')
+    else:
+        bad += 1
+        print('  FAIL  the endless-loop guard: %s' % why)
 
     try:
         if bom_check():
