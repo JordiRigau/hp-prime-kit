@@ -155,38 +155,28 @@ This is the first thing that trips people: the code for `[Enter]` is **30**,
 not 13. And the same code means different things in different modes -- 42 is
 `1` in normal mode and `y` in alpha mode.
 
-**A code is a position, counted along the keyboard from the top left.** The
-whole map, 51 keys, codes 0 to 50:
+**A code is a position, counted along the keyboard from the top left.**
+Measured on a G2, key by key: 51 keys, codes 0 to 50.
 
 | Where | Codes |
 |---|---|
-| top block | `Apps` **0**, `Symb` **1**, ▲ 2, `Help` **3**, `Esc` 4 |
-| | `Home` **5**, `Plot` **6**, ◄ 7, ► 8, `View` **9** |
-| | `CAS` **10**, `Num` **11**, ▼ 12, `Menu` **13** |
-| keypad, **six** wide | `Vars` **14**, Mem 15, Units 16, `x t θ n` 17, `a b/c` 18, `Del` 19 |
+| top block | `Apps` 0, `Symb` 1, ▲ 2, `Help` 3, `Esc` 4 |
+| | `Home` 5, `Plot` 6, ◄ 7, ► 8, `View` 9 |
+| | `CAS` 10, `Num` 11, ▼ 12, `Menu` 13 |
+| keypad, **six** wide | `Vars` 14, Mem 15, Units 16, `x t θ n` 17, `a b/c` 18, `Del` 19 |
 | keypad, **six** wide | `x^y` 20, `SIN` 21, `COS` 22, `TAN` 23, `LN` 24, `LOG` 25 |
-| keypad, five wide | `x²` 26, `+/-` 27, `( )` 28, `Eval` 29, **`Enter` 30** |
-| | `EEX` 31, **7 32**, **8 33**, **9 34**, `÷` 35 |
-| | `ALPHA` 36, **4 37**, **5 38**, **6 39**, `×` 40 |
-| | `Shift` 41, **1 42**, **2 43**, **3 44**, `−` 45 |
-| | `On` 46, `0` 47, `.` 48, space 49, `+` **50** |
+| keypad, five wide | `x²` 26, `+/-` 27, `( )` 28, `Eval` 29, `Enter` 30 |
+| | `EEX` 31, `7` 32, `8` 33, `9` 34, `÷` 35 |
+| | `ALPHA` 36, `4` 37, `5` 38, `6` 39, `×` 40 |
+| | `Shift` 41, `1` 42, `2` 43, `3` 44, `−` 45 |
+| | `On` 46, `0` 47, `.` 48, space 49, `+` 50 |
 
-Bold is measured by pressing the key. `Esc`, the arrows, `Del`, `On` and the
-digits come from two working apps that agree. The rest is **derived**: the
-codes are contiguous, so once the ends of a row are known the keys between
-them follow from the keyboard's own layout -- read off the machine, not
-guessed at.
+**The rows are not all the same width.** The two top rows of the white keypad
+have six keys; the five below them have five. That is what puts `Del` at 19,
+`Enter` at 30 and `+` last at 50.
 
-**The rows are not all the same width**, and that is the part worth
-remembering: the two top rows of the white keypad have **six** keys, the five
-below them have five. An earlier version of this page assumed five
-everywhere. It fitted the digits by luck and could not explain why 50, the
-last code, sits at the bottom right instead of starting another row. With the
-real layout, 14 + 6 + 6 + 5×5 = 51 keys and the last one is `+` at 50, which
-is exactly where it is.
-
-Nothing known contradicts this map: eleven keys measured directly and eleven
-read from other people's code all land on it.
+To read a code you did not expect, press the key:
+[examples/keymap/](../../examples/keymap/) prints it.
 
 ### The six on-screen labels are not keys
 

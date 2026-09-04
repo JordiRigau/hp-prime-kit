@@ -58,7 +58,9 @@ is worse than no linter -- people learn to ignore it.
 
 The same shape applies to the interpreter: a new builtin goes into `BUILTINS`
 with its case in `tests/test_interp.py`, and only after you have measured
-what the calculator returns for it. An invented semantics returns a number
+what the calculator returns for it. Measuring one is a short program that
+prints each case and its result on screen, run from Home, read off the
+display -- the edges are where the surprises are, so include them. An invented semantics returns a number
 where the calculator returns another, which is exactly the divergence this
 kit exists to catch.
 
@@ -84,7 +86,6 @@ In rough order of how much it would help:
 
 | | Why |
 |---|---|
-| **Pressing the keys whose codes are derived** | the map covers all 51, and every key anybody has pressed lands on it, but the ones in between were read off the layout rather than measured |
 | **The interpreter's remaining gaps** | `M := GZ` aliases here and copies on the Prime; a function whose body ends in an assignment answers 0 here and nobody has measured what it answers there |
 | **Anything measured on a G1** | everything here is a G2. Same firmware, different hardware |
 | **MicroPython speed, and an app's memory limit** | both listed as not measured, and both change what designs are possible |

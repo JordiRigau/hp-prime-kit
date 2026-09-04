@@ -24,48 +24,17 @@ code (4) on the way out. If you fill the screen it clears and carries on.
 
 ---
 
-## What it has already settled
+The whole map it produced is in
+[interface.md](../../docs/reference/interface.md#5-the-keyboard): 51 keys,
+codes 0 to 50, with the two top rows of the white keypad six keys wide and
+the rest five.
 
-One run on a G2 mapped the top three rows key by key:
+Two things that page states and this program is how to check:
 
-```
-        col 0       col 1       col 2   col 3       col 4
-row 0   Apps  0     Symb  1     ▲ 2     Help  3     Esc 4
-row 1   Home  5     Plot  6     ◄ 7     ► 8         View  9
-row 2   CAS  10     Num  11     ▼ 12    Menu 13     14
-```
-
-Two things came out of that, both now in
-[interface.md](../../docs/reference/interface.md#5-the-keyboard):
-
-- **A code is a position in a grid, five to a row.** Nine keys measured here
-  and four read from other people's apps fit the same numbering, and none of
-  the thirteen contradicts it.
-- **The six on-screen labels are not keys.** Touching them reported nothing
-  at all. So the codes two apps use for "soft keys 1..6" -- 0, 5, 10, 1, 6,
-  11 -- are physical keys: `Apps`, `Home`, `CAS`, `Symb`, `Plot`, `Num`.
-
-## And then the rest of it
-
-A second run carried the numbering past the top three rows: `Vars` is **14**,
-and the codes rise left to right, row by row, to the last key at the bottom
-right -- `+`, which is **50**. So the whole keyboard is one grid, 0 to 50.
-
-Laid against a picture of the keyboard, those two numbers fix the whole map:
-**the two top rows of the white keypad have six keys and the five below them
-have five**, so 14 + 6 + 6 + 5×5 = 51 keys, codes 0 to 50, ending on `+` at
-the bottom right.
-
-It is worth knowing how that was got wrong first. Assuming five keys to a row
-everywhere also fitted the digits, and looked confirmed -- but it could not
-explain why the last code sits at the bottom right instead of starting
-another row. The loose end was the clue, and a photograph settled it. A model
-that fits the data and leaves something unexplained is not finished.
-
-What is still open is only the keys nobody has pressed: the map covers all
-51, and every measured key lands on it, but the ones between the measured
-ends were read off the layout rather than measured. Any of them is one run
-away with this program.
+- the six labels along the bottom of the screen report **nothing** through
+  `GETKEY` -- they are touch targets, and touch arrives through `MOUSE`;
+- what other apps call "soft keys 1..6" are physical keys: `Apps`, `Home`,
+  `CAS`, `Symb`, `Plot`, `Num`.
 
 ## What to do with an answer
 

@@ -94,31 +94,22 @@ in the size:
 That block is what makes a data program open **instantly** on the calculator
 that receives it, with no compile wait.
 
-**It is a cache, and the calculator rebuilds it.** Measured, in two steps: a
-small program with two matrices was generated here, installed, and brought
-back carrying the block the calculator had written. One number in that block
-was then changed -- 3 became 9 -- with the source left alone, and the file
-installed again. The program answered with the **source's** value, and the
-copy that came back from the mirror had the block rebuilt, with the 9 gone.
+**It is a cache, and the calculator rebuilds it from the source.** Measured
+on a G2: a program was installed with one number in its block changed and its
+source left alone; it answered with the source's value, and the copy that
+came back had the block rebuilt.
 
-So a program carrying data does not have to be pasted in by hand, and does
-not need a block generated for it either: write the matrices as literals in
-the source and build it like any other program.
+So a program carrying data needs no block generated for it, and does not have
+to be pasted in by hand: write the matrices as literals in the source and
+build it like any other program.
 
-Two things that run does **not** establish:
+**Unverified**: when the rebuild happens -- on arrival, or on the first run.
+It is not a manual compile. And how long a large one takes to compile on
+receipt, which is the wait the block exists to avoid: two small matrices are
+instant, hundreds of kilobytes have not been timed.
 
-- **When** the rebuild happens -- on arrival, or on the first run. It is not
-  a manual compile: nothing was compiled by hand at any point in that
-  session. The block's 9 never reached the answer either way, so what is
-  measured holds; the timing is simply not known.
-- **How long** a large one takes to compile. That wait is the reason the
-  block exists, and a generated file has none, so the calculator does the
-  work on receipt. Two small matrices are instant; hundreds of kilobytes
-  have not been timed.
-
-One detail worth having: the same source compiled twice gives blocks that are
-identical except for the padding byte beside a matrix's type, which came out
-`CD` once and `00` the other time. Do not compare blocks byte for byte.
+The same source compiled twice gives blocks that differ in the padding byte
+beside a matrix's type. Do not compare blocks byte for byte.
 
 ### Who writes what, and why it matters
 
@@ -172,10 +163,8 @@ written in decimal. One file therefore gives tens of thousands of
 | Re-encoded and compared **byte for byte** | **44,718 of 44,718** |
 | Negatives inside that comparison | **1,616** |
 
-The negatives are the ones that mattered: a first attempt put a `1` in the
-sign nibble, the round trip failed on exactly the negatives, and that is how
-the `9` was established. Without negatives in the sample the mistake would
-have gone through.
+The negatives are what fix the sign nibble: it is `9`, not `1`, and a sample
+without negatives cannot tell the difference.
 
 Redo it against your own files with `python tests/test_numbers.py`.
 

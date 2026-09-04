@@ -9,7 +9,6 @@ Four things worth having, in the order you are likely to need them.
 | [`conformance/`](conformance/) | compares real PPL against a Python reference over thousands of cases. This is the use that pays for the interpreter |
 | [`apptest/`](apptest/) | an app that verifies, on its own screen, that a PPL app built end to end really opens and runs |
 | [`keymap/`](keymap/) | prints the code of every key you press, until Esc. How any line of the key table gets measured |
-| [`strings/`](strings/) | the two probes that measured what the string functions return, and where the TEXTOUT_P width goes. Kept for the edges still open |
 | starters | not here: `hpprime new NAME` writes one, from [`templates/starters/`](../templates/starters/) |
 
 ```bash

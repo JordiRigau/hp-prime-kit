@@ -104,13 +104,6 @@ def main():
     m.load_file(km)
     ok('KEYMAP' in m.funcs, 'KEYMAP parses and loads')
 
-    print('\n-- examples/strings')
-    for name in ('SPROBE.txt', 'TWTEST.txt'):
-        path = os.path.join(ROOT, 'examples', 'strings', name)
-        lints_clean(path, name)
-    # Not run here: these call the very functions the interpreter does not
-    # cover. That is the point of them.
-
     print('\n-- examples/probe')
     probe = os.path.join(ROOT, 'examples', 'probe', 'main.py')
     bad = appdir.check_imports([probe], [])
