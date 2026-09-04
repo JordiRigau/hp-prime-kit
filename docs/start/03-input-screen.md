@@ -134,6 +134,13 @@ has one you can copy.
 reach your program. Draw your own menu and read the keys yourself. That
 matters in [step 4](04-first-app.md).
 
+## Before you build something big
+
+A scrolling list, a menu with more than six actions, a text viewer -- someone
+has published each of those. [libraries.md](../reference/libraries.md) says
+which level a screen needs and what those libraries give you, so you can
+decide before writing rather than after.
+
 ---
 
 **Next:** [4. Wrapping it as an app](04-first-app.md).

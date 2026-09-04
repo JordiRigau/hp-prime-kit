@@ -24,6 +24,7 @@ Then, depending on the task:
 | the user has never programmed a Prime | [`docs/start/01-setup.md`](docs/start/01-setup.md) -- send them there before anything else |
 | anything in PPL | [`docs/reference/ppl.md`](docs/reference/ppl.md) |
 | screens, keys, touch | [`docs/reference/interface.md`](docs/reference/interface.md) |
+| choosing how to build a screen, or using somebody's library | [`docs/reference/libraries.md`](docs/reference/libraries.md) |
 | wrapping it as an app | [`docs/reference/apps.md`](docs/reference/apps.md) |
 | writing it in Python | [`docs/reference/micropython.md`](docs/reference/micropython.md) |
 | the binary formats, or moving a lot of data | [`docs/reference/formats.md`](docs/reference/formats.md) |

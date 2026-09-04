@@ -472,7 +472,14 @@ The kit's interpreter follows the same rule: `TEXTOUT_P`, `INPUT`, `CHOOSE`,
 `MSGBOX` and `WAIT` are **not drawn**; they are recorded in `machine.io` and
 return a neutral value, so the calculation runs with no interface.
 
-## 11. Where this comes from
+## 11. Somebody may have written it already
+
+Before building a scrolling list or a menu with pages, see
+[libraries.md](libraries.md): which of the three levels a screen needs, and
+what the published libraries -- `CHOOSE_R`, `LibMenu`, `SkeletonApp` -- give
+you.
+
+## 12. Where this comes from
 
 Third-party apps read from [hpcalc.org](https://www.hpcalc.org/prime/), all
 of them running on real calculators:

@@ -66,7 +66,8 @@ anything unconfirmed marked as such:
 | | |
 |---|---|
 | [ppl.md](docs/reference/ppl.md) | the language: the limits that really break, and four hypotheses that look reasonable and are false |
-| [interface.md](docs/reference/interface.md) | screen, keyboard, touch: `INPUT`, key codes, the touch that arrives twice |
+| [interface.md](docs/reference/interface.md) | screen, keyboard, touch: `INPUT`, the whole key map, the touch that arrives twice |
+| [libraries.md](docs/reference/libraries.md) | building an interface: which level a screen needs, and what the published libraries give you |
 | [apps.md](docs/reference/apps.md) | the `.hpappdir`, the hooks, the startup-view byte |
 | [micropython.md](docs/reference/micropython.md) | Python on the calculator, the bridge to PPL, and the call that closes the app |
 | [formats.md](docs/reference/formats.md) | the binary container and the internal number format, both decoded |
