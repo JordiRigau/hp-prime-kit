@@ -84,7 +84,7 @@ In rough order of how much it would help:
 
 | | Why |
 |---|---|
-| **The shape of the keyboard's last row** | the codes run 0 to 50 in reading order, five to a row, but 50 is the last one and sits at the bottom right, where a five-wide grid would not put it |
+| **Pressing the keys whose codes are derived** | the map covers all 51, and every key anybody has pressed lands on it, but the ones in between were read off the layout rather than measured |
 | **The interpreter's remaining gaps** | `M := GZ` aliases here and copies on the Prime; a function whose body ends in an assignment answers 0 here and nobody has measured what it answers there |
 | **Anything measured on a G1** | everything here is a G2. Same firmware, different hardware |
 | **MicroPython speed, and an app's memory limit** | both listed as not measured, and both change what designs are possible |

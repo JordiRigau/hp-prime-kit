@@ -51,15 +51,21 @@ A second run carried the numbering past the top three rows: `Vars` is **14**,
 and the codes rise left to right, row by row, to the last key at the bottom
 right -- `+`, which is **50**. So the whole keyboard is one grid, 0 to 50.
 
-That is also what confirms the model rather than merely fitting it. The
-digits were only ever read from other people's apps, and under this numbering
-`7 8 9`, `4 5 6` and `1 2 3` land on columns 2, 3 and 4 of three consecutive
-rows. A wrong row width would have scattered them.
+Laid against a picture of the keyboard, those two numbers fix the whole map:
+**the two top rows of the white keypad have six keys and the five below them
+have five**, so 14 + 6 + 6 + 5×5 = 51 keys, codes 0 to 50, ending on `+` at
+the bottom right.
 
-What is still open is small: which key carries each code that nobody has
-named yet, and the shape of the last row -- 50 sits at the bottom right,
-where a strictly five-wide grid would not put it. Both are one run away with
-this program.
+It is worth knowing how that was got wrong first. Assuming five keys to a row
+everywhere also fitted the digits, and looked confirmed -- but it could not
+explain why the last code sits at the bottom right instead of starting
+another row. The loose end was the clue, and a photograph settled it. A model
+that fits the data and leaves something unexplained is not finished.
+
+What is still open is only the keys nobody has pressed: the map covers all
+51, and every measured key lands on it, but the ones between the measured
+ends were read off the layout rather than measured. Any of them is one run
+away with this program.
 
 ## What to do with an answer
 

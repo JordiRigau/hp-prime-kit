@@ -136,7 +136,7 @@ Deliberately still open, and listed so nobody leans on them:
 
 | | |
 |---|---|
-| Which **key** carries each code below the top three rows | the numbering is measured -- reading order, 0 to 50 -- but only some of those keys have been named. `examples/keymap/` names any of them in one run |
+| The keys whose code is **derived, not pressed** | the map runs 0 to 50 and every measured key lands on it, but the ones between the measured ends were read off the keyboard's layout. `examples/keymap/` confirms any of them in one run |
 | **`MID(s, start)`** with a start below 1, and **`SORT`** of a list mixing numbers and strings | the two cases the string probes did not cover; the interpreter raises on both rather than pick an answer |
 | **G1** | everything here is a G2. Same firmware, different hardware |
 | MicroPython **speed** and an app's **memory limit** | not measured. The bridge crossing is: 0.2 ms |

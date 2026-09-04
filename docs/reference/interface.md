@@ -155,46 +155,38 @@ This is the first thing that trips people: the code for `[Enter]` is **30**,
 not 13. And the same code means different things in different modes -- 42 is
 `1` in normal mode and `y` in alpha mode.
 
-**A code is a position in a grid, five keys to a row.** The top three rows,
-measured key by key on a G2 with
-[examples/keymap/](../../examples/keymap/):
+**A code is a position, counted along the keyboard from the top left.** The
+whole map, 51 keys, codes 0 to 50:
 
-| | col 0 | col 1 | col 2 | col 3 | col 4 |
-|---|---|---|---|---|---|
-| **row 0** | `Apps` **0** | `Symb` **1** | ▲ 2 | `Help` **3** | `Esc` 4 |
-| **row 1** | `Home` **5** | `Plot` **6** | ◄ 7 | ► 8 | `View` **9** |
-| **row 2** | `CAS` **10** | `Num` **11** | ▼ 12 | `Menu` **13** | 14 |
+| Where | Codes |
+|---|---|
+| top block | `Apps` **0**, `Symb` **1**, ▲ 2, `Help` **3**, `Esc` 4 |
+| | `Home` **5**, `Plot` **6**, ◄ 7, ► 8, `View` **9** |
+| | `CAS` **10**, `Num` **11**, ▼ 12, `Menu` **13** |
+| keypad, **six** wide | `Vars` **14**, Mem 15, Units 16, `x t θ n` 17, `a b/c` 18, `Del` 19 |
+| keypad, **six** wide | `x^y` 20, `SIN` 21, `COS` 22, `TAN` 23, `LN` 24, `LOG` 25 |
+| keypad, five wide | `x²` 26, `+/-` 27, `( )` 28, `Eval` 29, **`Enter` 30** |
+| | `EEX` 31, **7 32**, **8 33**, **9 34**, `÷` 35 |
+| | `ALPHA` 36, **4 37**, **5 38**, **6 39**, `×` 40 |
+| | `Shift` 41, **1 42**, **2 43**, **3 44**, `−` 45 |
+| | `On` 46, `0` 47, `.` 48, space 49, `+` **50** |
 
-Bold is measured directly. The arrows and `Esc` come from two working apps
-that agree, and they land exactly where the grid predicts -- which is the
-cross-check that makes the model worth trusting: nine measured keys and four
-read from other people's code fit the same numbering, and none of the
-thirteen contradicts it.
+Bold is measured by pressing the key. `Esc`, the arrows, `Del`, `On` and the
+digits come from two working apps that agree. The rest is **derived**: the
+codes are contiguous, so once the ends of a row are known the keys between
+them follow from the keyboard's own layout -- read off the machine, not
+guessed at.
 
-**The grid covers the whole keyboard, 0 to 50.** Measured: the numbering
-carries on in reading order past the top three rows -- `Vars` is 14, and it
-rises left to right, row by row, to the last key at the bottom right, `+`,
-which is **50**.
+**The rows are not all the same width**, and that is the part worth
+remembering: the two top rows of the white keypad have **six** keys, the five
+below them have five. An earlier version of this page assumed five
+everywhere. It fitted the digits by luck and could not explain why 50, the
+last code, sits at the bottom right instead of starting another row. With the
+real layout, 14 + 6 + 6 + 5×5 = 51 keys and the last one is `+` at 50, which
+is exactly where it is.
 
-Everything that was previously only read from other people's apps lands in
-that grid without contradicting it:
-
-| Row | Codes | Keys known in it |
-|---|---|---|
-| 3 | 15-19 | backspace 19 |
-| 6 | 30-34 | `Enter` **30**, and `7 8 9` = 32, 33, 34 |
-| 7 | 35-39 | `4 5 6` = 37, 38, 39 |
-| 8 | 40-44 | `1 2 3` = 42, 43, 44 |
-| 9 | 45-49 | `ON` 46 |
-
-The three digit rows falling on columns 2, 3 and 4 of three consecutive rows
-is the check that matters: a wrong row width would scatter them.
-
-One loose end: 50 is the last code, and a strictly five-wide grid would put
-it at the start of an eleventh row rather than at the bottom right. So the
-bottom row is probably short, or not five wide. It does not affect reading a
-code -- press the key and `examples/keymap/` tells you -- but the shape of
-that last row is not established.
+Nothing known contradicts this map: eleven keys measured directly and eleven
+read from other people's code all land on it.
 
 ### The six on-screen labels are not keys
 
