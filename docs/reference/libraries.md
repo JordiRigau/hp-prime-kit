@@ -107,7 +107,7 @@ know about if your app is on the [Python side](micropython.md).
 | Module | What it is |
 |---|---|
 | `gui.py` | widget classes: `Component`, `Frame`, `Window`, `TextBox`, `Button`, `CloseButton`, `TextButton`, `Titlebar`, `TextField`, `InfoBar` |
-| `pointer.py` | touch, offered as a better alternative to `hpprime.mouse()` |
+| `pointer.py` | touch: fixes the coordinates' sign, turns readings into events, reports a tap once ([why that matters](interface.md#why-a-touch-layer-is-worth-having)) |
 | `kbd.py` | the keyboard, with shift and alpha layers -- **and a USB keyboard**, through `eval('uopen()')` and `usbrecv` |
 | `palette.py` | colours that follow the calculator's light or dark theme |
 | `time.py` | elapsed time and frames per second, built on `eval('ticks')` |

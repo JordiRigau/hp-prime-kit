@@ -361,6 +361,24 @@ _MOUSE = ('LOCAL zm:=MOUSE; LOCAL zp:=zm(1);'
           ' IFTE(SIZE(zp)==0,{-1,-1,-1},{zp(1),zp(2),zp(5)})')
 ```
 
+### Why a touch layer is worth having
+
+A published Python library wraps `mouse` rather than calling it directly, and
+reading it shows three jobs that raw readings leave to you. *Read from its
+source, not measured here.*
+
+- **The coordinates need their sign fixed.** It wraps each one with
+  `(c + 2**63) % 2**64 - 2**63`, which is an unsigned 64-bit value turned
+  signed. Without that you get astronomically large numbers instead of a
+  position off the edge.
+- **A reading is not an event.** `mouse` tells you what is happening now; it
+  cannot tell a finger that has just landed from one that has been there for
+  half a second. The library keeps the previous reading and derives `down`,
+  a fresh `tap`, and `dx`/`dy` for a drag.
+- **A tap is reported once, on release.** Its `istapped()` is `tap and not
+  down` -- true in exactly one update. That is the debounce above, arrived at
+  independently by another author, which is a fair sign it is not optional.
+
 ### The failure you cannot see by reading the code
 
 > The Prime's dialogs (`INPUT`, and notices) are accepted with an **OK button

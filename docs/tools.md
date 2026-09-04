@@ -117,9 +117,9 @@ measure it on the calculator first.
 `LEFT`, `RIGHT`, `MID`, `INSTRING` and `SORT` are covered, every case
 measured on a G2 -- including the trap that `LEFT(s,0)` and `RIGHT(s,0)`
 return the **whole** string while `MID(s,start,0)` returns an empty one. What
-the calculator raises on, this raises on; the two cases nobody has measured
-(`MID(s, start)` with a start below 1, and `SORT` of a list mixing numbers
-and strings) raise as unsupported and say which measurement is missing.
+the calculator raises on, this raises on -- including a `MID` start below 1
+and a `SORT` of a list mixing numbers with strings, both of which are errors
+there.
 
 One fidelity gap worth knowing: `M := GZ` (assigning a global matrix to a
 local) **aliases here and copies on the Prime**. The way never to be bitten

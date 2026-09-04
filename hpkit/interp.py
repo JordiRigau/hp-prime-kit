@@ -1067,6 +1067,7 @@ def _b_mid(m, a):
         MID("abcdef",7,2) = ""      a start past the end is empty
         MID("abcdef",2,0) = ""      a count of zero is empty
         MID("abcdef",0,2) = error   the start is 1-based and must be
+        MID("abcdef",9)   = ""      with two arguments too
     Note the asymmetry with LEFT and RIGHT, where 0 means "all".
     """
     if len(a) not in (2, 3):
@@ -1074,9 +1075,6 @@ def _b_mid(m, a):
     s = _as_string(a[0], 'MID')
     start = int(round(a[1]))
     if start < 1:
-        if len(a) == 2:
-            raise Unsupported('MID(s, start) with start below 1 is not '
-                              'measured')
         raise PPLError('MID with a start below 1')
     if len(a) == 2:
         return s[start - 1:]
@@ -1103,8 +1101,8 @@ def _b_sort(m, a):
     """SORT(list) -> the list in ascending order.
 
     Measured: SORT({3,1,2}) = {1,2,3} and SORT({"b","a"}) = {"a","b"}.
-    SORT of a string is an error on the calculator. A list mixing numbers
-    and strings was not measured, so it raises rather than pick an order.
+    A string, and a list mixing numbers with strings, are both errors on
+    the calculator. An empty list sorts to an empty list.
     """
     v = a[0]
     if isinstance(v, str):
@@ -1117,8 +1115,7 @@ def _b_sort(m, a):
         return sorted(v)
     if all(isinstance(x, float) or isinstance(x, int) for x in v):
         return sorted(v)
-    raise Unsupported('SORT of a list mixing numbers and strings is not '
-                      'measured')
+    raise PPLError('SORT of a list mixing numbers and strings')
 
 
 def _b_rref(m, a):

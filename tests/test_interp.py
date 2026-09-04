@@ -326,6 +326,14 @@ EXPORT F() BEGIN LOCAL L; L := SORT({3,1,2}); RETURN L(1)*100+L(2)*10+L(3); END;
 EXPORT F() BEGIN LOCAL L; L := SORT({"b","a"}); RETURN L(1) + L(2); END;
 """, 'F()', 'ab'),
 
+    ('SORT of an empty list is an empty list', """
+EXPORT F() BEGIN RETURN SIZE(SORT({})); END;
+""", 'F()', 0.0),
+
+    ('MID with two arguments past the end is empty', """
+EXPORT F() BEGIN RETURN SIZE(MID("abcdef", 9)); END;
+""", 'F()', 0.0),
+
     # A function that falls off the end answers with the last statement
     # that produced a value. One case per ending, all measured on a G2.
     ('no RETURN, ending in a call', """
@@ -401,13 +409,16 @@ EXPORT F() BEGIN RETURN EXPR(""); END;
     ('MID from before the start, an error on the calculator', """
 EXPORT F() BEGIN RETURN MID("abcdef", 0, 2); END;
 """, 'F()'),
+    ('MID with two arguments and a start below 1, also an error', """
+EXPORT F() BEGIN RETURN MID("abcdef", 0); END;
+""", 'F()'),
     ('LEFT with a negative count, an error on the calculator', """
 EXPORT F() BEGIN RETURN LEFT("abcdef", -1); END;
 """, 'F()'),
     ('SORT of a string, an error on the calculator', """
 EXPORT F() BEGIN RETURN SORT("cba"); END;
 """, 'F()'),
-    ('SORT of a list mixing types, which is not measured', """
+    ('SORT of a list mixing types, an error on the calculator', """
 EXPORT F() BEGIN RETURN SORT({1,"a"}); END;
 """, 'F()'),
     ('LEFT of something that is not a string', """
