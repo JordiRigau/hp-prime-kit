@@ -45,6 +45,11 @@ def main():
 
     print('\n%d passed, %d failed, across %d suites'
           % (total_pass, total_fail, len(SUITES)))
+    # Two suites walk whatever the Connectivity Kit mirror happens to hold,
+    # so the total moves with what is plugged in. A smaller number than last
+    # time is not a regression on its own; a failure is.
+    print('(test_program and test_numbers also walk your own files, so this'
+          ' total\n moves with what the Connectivity Kit has mirrored)')
 
     for name, out in failed_suites:
         print('\n---- %s ----' % name)
