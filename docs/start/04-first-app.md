@@ -14,10 +14,10 @@ The full detail is in [apps.md](../topics/apps.md).
 ## Build it
 
 ```bash
-hpprime build CIRCLEAPP CIRCLE.txt --ppl
+hpprime build CIRCLEAPP programs/CIRCLE/CIRCLE.txt --ppl -o programs/CIRCLE
 ```
 
-That gives you a folder
+That gives you a folder, beside the program in `programs/CIRCLE/`
 ([apps.hpappdir-contents](../topics/apps.md#apps.hpappdir-contents)):
 
 ```
@@ -63,7 +63,7 @@ say which view the app starts in
 can check for the drift before the app shows it to you:
 
 ```bash
-hpprime verify CIRCLEAPP.hpappdir CIRCLE.txt
+hpprime verify programs/CIRCLE/CIRCLEAPP.hpappdir programs/CIRCLE/CIRCLE.txt
 ```
 
 It exits 1 if the folder has stopped being the one you would generate

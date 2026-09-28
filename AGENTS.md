@@ -62,6 +62,18 @@ its evidence, in `ppl.md`:
 
 ## 2. The workflow to follow
 
+A person's programs go in [`programs/`](programs/README.md), one folder each:
+`programs/NAME/` holds the source and the `.hpprgm` built from it. Never write
+theirs at the root, in `examples/` or in `templates/`, which ship with the kit.
+Run the tools from the root, with the path:
+`hpprime write programs/NAME/NAME.txt -o programs/NAME/NAME.hpprgm`.
+
+The tools need Python 3.7 or newer. If `python --version` does not print a
+version -- on Windows a missing Python can answer that it was not found, or
+open the Microsoft Store -- stop there and send the person to the Python row of
+[step 1](docs/start/01-setup.md#what-to-install), instead of trying other
+commands.
+
 Never hand over PPL that has not been through both gates:
 
 ```bash

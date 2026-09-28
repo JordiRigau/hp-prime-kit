@@ -22,6 +22,7 @@ SUITES = [
     ('test_compare.py', 'the PC against the calculator, through a matrix'),
     ('test_numbers.py', 'the internal number format and .hpmat'),
     ('test_cli.py', 'the hpprime command, end to end'),
+    ('test_update.py', 'updating a download, and what it must not touch'),
     ('test_examples.py', 'the starters and examples people copy first'),
     ('test_docs.py', 'every link in the documentation resolves'),
     ('test_hpdocs.py', "the interpreter against HP's documented examples"),

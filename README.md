@@ -96,12 +96,15 @@ the short way: `.\hpprime` in PowerShell, `./hpprime` on macOS and Linux, or
 `python hpprime.py` anywhere.
 
 ```bash
-hpprime new CIRCLE                            # a starter that already runs
-hpprime lint CIRCLE.txt                       # what the compiler will not explain
-hpprime run  CIRCLE.txt --call "CIRCAREA(2)"  # run the real file, here
-hpprime write CIRCLE.txt -o CIRCLE.hpprgm     # build the binary
-hpprime install CIRCLE.hpprgm --restart       # into the emulator, and open it
+hpprime new CIRCLE
+hpprime lint    programs/CIRCLE/CIRCLE.txt
+hpprime run     programs/CIRCLE/CIRCLE.txt --call "CIRCAREA(2)"
+hpprime write   programs/CIRCLE/CIRCLE.txt -o programs/CIRCLE/CIRCLE.hpprgm
+hpprime install programs/CIRCLE/CIRCLE.hpprgm --restart
 ```
+
+`new` writes a starter that already runs in a folder of its own under
+[`programs/`](programs/README.md), where what you make goes and git keeps out.
 
 The last line installs into the emulator and opens it, with nothing to drag. On
 a physical calculator that step is a drag onto it in the Connectivity Kit
@@ -111,6 +114,7 @@ window. [deploy.md](docs/topics/deploy.md) covers both.
 |---|---|
 | `hpprime doctor` | what works on this machine, and what to do about what does not |
 | `hpprime new` | a starter that already compiles and runs |
+| `hpprime update` | a downloaded copy brought to the latest version, your `programs/` untouched |
 | `hpprime lint` | each finding names the fact it comes from and how that fact is known, and is an error only as far as the measurement reaches |
 | `hpprime run` | runs PPL on your PC: the file you install, through an interpreter that raises on what it does not cover |
 | `hpprime write` / `read` | the `.hpprgm` binary, both directions |
@@ -133,11 +137,18 @@ python examples/conformance/conformance.py --break
 
 ## Working with an AI
 
-An assistant that can read the repository starts at
-[`docs/llms.txt`](docs/llms.txt), and at the file its tool reads by itself:
-[`AGENTS.md`](AGENTS.md) for Cursor, Copilot or Codex, [`SKILL.md`](SKILL.md)
-for Claude Code. Both say what to read first, the two gates every program goes
-through, what not to claim without evidence, and what only a person can do.
+Download this repository -- on GitHub, **Code**, then **Download ZIP**, and
+unzip it -- or clone it. Open the folder in your assistant: Claude Code (the
+Code tab of the Claude desktop app), Cursor, Codex or Copilot, and say what you
+want the calculator to do. The only thing to install is Python 3.7 or newer.
+Your programs go in [`programs/`](programs/README.md), one folder each, which
+git ignores.
+
+The assistant starts at [`docs/llms.txt`](docs/llms.txt), and at
+[`AGENTS.md`](AGENTS.md), which Claude Code, Cursor, Copilot and Codex read by
+themselves when this folder is open. It says what to read first, the two gates
+every program goes through, what not to claim without evidence, and what only a
+person can do.
 A chat with no file access gets [`docs/ai/prompts.md`](docs/ai/prompts.md) §1
 pasted in, where every rule names the fact it comes from.
 [Step 6 of the guided path](docs/start/06-working-with-ai.md) is the version
@@ -178,7 +189,7 @@ and an app built end to end by `hpprime build --ppl`
 ([apps.generated-and-verified](docs/topics/apps.md#apps.generated-and-verified)).
 
 ```bash
-python tests/run_all.py     # thirteen suites, none of them needs a calculator
+python tests/run_all.py     # fourteen suites, none of them needs a calculator
 ```
 
 Open, and listed here so that nobody relies on them:

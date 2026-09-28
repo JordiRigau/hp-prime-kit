@@ -61,11 +61,13 @@
 - [x] **CHECK-04**: Every lint rule is tied to a fact, and every fact that can be caught from a PC has a rule or says why not
 - [x] **CHECK-05**: Every relative link resolves
 
-## Milestone 2 requirements: the agent kit (deferred)
+## Milestone 2 requirements: the agent kit
 
-Tracked, not in the current roadmap. Planned when milestone 1 is done.
+Defined with the user on 2026-09-26, in `milestone-2-CONTEXT.md`, and mapped
+to Phases 11 to 16. KIT-01 reworded the same day, when the plugin gave way to
+the kit's own folder.
 
-- **KIT-01**: One command installs the kit into Claude Code, and the agent picks it up without being told
+- **KIT-01**: Downloading the kit and opening its folder is the whole install, and the agent picks it up without being told
 - **KIT-02**: One entry point per job (new program, port, debug, screen, app, deploy, measure), each loading only the entries that job needs
 - **KIT-03**: Specialised agents: one writes, another verifies and assumes nothing works until a command shows it does
 - **KIT-04**: Agent reports cite the documentation's identifiers instead of paraphrasing, and a test checks that every citation resolves
@@ -86,7 +88,7 @@ Tracked, not in the current roadmap. Planned when milestone 1 is done.
 | A Spanish version | Not chosen; it doubles the maintenance of every page |
 | Growing the interpreter in milestone 1 | The user's choice: it only learns the list of names, and grows in milestone 2 |
 | Automating the send to a physical calculator | The user's choice: explain it, do not automate it |
-| Agents other than Claude Code | Milestone 2 targets Claude Code only |
+| The checks enforced in agents other than Claude Code | They read the same `AGENTS.md`; the checks that block are Claude Code hooks |
 | Copying HP's help text | It is HP's text; entries are written in the kit's words and cite it |
 | Node.js, or becoming a GSD capability | The kit stays standard-library Python |
 
@@ -138,6 +140,25 @@ Tracked, not in the current roadmap. Planned when milestone 1 is done.
 - Mapped to phases: 38
 - Complete: 38
 - Unmapped: 0
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| KIT-01 | Phase 11 | Pending |
+| KIT-09 | Phase 11 | Pending |
+| KIT-05 | Phase 12 | Pending |
+| KIT-04 | Phase 12 | Pending |
+| KIT-07 | Phase 13 | Pending |
+| KIT-03 | Phase 13 | Pending |
+| KIT-06 | Phase 13 | Pending |
+| KIT-02 | Phases 13 and 14 | Pending |
+| KIT-10 | Phase 14 | Pending |
+| KIT-08 | Phase 15 | Pending |
+| KIT-11 | Phases 13 to 16 | Pending |
+
+**Coverage, milestone 2:**
+- Requirements: 11 total
+- Mapped to phases: 11
+- Complete: 0
 
 ---
 *Requirements defined: 2026-09-11*

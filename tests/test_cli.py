@@ -44,13 +44,24 @@ class quiet(object):
 def main():
     tmp = tempfile.mkdtemp(prefix='hpcli_')
     here = os.getcwd()
+    programs = cli.PROGRAMS
     try:
         os.chdir(tmp)
+        # `new` writes into the kit's programs/; here, into this folder's, so
+        # that a test run leaves the kit as it found it.
+        cli.PROGRAMS = os.path.join(tmp, 'programs')
+        demo = os.path.join('programs', 'DEMO', 'DEMO.txt')
+        built = os.path.join('programs', 'DEMO', 'DEMO.hpprgm')
 
         with quiet() as q:
             rc = cli.main(['new', 'DEMO'])
-        ok(rc == 0 and os.path.isfile('DEMO.txt'), 'new writes DEMO.txt')
-        ok('hpprime lint' in q.text, 'and says what to do next')
+        ok(rc == 0 and os.path.isfile(demo),
+           'new writes programs/DEMO/DEMO.txt')
+        # With forward slashes, on Windows too: Git Bash eats a backslash.
+        ok('hpprime lint programs/DEMO/DEMO.txt' in q.text,
+           'and says what to do next, with that path', q.text.strip())
+        ok('-o programs/DEMO/DEMO.hpprgm' in q.text,
+           'and builds the binary beside it', q.text.strip())
 
         with quiet():
             rc = cli.main(['new', 'DEMO'])
@@ -60,57 +71,65 @@ def main():
             rc = cli.main(['new', 'bad name'])
         ok(rc == 2, 'new refuses a name with a space in it')
 
+        with quiet():
+            rc = cli.main(['new', 'HERE', '-o', '.'])
+        ok(rc == 0 and os.path.isfile('HERE.txt'),
+           'new -o DIR writes where it is told instead')
+
         with quiet() as q:
-            rc = cli.main(['lint', 'DEMO.txt'])
+            rc = cli.main(['lint', demo])
         ok(rc == 0, 'the starter passes the linter')
         ok('0 error(s)' in q.text, 'with no errors reported', q.text.strip())
 
         with quiet() as q:
-            rc = cli.main(['run', 'DEMO.txt', '--call', 'CIRCAREA(2)'])
+            rc = cli.main(['run', demo, '--call', 'CIRCAREA(2)'])
         ok(rc == 0 and '12.56' in q.text,
            'the starter runs on the PC and CIRCAREA(2) is right', q.text.strip())
 
         with quiet():
-            rc = cli.main(['write', 'DEMO.txt', '-o', 'DEMO.hpprgm'])
-        ok(rc == 0 and os.path.isfile('DEMO.hpprgm'),
+            rc = cli.main(['write', demo, '-o', built])
+        ok(rc == 0 and os.path.isfile(built),
            'write builds the binary with no -t (it finds the template)')
 
         with quiet():
-            rc = cli.main(['verify', 'DEMO.hpprgm'])
+            rc = cli.main(['verify', built])
         ok(rc == 0, 'verify round-trips the binary it just built')
 
         with quiet():
-            rc = cli.main(['read', 'DEMO.hpprgm', '-o', 'back.txt'])
-        source = io.open('DEMO.txt', encoding='utf-8').read()
+            rc = cli.main(['read', built, '-o', 'back.txt'])
+        source = io.open(demo, encoding='utf-8').read()
         back = io.open('back.txt', encoding='utf-8').read()
         ok(rc == 0 and back == program.normalize_source(source),
            'read gives back the source that was written')
 
-        with quiet():
+        pyfolder = os.path.join('programs', 'PYDEMO')
+        main_py = os.path.join(pyfolder, 'main.py')
+        appdir = os.path.join(pyfolder, 'PYDEMO.hpappdir')
+        with quiet() as q:
             rc = cli.main(['new', 'PYDEMO', '--python'])
-        ok(rc == 0 and os.path.isfile(os.path.join('PYDEMO', 'main.py')),
-           'new --python writes a main.py')
+        ok(rc == 0 and os.path.isfile(main_py),
+           'new --python writes programs/PYDEMO/main.py')
+        ok('hpprime build PYDEMO programs/PYDEMO/main.py -o programs/PYDEMO'
+           in q.text, 'and says to build the app beside it', q.text.strip())
 
         with quiet():
-            rc = cli.main(['build', 'PYDEMO',
-                           os.path.join('PYDEMO', 'main.py'), '--quiet'])
-        ok(rc == 0 and os.path.isdir('PYDEMO.hpappdir'),
-           'build makes the .hpappdir')
+            rc = cli.main(['build', 'PYDEMO', main_py, '-o', pyfolder,
+                           '--quiet'])
+        ok(rc == 0 and os.path.isdir(appdir),
+           'build makes the .hpappdir where new said')
 
         with quiet():
-            rc = cli.main(['verify', 'PYDEMO.hpappdir',
-                           os.path.join('PYDEMO', 'main.py')])
+            rc = cli.main(['verify', appdir, main_py])
         ok(rc == 0, 'verify says the app folder is current')
 
         # The failure that only shows on the calculator: the wrapper rewritten
         # with the Python console as its startup view.
-        path = os.path.join('PYDEMO.hpappdir', 'PYDEMO.hpapp')
+        path = os.path.join(appdir, 'PYDEMO.hpapp')
         data = open(path, 'rb').read()
         with open(path, 'wb') as f:
             f.write(data[:-4] + b'\x03\x00\x00\x00')
         with quiet():
-            rc = cli.main(['verify', 'PYDEMO.hpappdir',
-                           os.path.join('PYDEMO', 'main.py')])
+            rc = cli.main(['verify', appdir, main_py])
         ok(rc == 1, 'verify catches the rewritten app wrapper')
 
         with quiet():
@@ -125,6 +144,7 @@ def main():
             rc = cli.main(['doctor'])
         ok(rc == 0, 'doctor is happy with this checkout')
     finally:
+        cli.PROGRAMS = programs
         os.chdir(here)
         shutil.rmtree(tmp, ignore_errors=True)
 

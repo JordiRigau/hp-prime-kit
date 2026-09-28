@@ -79,11 +79,21 @@ A physical calculator is not required to start. The Virtual Calculator runs
 HP's own firmware, so it is close to a G2, but it is not one: where something
 was measured on only one of the two, the claim says which.
 
-Then clone the repository and check the setup:
+Then get the repository, <https://github.com/JordiRigau/hp-prime-kit>, either
+way:
+
+- **Download it.** On that page, **Code**, then **Download ZIP**, and unzip it.
+  The folder is called `hp-prime-kit-main`.
+- **Clone it**, if you use git. The folder is called `hp-prime-kit`:
+
+  ```bash
+  git clone https://github.com/JordiRigau/hp-prime-kit
+  ```
+
+Open a terminal in that folder -- on Windows 11, right-click inside it in File
+Explorer and choose **Open in Terminal** -- and check the setup:
 
 ```bash
-git clone https://github.com/JordiRigau/hp-prime-kit
-cd hp-prime-kit
 python hpprime.py doctor
 ```
 
@@ -91,9 +101,12 @@ python hpprime.py doctor
 found the Connectivity Kit and the Virtual Calculator, and what to do about
 anything missing. Its last line says whether everything is in place.
 
-Run these in a terminal, with the repository folder as the current directory,
-which is what the `cd` above does. Every command in these pages is written the
-short way, `hpprime doctor`, and how you type that depends on your shell:
+To bring it up to date later: `git pull` in a clone, and
+[`hpprime update`](../tools.md#update) in a download.
+
+Every command in these pages runs in a terminal opened in that folder, and is
+written the short way, `hpprime doctor`. How you type that depends on your
+shell:
 
 | Shell | Type |
 |---|---|

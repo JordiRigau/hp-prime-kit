@@ -13,12 +13,15 @@ top. Reordered on 2026-09-24: before any more batches, the tools stop giving
 wrong answers and losing evidence in silence; then the variables of Home and
 the system, with the open questions every program runs into, come ahead of
 the last app variables; and the milestone closes by holding the linter to the
-facts. Milestone 2, the agent kit, is planned once this one is done.
+facts. Milestone 2, the agent kit, builds on it: the kit's own folder as the place to
+work, nothing installed; the beginner's path first, checks that block, and a new app the size of TermoHP
+to close it, as defined in `milestone-2-CONTEXT.md`, approved and revised on
+2026-09-26.
 
 ## Milestones
 
 - ✅ **Milestone 1: the documentation** — Phases 1-10 (completed 2026-09-25)
-- 📋 **Milestone 2: the agent kit** — planned after milestone 1 (KIT-01 to KIT-11 in `REQUIREMENTS.md`)
+- 🚧 **Milestone 2: the agent kit** — Phases 11-16 (in progress; KIT-01 to KIT-11 in `REQUIREMENTS.md`)
 
 ## Phases
 
@@ -38,6 +41,12 @@ facts. Milestone 2, the agent kit, is planned once this one is done.
 - [x] **Phase 9: Guided path, index and README** - The way in, for a person and for a model (completed 2026-09-24; counted again in Phase 10)
 - [x] **Phase 9.1: Tools that keep their promise** (INSERTED) - The interpreter never answers wrong in silence, and a batch never loses evidence in silence (completed 2026-09-24)
 - [x] **Phase 10: What a PC can catch** - Every fact a PC could catch has a lint rule or says why not, and milestone 1 closes (completed 2026-09-25)
+- [ ] **Phase 11: The working folder** - Downloaded and opened, nothing installed; a person's programs in `programs/`, kept through an update
+- [ ] **Phase 12: Checks the agent cannot skip** - `lint` after every PPL edit, blocking on an error; claims no command backs caught; every citation resolves
+- [ ] **Phase 13: From an idea to the calculator** - Questions before any PPL, a writer and a verifier, and a fixed hand-over
+- [ ] **Phase 14: The other jobs** - Port, debug, screen, app, deploy and measure, and the paste block generated from the documentation
+- [ ] **Phase 15: Projects across sessions** - The plan and the state in files, each step checked before the next
+- [ ] **Phase 16: A new app, from scratch** - The size of TermoHP, on the G2, and milestone 2 closed
 
 ## Phase Details
 
@@ -222,6 +231,70 @@ Plans:
 - [x] 10-02: The checks the list decided on
 - [x] 10-03: Phase 9's counts again, and milestone 1 closed
 
+### Phase 11: The working folder
+**Goal**: Downloading the kit and opening its folder is the whole install: a fresh session picks up the contract, the tools run from the folder, and a person's programs stay in `programs/` through an update
+**Depends on**: Milestone 1
+**Requirements**: KIT-01, KIT-09
+**Success Criteria** (what must be TRUE):
+  1. The repository downloaded as a ZIP from GitHub and opened in the Claude Code desktop app, in a folder that is not this clone, is picked up with nothing installed: the session loads `AGENTS.md` and reads `docs/llms.txt` when PPL comes up
+  2. The tools run from that folder: `hpprime lint`, `run` and `write` at least, on this Windows machine; how they start on others, and what the agent does when no Python starts, is written down, and labelled where it was not run
+  3. A person's programs go in `programs/`, which git ignores and the kit ships with a note in; `hpprime update` brings a ZIP to the latest version without writing inside `programs/`, refuses in a clone, and a test holds both
+  4. An expert clones and uses the tools and the documentation without the kit's procedures, and the README says how, for both ways in
+**Plans**: 3, replanned on 2026-09-26 when the plugin gave way to the kit's own folder. The plugin's plan 11-01 was undone before it was committed; `11-RESEARCH.md` stays as the record of what was read about hooks
+
+Plans:
+- [x] 11-01: The folder: `programs/`, and the README's two ways in
+- [x] 11-02: `hpprime update`
+- [ ] 11-03: Downloaded and tried
+
+### Phase 12: Checks the agent cannot skip
+**Goal**: The gates of `AGENTS.md` run without depending on the agent remembering them
+**Depends on**: Phase 11
+**Requirements**: KIT-05, KIT-04
+**Success Criteria** (what must be TRUE):
+  1. After an edit to a PPL file, `lint` runs by itself; an error stops the agent until it is fixed, and a warning is shown without stopping it
+  2. A report claiming a program compiles, works on the calculator or is installed, with no command's output behind it, is caught when the agent finishes; cases it must let pass are held by tests, and the person, not the agent, can switch it off
+  3. Every identifier the kit's skills and agents cite resolves, and a test fails on one that does not
+**Plans**: TBD
+
+### Phase 13: From an idea to the calculator
+**Goal**: A person with an idea and no PPL gets a program running on the calculator
+**Depends on**: Phase 12
+**Requirements**: KIT-07, KIT-03, KIT-06, KIT-02 in part
+**Success Criteria** (what must be TRUE):
+  1. Given an idea, the agent asks what it needs before it writes any PPL
+  2. One role writes and another verifies, and the second assumes nothing works until a command shows it does
+  3. What only the person can do is handed over in one fixed form: what was built, the keys to press, the values to expect, and what to report back
+  4. The user brings an idea of their own, never reads the PPL, and the program runs on their G2
+**Plans**: TBD
+
+### Phase 14: The other jobs
+**Goal**: Every job the kit names has its own short procedure
+**Depends on**: Phase 13
+**Requirements**: KIT-02, KIT-10
+**Success Criteria** (what must be TRUE):
+  1. Port, debug, screen, app, deploy and measure each have an entry point that loads only the documentation that job needs
+  2. The paste block for chats with no file access is generated from the documentation, and a test fails when it is stale
+**Plans**: TBD
+
+### Phase 15: Projects across sessions
+**Goal**: A project too big for one session is built across several without losing its place
+**Depends on**: Phase 14
+**Requirements**: KIT-08
+**Success Criteria** (what must be TRUE):
+  1. A project's plan and state live in files in its folder under `programs/`, and a new session resumes from them
+  2. Each step is checked by the kit's gates before the next one starts
+**Plans**: TBD
+
+### Phase 16: A new app, from scratch
+**Goal**: The kit builds an app the size of TermoHP, and milestone 2 closes
+**Depends on**: Phase 15
+**Requirements**: KIT-11
+**Success Criteria** (what must be TRUE):
+  1. A new app with an engine, several screens and a large data set -- not TermoHP -- is built from scratch across sessions in a fresh download of the kit, and runs on the G2
+  2. Every builtin the kit's programs needed from the interpreter is covered, each measured first
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
@@ -241,3 +314,9 @@ Plans:
 | 9. Guided path, index and README | 4/4 | Complete, counted again in Phase 10 on 2026-09-25 | 2026-09-24 |
 | 9.1. Tools that keep their promise | 2/2 | Complete (INSERTED) | 2026-09-24 |
 | 10. What a PC can catch | 3/3 | Complete: milestone 1 closed | 2026-09-25 |
+| 11. The working folder | 2/3 | In progress: `programs/`, the two ways in, `hpprime update`; trying a download is next | - |
+| 12. Checks the agent cannot skip | 0/TBD | Not started | - |
+| 13. From an idea to the calculator | 0/TBD | Not started | - |
+| 14. The other jobs | 0/TBD | Not started | - |
+| 15. Projects across sessions | 0/TBD | Not started | - |
+| 16. A new app, from scratch | 0/TBD | Not started | - |

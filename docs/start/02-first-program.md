@@ -13,8 +13,10 @@ You do not need an editor on the calculator. A PPL program is text.
 hpprime new CIRCLE
 ```
 
-That writes `CIRCLE.txt`. Open it: it is a working program, not a stub. Its
-comments aside, it is this:
+That writes `programs/CIRCLE/CIRCLE.txt`. What you make goes in `programs/`,
+one folder each, and the commands below give its path from the repository's
+folder. Open it: it is a working program, not a stub. Its comments aside, it is
+this:
 
 ```ppl
 EXPORT CIRCAREA(zr)
@@ -51,7 +53,7 @@ grows is what makes this platform workable.
 ## Step 2 — lint it, before compiling anything
 
 ```bash
-hpprime lint CIRCLE.txt
+hpprime lint programs/CIRCLE/CIRCLE.txt
 ```
 
 It should say `0 error(s), 0 warning(s)`. The linter catches, before the
@@ -66,7 +68,7 @@ calculator the same mistake costs a round trip.
 ## Step 3 — run it, on your PC
 
 ```bash
-hpprime run CIRCLE.txt --call "CIRCAREA(2)"
+hpprime run programs/CIRCLE/CIRCLE.txt --call "CIRCAREA(2)"
 ```
 
 You should get `12.5663706144`. This runs the file you are going to install,
@@ -79,7 +81,7 @@ that the two agree on a call is to run it on both, which is what
 Try the interface half too:
 
 ```bash
-hpprime run CIRCLE.txt --call "MAIN()"
+hpprime run programs/CIRCLE/CIRCLE.txt --call "MAIN()"
 ```
 
 It answers `3.1415926536`, the area for the radius `MAIN` starts with.
@@ -91,7 +93,7 @@ neutral value, so the calculation runs without an interface. See
 ## Step 4 — turn it into a `.hpprgm`
 
 ```bash
-hpprime write CIRCLE.txt -o CIRCLE.hpprgm
+hpprime write programs/CIRCLE/CIRCLE.txt -o programs/CIRCLE/CIRCLE.hpprgm
 ```
 
 `.hpprgm` is a binary container with the source inside it verbatim
@@ -105,8 +107,8 @@ Kit, has been loaded and run on a G2
 
 1. Connect the calculator, or open the Virtual Calculator, and open the
    Connectivity Kit.
-2. Drag `CIRCLE.hpprgm` from your file manager onto the calculator in the CK
-   window.
+2. Drag `CIRCLE.hpprgm`, in `programs/CIRCLE/`, from your file manager onto
+   the calculator in the CK window.
 
 > Do not copy it into the mirror folder. It looks like a mailbox and it is not:
 > on connecting, the CK overwrites it with whatever is on the calculator, and
@@ -118,7 +120,7 @@ problem: check whether the CK is set to run as administrator
 ([deploy.drag-refused-when-elevated](../topics/deploy.md#deploy.drag-refused-when-elevated)).
 
 On the Virtual Calculator there is a second way, with no drag:
-[`hpprime install CIRCLE.hpprgm --restart`](../tools.md#install--pull) copies
+[`hpprime install programs/CIRCLE/CIRCLE.hpprgm --restart`](../tools.md#install--pull) copies
 it into the emulator's own folder, which, unlike the mirror, is read when the
 emulator starts
 ([deploy.emulator-folder](../topics/deploy.md#deploy.emulator-folder)). A
@@ -160,8 +162,8 @@ The source can be read back out of what is installed and compared with yours
 physical calculator, through the mirror, which is fine to read:
 
 ```bash
-hpprime read ".../Calculators/HP Prime/CIRCLE.hpprgm" -o installed.txt
-diff installed.txt CIRCLE.txt
+hpprime read ".../Calculators/HP Prime/CIRCLE.hpprgm" -o programs/CIRCLE/installed.txt
+diff programs/CIRCLE/installed.txt programs/CIRCLE/CIRCLE.txt
 ```
 
 The only difference should be the trailing newline: the calculator stores the
@@ -172,7 +174,7 @@ From the Virtual Calculator it is one command, which exits 1 when what is
 installed is not your file:
 
 ```bash
-hpprime pull CIRCLE --diff CIRCLE.txt
+hpprime pull CIRCLE --diff programs/CIRCLE/CIRCLE.txt
 ```
 
 This is the check that catches a calculator still running an old version.

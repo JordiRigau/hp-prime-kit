@@ -13,9 +13,10 @@ Two layers in one repository, built in this order:
    alike. Each entry stands on its own and has an identifier, so a model can
    load only what it needs, and the whole still reads well from start to
    finish.
-2. **The agent kit**, built on that documentation. It is installed into Claude
-   Code and gives the agent one procedure per job, specialised roles, and
-   checks it cannot skip. It cites the documentation by identifier instead of
+2. **The agent kit**, built on that documentation. It works in the kit's own
+   folder, opened in Claude Code or another agent, with nothing installed,
+   and gives the agent one procedure per job, specialised roles, and checks
+   it cannot skip. It cites the documentation by identifier instead of
    restating it. The Python tools (lint, run, write, install, compare) sit
    between the two layers: they make the documentation checkable, and they are
    the gates the agent works through.
@@ -34,8 +35,8 @@ the agents built on it never claim more than it does.
   syntax, its behaviour, an example and its status; every fact measured so far
   is there with an identifier; and `hpprime lint` flags a command that does
   not exist.
-- **Milestone 2, the agent kit:** with a fresh Claude Code session on the
-  installed kit, somebody who has never programmed a Prime has their program
+- **Milestone 2, the agent kit:** with a fresh Claude Code session opened
+  on the kit's folder, somebody who has never programmed a Prime has their program
   working on the calculator without reading any PPL, and an app the size of
   TermoHP (an engine, several screens, a large data set) is built from
   scratch.
@@ -87,9 +88,13 @@ Numbered in `REQUIREMENTS.md`.
 
 ### Active: Milestone 2, the agent kit, built on the documentation
 
-Deferred in `REQUIREMENTS.md`; planned when milestone 1 is done.
+Defined with the user and approved on 2026-09-26, in
+`milestone-2-CONTEXT.md`, and revised the same day: the kit's own folder as
+the place to work, nothing installed; the beginner's path first,
+checks that block, the user playing the beginner without reading the PPL,
+and a new app the size of TermoHP to close it. Phases 11 to 16.
 
-- [ ] One command installs the kit into Claude Code, and the agent picks it up without being told
+- [ ] Downloading the kit and opening its folder is the whole install, and the agent picks it up without being told
 - [ ] One entry point per job (new program, port, debug, screen, app, deploy, measure), each a short procedure that loads only the entries that job needs
 - [ ] Specialised agents: one writes, another verifies and assumes nothing works until a command shows it does
 - [ ] Agent reports and lint messages cite the documentation's identifiers instead of paraphrasing, and a test checks that every citation resolves
@@ -109,7 +114,7 @@ Deferred in `REQUIREMENTS.md`; planned when milestone 1 is done.
 - Automating the keypresses on the emulator — the user's choice for Phase 3: the user presses them, a few batches in all
 - Two repositories — one repository with two layers. The documentation can be split out later with `git subtree split`, history included, if it gains contributors of its own
 - Rewriting the Python tools — they are validated; they change only where the new structure needs them to
-- Other agents (Codex, Cursor, Copilot and the rest) — the kit targets Claude Code only. The content stays in one source so a converter can be added later
+- The checks enforced in agents other than Claude Code — Codex, Cursor, Copilot and the rest read the same `AGENTS.md` and procedures, but the checks that block are Claude Code hooks. Until 2026-09-26 the kit targeted Claude Code only
 - Automating the send to a physical calculator — the user's decision: explain it, do not automate it. It has worked once, after five attempts
 - A Node.js installer or dependency — the kit is Python 3.7+ standard library only, and this machine has no Node
 - Becoming a GSD capability — it would need Node and GSD installed; the kit learns from GSD instead of depending on it. Can be revisited
@@ -174,7 +179,7 @@ Deferred in `REQUIREMENTS.md`; planned when milestone 1 is done.
 - **Direction**: the documentation never depends on the kit; the kit depends on the documentation — so the documentation stands on its own and can be split out
 - **Evidence**: every entry states how it is known: measured on a G2 (what was run, on which firmware, what was seen), run on the Virtual Calculator, taken from HP's help, or unverified — the whole value is that it can be trusted
 - **Own words**: entries are written in the kit's words, and HP's help is cited, not copied, with at most a short quotation — it is HP's text and the repository is MIT. HP's sources are read outside the repository
-- **Tech stack**: Python 3.7+, standard library only, no install step for the tools — anybody with a fresh clone and a stock Python has to be able to run everything
+- **Tech stack**: Python 3.7+, standard library only, no install step for the tools — anybody with a fresh clone or the ZIP and a stock Python has to be able to run everything
 - **Agent**: Claude Code for the kit — skills, agents and hooks in its native format
 - **Language**: English in the repository (code, docs, commits); the agent answers the user in the user's language
 - **Platforms**: Windows first, because that is where the emulator and the Connectivity Kit run; macOS and Linux for everything that does not need them
@@ -185,7 +190,13 @@ Deferred in `REQUIREMENTS.md`; planned when milestone 1 is done.
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Documentation first, then the agent kit built on it | The user's correction on 2026-09-11 | — Pending |
+| Documentation first, then the agent kit built on it | The user's correction on 2026-09-11 | ✓ Good: milestone 1 closed on 2026-09-25, and milestone 2 is built on it |
+| The kit's folder is where you work: downloaded as a ZIP or cloned, opened, nothing installed; a person's programs in `programs/` | The user's choice on 2026-09-26, replacing a Claude Code plugin chosen earlier that day: the plugin tied the kit to Claude Code, installed through concepts a beginner does not know, kept its files in a cache nobody opens, and carried machinery and open points for what it gave | — Pending |
+| A ZIP updates with `hpprime update`, which never writes inside `programs/`; a clone with `git pull` | The user's choice on 2026-09-26, over re-downloading by hand | — Pending |
+| The beginner's path first | The user's choice on 2026-09-26: it exercises what the large project needs, on the shortest route | — Pending |
+| The checks block: a lint error stops the agent, and claims no command backs are caught | The user's choice on 2026-09-26, over blocking only lint errors or only reporting | — Pending |
+| Milestone 2 closes on a new app the size of TermoHP, not TermoHP | The user's choice on 2026-09-26, so that knowing TermoHP cannot flatter the kit | — Pending |
+| The user plays the beginner, without reading the PPL | The user's choice on 2026-09-26, over a person who knows no PPL | — Pending |
 | One repository, two layers | Chosen on 2026-09-11: a fact, its lint rule and its test change together; one clone gives everything; the documentation can be split out later | ✓ Good (Phases 1-2) |
 | The documentation covers every PPL command, plus the platform topics | The user's choice on 2026-09-11; with the full list, the linter can flag invented commands | ✓ Good: the list exists and lint reads it (Phase 2) |
 | The documentation is written for models and people alike | The user's choice on 2026-09-11 | — Pending |
@@ -204,7 +215,7 @@ Deferred in `REQUIREMENTS.md`; planned when milestone 1 is done.
 | The linter compares the calculator's names without regard to case | Never flag a spelling the calculator might accept; the calculator's own behaviour is not measured | ✓ Good: the calculator reads `alog(2)` as `ALOG(2)`, `ppl.names-ignore-case` (08.1-01) |
 | Keep the measured facts and the Python tools; redo the structure, the docs and the entry points | They are validated on hardware; the problem is the shape, not the content | ✓ Good so far |
 | The redo happens on a local branch `redo` | The user's choice on 2026-09-11: `main` stays intact until the redo is ready | ✓ Good: `main` moved to it by fast-forward on 2026-09-14 |
-| The kit targets Claude Code only, with the content kept in one source | The user's choice on 2026-09-11; Claude Code has skills, agents and hooks natively | — Pending |
+| Every agent reads the same `AGENTS.md`; Claude Code also enforces it with hooks | The user's choice on 2026-09-26, replacing "Claude Code only" (2026-09-11): being tied to one tool was one of the plugin's faults | — Pending |
 | The send to a physical calculator is explained, not automated | The user's choice on 2026-09-11; one run, five attempts | — Pending |
 | Done means: every PPL command documented; then a beginner succeeds end to end and a TermoHP-sized app is built from scratch | The user's choices on 2026-09-11 | — Pending |
 | Learn from GSD, do not depend on it | No Node on this machine, and the kit stays standard-library only | ✓ Good so far |
@@ -246,4 +257,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with the current state
 
 ---
-*Last updated: 2026-09-25, when milestone 1 closed with Phase 10*
+*Last updated: 2026-09-26, when milestone 2 was defined and approved*

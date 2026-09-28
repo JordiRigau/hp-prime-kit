@@ -35,13 +35,37 @@ Run it first, and again whenever something behaves strangely.
 ## new
 
 ```bash
-hpprime new NAME              # a PPL program: NAME.txt
-hpprime new NAME --python     # a Python app: NAME/main.py
+hpprime new NAME              # a PPL program: programs/NAME/NAME.txt
+hpprime new NAME --python     # a Python app: programs/NAME/main.py
+hpprime new NAME -o DIR       # somewhere else: DIR/NAME.txt
 ```
 
-Writes a starter that already compiles and runs, and prints the commands to
-take it to the calculator. The name is what it will be called there: letters
-and digits, no spaces.
+Writes a starter that already compiles and runs, in a folder of its own under
+`programs/`, and prints the commands to take it to the calculator, with its
+paths. Git ignores what is in `programs/`, so what you make there stays yours.
+The name is what it will be called on the calculator: letters and digits, no
+spaces.
+
+## update
+
+```bash
+hpprime update                     # to the latest version on GitHub
+hpprime update --from main.zip     # to a ZIP you downloaded yourself
+hpprime update --dry-run           # say what would change, write nothing
+```
+
+Brings a downloaded copy of the repository up to date: it fetches the `main`
+branch as a ZIP and writes the files that changed and the new ones. A clone
+updates with `git pull`, and this refuses to run in one.
+
+It never writes inside `programs/`, nor to `.claude/settings.local.json`, and
+it never deletes. A file on disk that the new version no longer has is listed
+for you to remove, since it could be yours; files the repository's
+`.gitignore` marks, such as built `.hpprgm` files, are not listed. It says how
+many files changed, and which commit it installed.
+
+If the download fails, download the ZIP by hand (on GitHub, **Code**, then
+**Download ZIP**) and pass it with `--from`.
 
 ## lint
 
@@ -687,7 +711,7 @@ of 58 qualified.
 python tests/run_all.py
 ```
 
-Thirteen suites, and none of them needs a calculator. Two use one if it is there:
+Fourteen suites, and none of them needs a calculator. Two use one if it is there:
 the `.hpprgm` reader against your own binaries, and the number format against
 your own data. They skip what they cannot find rather than failing.
 
@@ -699,6 +723,7 @@ your own data. They skip what they cannot find rather than failing.
 | `test_appdir.py` | building an app, and what `verify` sees |
 | `test_numbers.py` | the internal number format, against real encodings |
 | `test_cli.py` | the whole `hpprime` path a newcomer walks |
+| `test_update.py` | `update` on a folder and ZIPs made in the test: what it writes, and what it must never touch |
 | `test_examples.py` | the starters and examples, so the first thing anybody copies still works |
 | `test_docs.py` | every relative link in the documentation resolves |
 | `test_hpdocs.py` | the interpreter against the examples in HP's own help |
@@ -712,7 +737,7 @@ your own data. They skip what they cannot find rather than failing.
 Every command is a thin front over a module you can import:
 
 ```python
-from hpkit import lint, interp, program, appdir, numbers, emulator, compare, docs, examples
+from hpkit import lint, interp, program, appdir, numbers, emulator, compare, docs, examples, update
 ```
 
 | Module | Main entry points |

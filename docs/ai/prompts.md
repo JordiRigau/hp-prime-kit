@@ -5,8 +5,7 @@ repository; the rest are task prompts that assume it can.
 
 If your assistant *can* read files, do not paste any of this. Point it at
 [`docs/llms.txt`](../llms.txt), the index of every fact and command entry, and
-at [`AGENTS.md`](../../AGENTS.md) (or [`SKILL.md`](../../SKILL.md) for Claude
-Code) for how to work here.
+at [`AGENTS.md`](../../AGENTS.md) for how to work here.
 
 ---
 

@@ -30,7 +30,7 @@ touch arrives and with what coordinates. One app answers all of them in a
 single pass:
 
 ```bash
-hpprime build PROBE examples/probe/main.py
+hpprime build PROBE examples/probe/main.py -o programs/PROBE
 ```
 
 Drag it over, open it and read what it reports. It leaves a mark after each
@@ -43,7 +43,7 @@ step in order of increasing risk, so if it closes, the last mark says where
 hpprime new MYAPP --python
 ```
 
-That writes `MYAPP/main.py`, with its code at module level rather than inside
+That writes `programs/MYAPP/main.py`, with its code at module level rather than inside
 an `if __name__` block. Every Python app examined is built that way, with the
 file called `main.py` and the code running on import. Whether another name
 would work has not been tried, so keep both
@@ -68,7 +68,7 @@ r = ev('CIRCAREA(2)')    # call YOUR PPL library
 Then build and drag it over:
 
 ```bash
-hpprime build MYAPP MYAPP/main.py
+hpprime build MYAPP programs/MYAPP/main.py -o programs/MYAPP
 ```
 
 ## The two traps that cost a day each

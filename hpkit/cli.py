@@ -12,12 +12,27 @@ import io, os, shutil, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 STARTERS = os.path.join(ROOT, 'templates', 'starters')
+# Where a person's programs go, one folder each; git ignores what is in it.
+PROGRAMS = os.path.join(ROOT, 'programs')
+
+
+def _shown(path):
+    """A path as a person should type it: from here when it is below here,
+    whole otherwise, and with forward slashes, which every shell passes on
+    as they are; Git Bash eats a backslash."""
+    try:
+        rel = os.path.relpath(path)
+    except ValueError:              # another drive, on Windows
+        rel = '..'
+    shown = os.path.abspath(path) if rel.startswith('..') else rel
+    return shown.replace(os.sep, '/')
 
 USAGE = """hpprime <command> [arguments]
 
 Getting started
   doctor                  check this machine: Python, templates, the CK
-  new NAME [--python]     write a starter program (or a starter app)
+  new NAME [--python]     write a starter program (or app) in programs/NAME/
+  update [--from FILE.zip]      bring a downloaded kit to the latest version
 
 Writing code
   lint FILES...           the errors the Prime's compiler will not explain
@@ -159,15 +174,18 @@ def _doctor():
 
 
 def _new(argv):
-    """Write a starter you can run today, and say what to do with it."""
+    """Write a starter you can run today, and say what to do with it.
+
+    It goes in programs/NAME/, a folder of its own where git keeps out, from
+    wherever this runs; -o DIR puts it somewhere else instead."""
     args = [a for a in argv if not a.startswith('-')]
     if not args:
         print('usage: hpprime new NAME [--python] [-o DIR]')
         print('       NAME is what the program or app will be called on the')
-        print('       calculator: letters and digits, no spaces.')
+        print('       calculator: letters and digits, no spaces. It goes in')
+        print('       programs/NAME/, or in DIR if you give one.')
         return 2
     name = args[0]
-    base = args[1] if len(args) > 1 else '.'
     as_python = '--python' in argv
 
     if not name.replace('_', '').isalnum():
@@ -175,10 +193,10 @@ def _new(argv):
         return 2
 
     if as_python:
-        folder = os.path.join(base, name)
+        folder = os.path.join(args[1] if len(args) > 1 else PROGRAMS, name)
         if os.path.exists(folder):
             print('ERROR: %s already exists; delete it or pick another name'
-                  % folder)
+                  % _shown(folder))
             return 1
         os.makedirs(folder)
         src = io.open(os.path.join(STARTERS, 'main.py'),
@@ -186,30 +204,35 @@ def _new(argv):
         dest = os.path.normpath(os.path.join(folder, 'main.py'))
         with io.open(dest, 'w', encoding='utf-8', newline='\n') as f:
             f.write(src.replace('__NAME__', name))
-        print('wrote %s' % dest)
+        print('wrote %s' % _shown(dest))
         print('')
         print('Next:')
-        print('  hpprime build %s %s' % (name, dest))
-        print('  then drag %s.hpappdir onto the calculator in the CK window'
-              % name)
+        print('  hpprime build %s %s -o %s'
+              % (name, _shown(dest), _shown(folder)))
+        print('  then drag %s onto the calculator in the CK window'
+              % _shown(os.path.join(folder, name + '.hpappdir')))
         return 0
 
-    dest = os.path.normpath(os.path.join(base, name + '.txt'))
+    folder = args[1] if len(args) > 1 else os.path.join(PROGRAMS, name)
+    dest = os.path.normpath(os.path.join(folder, name + '.txt'))
     if os.path.exists(dest):
         print('ERROR: %s already exists; delete it or pick another name'
-              % dest)
+              % _shown(dest))
         return 1
+    if not os.path.isdir(folder):
+        os.makedirs(folder)
     src = io.open(os.path.join(STARTERS, 'program.txt'),
                   encoding='utf-8').read()
     with io.open(dest, 'w', encoding='utf-8', newline='\n') as f:
         f.write(src.replace('__NAME__', name))
-    print('wrote %s' % dest)
+    built = _shown(os.path.join(folder, name + '.hpprgm'))
+    print('wrote %s' % _shown(dest))
     print('')
     print('Next:')
-    print('  hpprime lint %s' % dest)
-    print('  hpprime run %s --call "CIRCAREA(2)"' % dest)
-    print('  hpprime write %s -o %s.hpprgm' % (dest, name))
-    print('  then drag %s.hpprgm onto the calculator in the CK window' % name)
+    print('  hpprime lint %s' % _shown(dest))
+    print('  hpprime run %s --call "CIRCAREA(2)"' % _shown(dest))
+    print('  hpprime write %s -o %s' % (_shown(dest), built))
+    print('  then drag %s onto the calculator in the CK window' % built)
     return 0
 
 
@@ -264,6 +287,9 @@ def main(argv=None):
         return _doctor()
     if cmd == 'new':
         return _new(rest)
+    if cmd == 'update':
+        from hpkit import update
+        return update.cli(rest)
     if cmd == 'verify':
         return _verify(rest)
     if cmd == 'lint':

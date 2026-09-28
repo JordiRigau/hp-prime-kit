@@ -16,3 +16,8 @@ __pycache__/
 !templates/code.hpprgm
 !templates/app/*
 !tests/fixtures/*.hpprgm
+
+# A person's programs, one folder each. They are theirs: git keeps out of
+# them, and only the note that says what goes there ships.
+programs/*
+!programs/README.md
