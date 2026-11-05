@@ -67,7 +67,7 @@ Defined with the user on 2026-09-26, in `milestone-2-CONTEXT.md`, and mapped
 to Phases 11 to 16. KIT-01 reworded the same day, when the plugin gave way to
 the kit's own folder.
 
-- **KIT-01**: Downloading the kit and opening its folder is the whole install, and the agent picks it up without being told
+- [x] **KIT-01**: Downloading the kit and opening its folder is the whole install, and the agent picks it up without being told
 - **KIT-02**: One entry point per job (new program, port, debug, screen, app, deploy, measure), each loading only the entries that job needs
 - **KIT-03**: Specialised agents: one writes, another verifies and assumes nothing works until a command shows it does
 - **KIT-04**: Agent reports cite the documentation's identifiers instead of paraphrasing, and a test checks that every citation resolves
@@ -75,7 +75,7 @@ the kit's own folder.
 - **KIT-06**: A fixed hand-over for what only the human can do: what was built, the keys to press, the values to expect, what to report back
 - **KIT-07**: A beginner can start from an idea, and the agent asks what it needs before writing any PPL
 - **KIT-08**: A TermoHP-sized project can be built across sessions, with the plan and the state in files and each step checked before the next
-- **KIT-09**: An expert can use the tools and the documentation directly, without the agent's procedures
+- [x] **KIT-09**: An expert can use the tools and the documentation directly, without the agent's procedures
 - **KIT-10**: A block to paste into a chat with no file access, generated from the documentation
 - **KIT-11**: The interpreter grows to cover what the kit's programs use, each builtin measured first
 
@@ -143,8 +143,8 @@ the kit's own folder.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| KIT-01 | Phase 11 | Pending |
-| KIT-09 | Phase 11 | Pending |
+| KIT-01 | Phase 11 | Complete |
+| KIT-09 | Phase 11 | Complete |
 | KIT-05 | Phase 12 | Pending |
 | KIT-04 | Phase 12 | Pending |
 | KIT-07 | Phase 13 | Pending |

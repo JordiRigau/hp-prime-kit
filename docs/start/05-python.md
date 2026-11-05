@@ -16,11 +16,9 @@ The full detail is in [micropython.md](../topics/micropython.md).
 | you already have the logic in Python on your PC | you need a library other programs call |
 | you want to test the real code on your PC | you are calling the calculator's own maths |
 
-The reason that outweighs the others is that the file that computes can be
-exactly the same on the PC and on the calculator. Only the module underneath
-it changes, the one that looks data up, and with that your PC tests say
-something real about what runs on the G2
-([the architecture](../topics/micropython.md#the-architecture-that-makes-this-useful)).
+One reason that weighs with many is that a Python file can be exactly the
+same on the PC and on the calculator, so a test on the PC runs the code the
+calculator runs ([patterns.md](../patterns.md#one-python-file-in-both-places)).
 
 ## Send a probe first
 
@@ -45,8 +43,9 @@ hpprime new MYAPP --python
 
 That writes `programs/MYAPP/main.py`, with its code at module level rather than inside
 an `if __name__` block. Every Python app examined is built that way, with the
-file called `main.py` and the code running on import. Whether another name
-would work has not been tried, so keep both
+file called `main.py` and the code running on import. An app whose only file
+had another name ran it too, but with several files which one the calculator
+imports has not been tried, so keep both
 ([apps.main-py](../topics/apps.md#apps.main-py)).
 
 Everything the screen does goes through the `hpprime` module
@@ -119,32 +118,16 @@ got. Put the marks in order of increasing risk, and the point where it dies
 identifies the cause without further experiments
 ([micropython.mark-debugging](../topics/micropython.md#micropython.mark-debugging)).
 
-## The architecture to aim for
+## One way to lay out a Python app
 
-```
-      PC                                   calculator
-   ---------                            -----------------
-   engine.py   \                       /   LIB (PPL)
-                >   data.py (2 faces) <
-                                       \   hpprime.eval
-                       |
-                    app.py      <-- THE SAME FILE in both places
-                       |
-                 main / screen         <-- pixels only here
-```
+Some Python apps keep the file that computes identical on the PC and on the
+calculator, with a data module written twice underneath it, and keep what
+draws as thin as they can. How, and what it costs, is in
+[patterns.md](../patterns.md#one-python-file-in-both-places). An app laid out
+another way works just as well on the calculator.
 
-- `app.py` is literally the same file in your repository and in the app.
-  `hpprime build` copies it, and `hpprime verify` tells you when the two have
-  drifted apart.
-- `data.py` is the one piece deliberately written twice, with the same face:
-  one version over your PC engine, one over the bridge.
-- Whatever touches pixels and keys stays as thin as you can make it, because it
-  is the only part you cannot test from the PC.
-
-The detail is in
-[micropython.md](../topics/micropython.md#the-architecture-that-makes-this-useful).
-A crossing of the bridge costs 0.2 ms, and a calculation making 30 to 40 of
-them spends about 8 ms there, so there is nothing to optimise: write the clear
+A crossing of the bridge was timed once at 0.2 ms, and a calculation making 30
+to 40 of them spends about 8 ms there, so there is nothing to optimise: write the clear
 version ([micropython.bridge-cost](../topics/micropython.md#micropython.bridge-cost)).
 
 ---

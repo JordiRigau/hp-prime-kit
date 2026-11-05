@@ -1,0 +1,5 @@
+// control: compiles again
+EXPORT ZRCOB()
+BEGIN
+  RETURN 5001;
+END;

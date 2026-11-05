@@ -51,6 +51,8 @@ Inferred from the existing repository, and added phase by phase.
 - ✓ An entry for every variable of Home and the system, and for `GET`; the open questions a program runs into measured, and `hpprime examples --compile` to ask whether a program compiles — Phase 8.1
 - ✓ An entry for every name the list documents, 706 of 706: every statement, command, Home function, app function, app variable and variable, and `GET` — Phases 5 to 8.1, closed with Phase 8 on 2026-09-25
 - ✓ Every fact names what catches it from a PC -- a lint rule, another command and its test -- or why nothing can; `hpprime lint` has twenty rules, eighteen tied to a fact — Phase 10
+- ✓ The facts a reader disputed, and what the review after them found, rest on programs run on a G2 with controls; the linter and the interpreter follow; `hpprime lint` has twenty-three rules, twenty-one tied to a fact — Phase 11.1
+- ✓ `hpprime screen`, `press`, `type` and `send`: a G2 on its cable from Windows, with no Connectivity Kit — 2026-11-04 and 2026-11-05
 - ✓ A program reaches another app's variables and functions with the app's name in front, `Statistics_1Var.MeanX`, measured in source and through `EXPR`, and `hpprime run` calls it not covered rather than an error — Phase 8
 - ✓ `hpprime run`: runs the real PPL file on the PC, and raises instead of inventing a result — existing
 - ✓ `hpprime write` / `read` / `verify`: the `.hpprgm` container in both directions — existing
@@ -115,7 +117,7 @@ and a new app the size of TermoHP to close it. Phases 11 to 16.
 - Two repositories — one repository with two layers. The documentation can be split out later with `git subtree split`, history included, if it gains contributors of its own
 - Rewriting the Python tools — they are validated; they change only where the new structure needs them to
 - The checks enforced in agents other than Claude Code — Codex, Cursor, Copilot and the rest read the same `AGENTS.md` and procedures, but the checks that block are Claude Code hooks. Until 2026-09-26 the kit targeted Claude Code only
-- Automating the send to a physical calculator — the user's decision: explain it, do not automate it. It has worked once, after five attempts
+- Automating the send through the Connectivity Kit's window — the user's decision: explain it, do not automate it. It has worked twice, after five attempts and after two, by clicking at positions in a window. Programs now go over USB with `hpprime send` instead (2026-11-04); apps have not been tried that way
 - A Node.js installer or dependency — the kit is Python 3.7+ standard library only, and this machine has no Node
 - Becoming a GSD capability — it would need Node and GSD installed; the kit learns from GSD instead of depending on it. Can be revisited
 - Drawing the interface on the PC, and running MicroPython on the PC — unchanged from today
@@ -216,7 +218,15 @@ and a new app the size of TermoHP to close it. Phases 11 to 16.
 | Keep the measured facts and the Python tools; redo the structure, the docs and the entry points | They are validated on hardware; the problem is the shape, not the content | ✓ Good so far |
 | The redo happens on a local branch `redo` | The user's choice on 2026-09-11: `main` stays intact until the redo is ready | ✓ Good: `main` moved to it by fast-forward on 2026-09-14 |
 | Every agent reads the same `AGENTS.md`; Claude Code also enforces it with hooks | The user's choice on 2026-09-26, replacing "Claude Code only" (2026-09-11): being tied to one tool was one of the plugin's faults | — Pending |
-| The send to a physical calculator is explained, not automated | The user's choice on 2026-09-11; one run, five attempts | — Pending |
+| The send through the Connectivity Kit's window is explained, not automated | The user's choice on 2026-09-11; one run, five attempts | ✓ Good: it stays explained. For programs it was overtaken by the next row |
+| Programs go to a physical G2 with `hpprime send`, directly over USB | The user's choice on 2026-11-04, once a send took no window and no Kit: the message copied from what the calculator itself sends, five versions of one program run on it. Apps stay a drag, untried | — Pending |
+| A `G2` label needs what was run and what came back; evidence that only says it was measured is `unverified` | The user's choice on 2026-11-05, after a reader's review showed one compile error enforced as a rule, and the forum reply promising it | ✓ Good: seven facts relabelled, seven more given programs, and `hpprime docs --check` holds it |
+| Before a large public commit, look for the fault everywhere rather than where it was reported | The user's request on 2026-11-05: "I don't want to have more errors" | ✓ Good: it found plan 11.1-01 itself past its measurements, and 45 more probes on the G2 corrected it (11.1-02) |
+| `hpprime send --no-lint`, and the probe runner stays out of the repository | The user's choice on 2026-11-05: a rule the kit enforces has to be testable through the kit | — Pending |
+| Phase 12's hooks are published before plan 12-03's trial on a download, with the worktree bug fixed and the README saying what has been tried | The user's choice on 2026-11-05, since they share files with the corrections and fail bounded | — Pending |
+| The kit does not choose an app's design: ways apps are built live in `docs/patterns.md`, each as an option with what it solves and what it costs, and topic pages and the guided path state facts | The user's choice on 2026-11-07: "it has to serve the purpose of being the best documentation repo that everyone can use for their apps". The launcher, the shared Python file, logic apart from pixels and the windowed list had been taught as the way, from one data-table app | — Pending |
+| The end check accepts a program `run` only loaded, and names it to the person | The user's choice on 2026-11-07: requiring a call that answers pushed every app towards logic a PC can test, a design choice of its own | — Pending |
+| Lint does not warn on code that compiles for a habit's sake: 7 and 8 locals, and exported drawing helpers with arguments, are no longer flagged | 2026-11-07, from 118 and 16 such warnings on working programs | — Pending |
 | Done means: every PPL command documented; then a beginner succeeds end to end and a TermoHP-sized app is built from scratch | The user's choices on 2026-09-11 | — Pending |
 | Learn from GSD, do not depend on it | No Node on this machine, and the kit stays standard-library only | ✓ Good so far |
 | Build the redo with GSD's method: `.planning/` with PROJECT, REQUIREMENTS, ROADMAP and STATE, one phase at a time | The user asked to use GSD to capture what they want | ✓ Good: it surfaced the "documentation first" correction |
@@ -257,4 +267,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with the current state
 
 ---
-*Last updated: 2026-09-26, when milestone 2 was defined and approved*
+*Last updated: 2026-11-05, with Phase 11.1 and the review before its commit*

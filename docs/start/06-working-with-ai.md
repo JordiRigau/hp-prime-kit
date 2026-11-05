@@ -44,7 +44,7 @@ names that have no entry yet.
    what it should do   →    the PPL       →    (0 errors?) ──┐
                                                               │
    you check the        hpprime write      hpprime run        │
-   result on the    ←   + drag over    ←   --call "F(x)"  ←───┘
+   result on the    ←   + drag over    ←   --call "FN(x)" ←───┘
    calculator                               (right answer?)
 ```
 
@@ -65,9 +65,9 @@ both, with one keypress of yours on the emulator.
 
 ## What to ask for, and how
 
-Ask for the pure half separately. "Write the function that computes X, with no
-screen calls" gets you something testable. Screens and key handling come after,
-once the arithmetic is right.
+If the program computes something, ask for that part on its own first. "Write
+the function that computes X, with no screen calls" gets you something
+`hpprime run` can test, before screens and key handling.
 
 Say what you already know. "This is PPL for an HP Prime G2, firmware 2.4" is
 worth a paragraph of correction later.

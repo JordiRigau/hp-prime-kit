@@ -1,0 +1,10 @@
+EXPORT ZLSCP()
+BEGIN
+  LOCAL za;
+  za := 4734;
+  IF za == 4734 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN za + zb;
+END;

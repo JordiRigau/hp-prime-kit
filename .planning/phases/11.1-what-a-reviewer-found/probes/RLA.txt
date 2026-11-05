@@ -1,0 +1,10 @@
+// IF: only assigned after
+EXPORT ZRLA()
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  zb := 4;
+  RETURN 5170;
+END;

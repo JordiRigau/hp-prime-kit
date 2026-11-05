@@ -40,7 +40,7 @@ evidence:
 | In the program | The rule |
 |---|---|
 | `EXPORT` | makes a function visible from Home and from every other program, in one shared namespace, which is why the name has a prefix: `AREA` is already the Function app's [AREA](../commands/function/AREA.md) ([ppl.global-namespace](../topics/ppl.md#ppl.global-namespace)) |
-| `LOCAL zr;` first | every local is declared at the top of the `BEGIN` ([ppl.locals-at-top](../topics/ppl.md#ppl.locals-at-top)) |
+| `LOCAL zr;` | declares a local, which lasts until the end of its block ([ppl.local-block-scope](../topics/ppl.md#ppl.local-block-scope)) |
 | `zr := 1;` | `:=` assigns and `==` compares ([ppl.equality-operators](../topics/ppl.md#ppl.equality-operators)) |
 | `END;` | `END` closes every block: there is no `ENDIF` ([ppl.no-end-keywords](../topics/ppl.md#ppl.no-end-keywords)) |
 | the `;` after `END` | it is required, and a missing one is reported on the next line ([ppl.end-semicolon](../topics/ppl.md#ppl.end-semicolon)) |
@@ -119,6 +119,11 @@ If the drag shows the no-entry cursor and nothing happens, the file is not the
 problem: check whether the CK is set to run as administrator
 ([deploy.drag-refused-when-elevated](../topics/deploy.md#deploy.drag-refused-when-elevated)).
 
+On a G2 on its cable, from Windows and with the CK closed, there is a way with
+no drag: `hpprime send programs/CIRCLE/CIRCLE.txt`. It replaces a program of that
+name without asking, and nothing on the calculator says it arrived
+([usb.send-program](../topics/usb.md#usb.send-program)).
+
 On the Virtual Calculator there is a second way, with no drag:
 [`hpprime install programs/CIRCLE/CIRCLE.hpprgm --restart`](../tools.md#install--pull) copies
 it into the emulator's own folder, which, unlike the mirror, is read when the
@@ -147,11 +152,11 @@ Then run the interface half, and note the missing parentheses:
 MAIN
 ```
 
-> On Home, a function with no arguments is called without parentheses:
-> `MAIN()` answers *syntax error* and `MAIN` runs it. Inside your source the
-> parentheses are right, and `CIRCAREA(zr)` is called normally from `MAIN`, so
-> this is a rule of Home rather than of PPL
-> ([ppl.home-no-parentheses](../topics/ppl.md#ppl.home-no-parentheses)).
+> On Home, type a function with no arguments without parentheses: `MAIN` runs
+> it, and `MAIN()` answers *syntax error*, except on the RPN stack
+> ([ppl.home-no-parentheses](../topics/ppl.md#ppl.home-no-parentheses)). This is
+> a rule of Home rather than of PPL: inside your source a call works either way
+> ([ppl.call-no-parentheses](../topics/ppl.md#ppl.call-no-parentheses)).
 
 It is the first failure most people meet, and it is not in your program.
 
@@ -188,18 +193,19 @@ Each row links to the fact that says how it is known. The last column is what
 
 | What you do | What happens | Instead | Known from | `hpprime lint` |
 |---|---|---|---|---|
-| `LOCAL` with 9 names | *syntax error* on that line | at most 8 per `LOCAL`; use groups of 6 | [ppl.local-limit](../topics/ppl.md#ppl.local-limit) | error from 9, warning at 7 and 8 |
+| `LOCAL` with 9 names | *syntax error* on that line | at most 8 per `LOCAL`, and several `LOCAL`s for more | [ppl.local-limit](../topics/ppl.md#ppl.local-limit) | error from 9 |
 | `ENDIF`, `ENDFOR`, `ENDWHILE` | *syntax error* | `END` for everything | [ppl.no-end-keywords](../topics/ppl.md#ppl.no-end-keywords) | error |
 | `END` without its `;` | *syntax error*, on a block's reported on the next line | `END;` | [ppl.end-semicolon](../topics/ppl.md#ppl.end-semicolon) | error |
 | `za = 2;` meaning to assign | nothing is assigned, and no error | `za := 2;` | [ppl.equality-operators](../topics/ppl.md#ppl.equality-operators) | a warning |
 | `n := SIZE(M)(1);` | *syntax error* | `zd := DIM(M);` then `zd(1)` | [ppl.index-call](../topics/ppl.md#ppl.index-call) | error |
-| a `LOCAL` half way down a function | *syntax error* | all of them at the top of the `BEGIN` | [ppl.locals-at-top](../topics/ppl.md#ppl.locals-at-top) | error |
+| a `LOCAL` from a block used after its `END` | it does not compile | declare it before the block | [ppl.local-block-scope](../topics/ppl.md#ppl.local-block-scope) | error |
+| `EXPORT Z := 1;` | it does not compile | a name of your own, with a prefix | [ppl.export-home-variable](../topics/ppl.md#ppl.export-home-variable) | error for `A`, `Y` and `Z`, a warning for the calculator's other variables |
 | `L(0)` on a list | its **last** element, with no error | positions count from 1 | [ppl.one-based](../topics/ppl.md#ppl.one-based) | a warning |
 | `MAIN()` on Home | *syntax error* | `MAIN`, with no parentheses | [ppl.home-no-parentheses](../topics/ppl.md#ppl.home-no-parentheses) | cannot see Home |
 | a program that draws, then returns | you see Home and the returned value, not the drawing | wait for a key before returning | [interface.draw-then-return](../topics/interface.md#interface.draw-then-return) | a warning |
 | copying the file into the mirror | nothing is installed | drag it in the CK window | [deploy.ck-mirror](../topics/deploy.md#deploy.ck-mirror) | cannot see it |
 | a program installed before the one whose functions it calls | it does not see them | install in dependency order, or recompile it | [ppl.compilation-order](../topics/ppl.md#ppl.compilation-order) | cannot see it |
-| passing a big matrix to a function | it is copied | keep large data in a global | [ppl.matrices-by-value](../topics/ppl.md#ppl.matrices-by-value) | cannot see it |
+| a function writing to a matrix it was given | the caller's stays as it was | return the new one | [ppl.matrices-by-value](../topics/ppl.md#ppl.matrices-by-value) | cannot see it |
 
 A single `=` in a condition is not on the list. `IF a = 1 THEN` compiles and
 compares, exactly as `==` does

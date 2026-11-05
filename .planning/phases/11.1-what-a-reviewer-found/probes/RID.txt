@@ -1,0 +1,8 @@
+// DIM(M) stored first, its pair
+EXPORT ZRID()
+BEGIN
+  LOCAL zm, zd;
+  zm := [[1,2],[3,4]];
+  zd := DIM(zm);
+  RETURN zd(1) + 5270;
+END;

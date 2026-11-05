@@ -104,6 +104,27 @@ def main():
     m.load_file(km)
     ok('KEYMAP' in m.funcs, 'KEYMAP parses and loads')
 
+    print('\n-- examples/touch')
+    th = os.path.join(ROOT, 'examples', 'touch', 'TOUCH.txt')
+    lints_clean(th, 'TOUCH.txt')
+    # Not loaded here: the interpreter does not read the arrow in B→R,
+    # and on the PC no key would end its loops. What it can check is that
+    # both programs are exported, and that the linter has no warning.
+    text = io.open(th, encoding='utf-8').read()
+    found, _ = lint.check_source(th, text)
+    ok(not found, 'TOUCH.txt has no warning either',
+       '; '.join('%d %s' % (f.line, f.rule) for f in found))
+    ok('EXPORT TOUCHEV()' in text and 'EXPORT TOUCHMS()' in text,
+       'TOUCH.txt exports TOUCHEV and TOUCHMS')
+
+    print('\n-- examples/glyphs')
+    gl = os.path.join(ROOT, 'examples', 'glyphs', 'GLYPHS.txt')
+    lints_clean(gl, 'GLYPHS.txt')
+    # Not called either: it waits for a key the same way.
+    m = interp.Machine()
+    m.load_file(gl)
+    ok('GLYPHS' in m.funcs, 'GLYPHS parses and loads')
+
     print('\n-- examples/probe')
     probe = os.path.join(ROOT, 'examples', 'probe', 'main.py')
     bad = appdir.check_imports([probe], [])

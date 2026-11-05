@@ -40,10 +40,12 @@ Virtual Calculator. Cite the identifier when you rely on a rule.
   [ppl.no-end-keywords, G2]
 - END is followed by a semicolon: END; A missing one is reported on the
   line after it. [ppl.end-semicolon, emulator]
-- All LOCAL declarations go together at the top of the BEGIN.
+- A LOCAL can go after other statements, not only at the top of the BEGIN.
   [ppl.locals-at-top, G2]
+- A LOCAL lasts until the end of its block: used after that, it does not
+  compile. A THEN and its ELSE are two blocks. [ppl.local-block-scope, G2]
 - One LOCAL statement holds at most 8 variables; 9 does not compile. Use
-  groups of 6. [ppl.local-limit, G2]
+  several LOCAL statements for more. [ppl.local-limit, G2]
 - You cannot index the result of a call: SIZE(M)(1) does not compile.
   Use d := DIM(M); then d(1). [ppl.index-call, G2]
 - Indexing a global declared in another program has been seen both to fail
@@ -54,8 +56,15 @@ Virtual Calculator. Cite the identifier when you rely on a rule.
 - EXPORT makes a function visible outside its file. Exported names are
   global and collide with each other and with HP's own names (AREA is the
   Function app's), so prefix them. [ppl.global-namespace, G2]
-- Matrices are passed BY VALUE: passing a large one copies it.
-  [ppl.matrices-by-value, G2]
+- Exporting one of Home's variables does not compile: EXPORT Z := 1; is
+  refused, and Y and A too. A function called like one compiles, but typed on
+  Home F answers the variable. Prefix exported names.
+  [ppl.export-home-variable, G2]
+- One EXPORT statement holds at most 8 variables; 9 does not compile.
+  [ppl.export-initialised, G2]
+- Matrices are passed by value: a function that writes to one it was given
+  does not change the caller's. A big one is not slower to pass, only to write
+  to, so do not move data to a global for that. [ppl.matrices-by-value, G2]
 - EXPR("") fails at run time. Check SIZE(s) > 0 first. [ppl.expr-empty, G2]
 - GETKEY returns a key position, not a character. Enter is 30.
   [interface.getkey-position, G2]
@@ -66,10 +75,12 @@ Virtual Calculator. Cite the identifier when you rely on a rule.
 - A function with no RETURN is not silent: it answers with the value of its
   last statement that produced one. You cannot make one return nothing by
   omitting it. [ppl.function-always-answers, G2]
-- On the Home screen a function with no arguments is called WITHOUT
-  parentheses: MYFUNC, not MYFUNC(). Inside PPL source the parentheses
-  are correct. Tell the user the right form when you tell them to test.
+- On the Home screen, type a function with no arguments WITHOUT parentheses:
+  MYFUNC. MYFUNC() is a syntax error there, except on the RPN stack. Tell the
+  user the right form when you tell them to test.
   [ppl.home-no-parentheses, G2]
+- In PPL source a call with no arguments works with or without parentheses.
+  [ppl.call-no-parentheses, G2]
 - TEXTOUT_P's last argument is the maximum width in pixels. Without it,
   text that does not fit is painted over its neighbour with no error.
   [interface.textout-width, G2]
@@ -87,15 +98,16 @@ For MicroPython on the Prime, add:
 
 ```
 - MicroPython on the Prime has math, hpprime, micropython. It does NOT have
-  time, __future__, or os/sys as CPython has them. [micropython.modules, G2]
+  time, __future__, or os/sys as CPython has them. [micropython.modules, unverified]
 - hpprime.eval(ppl_string) runs PPL and returns the result.
   [micropython.eval, G2]
 - Only numbers and flat lists of numbers may cross: a list with a string
   inside closes the app silently, with no traceback.
   [micropython.list-with-string-closes-the-app, G2]
-- Every Python app examined has its entry point in main.py, with its code at
-  module level. Whether another name works is not known, so keep that.
-  [apps.main-py, unverified]
+- Call a Python app's entry file main.py, with its code at module level: the
+  calculator imports it and that is when it runs. A lone file with another
+  name also ran; with several, which one is imported is not known.
+  [apps.main-py, emulator]
 ```
 
 ## 2. Task prompts
@@ -117,8 +129,8 @@ expected values turns the run into a real check.
 ```
 Here is a Python function: <paste>
 Translate it to PPL for an HP Prime. Keep the same name and the same
-argument order. Remember: 1-based indexing, LOCALs at the top in groups of 6,
-END; to close. Then tell me which lines of the original you could not
+argument order. Remember: 1-based indexing, at most 8 names per LOCAL, END; to
+close. Then tell me which lines of the original you could not
 translate directly and why.
 ```
 

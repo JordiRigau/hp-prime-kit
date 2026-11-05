@@ -28,7 +28,7 @@ Every claim carries one of four labels, strongest first
 
 | Label | Means |
 |---|---|
-| `G2` | measured on a physical HP Prime G2 |
+| `G2` | measured on a physical HP Prime G2, and its evidence says what was run and how often |
 | `emulator` | run on HP's Virtual Calculator, with the answer kept in [results.tsv](docs/commands/results.tsv) |
 | `HP help` | stated in the calculator's built-in help |
 | `unverified` | none of those, and it says where it came from |
@@ -42,8 +42,8 @@ Where it stands:
   on file, 4 were measured by hand on a G2, and 17 have no value to record,
   with the reason in their entry. None is unrun, and the tests fail if one
   ever is.
-- **Facts.** 122 facts about the platform: 76 measured on a G2, 26 on the
-  emulator, and 20 unverified, which say so.
+- **Facts.** 143 facts about the platform: 88 measured on a G2, 33 on the
+  emulator, and 22 unverified, which say so.
 
 ### Where a person starts
 
@@ -79,6 +79,7 @@ command by its name. Whether a name exists at all is in
 | [micropython.md](docs/topics/micropython.md) | Python on the calculator, the bridge to PPL, and the call that closes the app |
 | [formats.md](docs/topics/formats.md) | the binary container and the internal number format, both decoded, and what is still not |
 | [deploy.md](docs/topics/deploy.md) | getting it onto the calculator: the emulator folder you can write into, and the two traps of the one you cannot |
+| [patterns.md](docs/patterns.md) | ways apps that work are built, each with what it solves and what it costs. Options, not rules |
 
 ## The tools
 
@@ -107,8 +108,9 @@ hpprime install programs/CIRCLE/CIRCLE.hpprgm --restart
 [`programs/`](programs/README.md), where what you make goes and git keeps out.
 
 The last line installs into the emulator and opens it, with nothing to drag. On
-a physical calculator that step is a drag onto it in the Connectivity Kit
-window. [deploy.md](docs/topics/deploy.md) covers both.
+a physical calculator that step is `hpprime send`, for a program on a G2 from
+Windows, or a drag onto it in the Connectivity Kit window.
+[deploy.md](docs/topics/deploy.md) covers them all.
 
 | | |
 |---|---|
@@ -122,6 +124,7 @@ window. [deploy.md](docs/topics/deploy.md) covers both.
 | `hpprime install` / `pull` | into the emulator, and back out of it |
 | `hpprime emu` | calculators to experiment on, and put back |
 | `hpprime compare` | the same call here and on the calculator, side by side |
+| `hpprime screen` / `press` / `type` / `send` | a physical G2 on its USB cable: what it is showing, its keys, typing a name, and installing a program, on Windows with the Connectivity Kit closed |
 | `hpprime matrix` | `.hpmat` files: a whole matrix as a file, nothing pasted |
 | `hpprime docs` / `examples` | the documentation held to its format, and its examples run on the Virtual Calculator |
 
@@ -149,6 +152,19 @@ The assistant starts at [`docs/llms.txt`](docs/llms.txt), and at
 themselves when this folder is open. It says what to read first, the two gates
 every program goes through, what not to claim without evidence, and what only a
 person can do.
+
+In Claude Code the gates are not left to the assistant's memory: hooks in
+[`.claude/settings.json`](.claude/settings.json) lint every program it edits
+in `programs/`, and do not let it finish until each one has passed `lint` on
+what it now holds and `run` has loaded it, and every fact it cites exists. A
+program that was only loaded, with nothing the PC could call, is named to you
+when it finishes. To turn them off,
+put `"disableAllHooks": true` in `.claude/settings.local.json` in this folder,
+which is yours and which git ignores. They start `python`: on a machine where
+only `python3` starts they do not run, and the gates are back to the assistant's
+memory. They have been seen working on Windows, in a clone; how a fresh download
+takes them has not been tried.
+
 A chat with no file access gets [`docs/ai/prompts.md`](docs/ai/prompts.md) §1
 pasted in, where every rule names the fact it comes from.
 [Step 6 of the guided path](docs/start/06-working-with-ai.md) is the version
@@ -160,18 +176,18 @@ for the person on the other side.
   recorded rather than painted, so a program with a screen runs end to end
   here, but seeing it needs the emulator.
 - **Run MicroPython.** The `hpprime.eval` bridge exists only on the
-  calculator. What you can do is write the engine so that the file which
-  computes is the same file in both places; see
-  [micropython.md](docs/topics/micropython.md).
+  calculator. One way round it is to keep the file that computes identical in both
+  places: [patterns.md](docs/patterns.md#one-python-file-in-both-places).
 - **Generate a program's compiled block**, which it does not need to. That
   block is a cache the calculator rebuilds from the source
   ([formats.block-is-a-cache](docs/topics/formats.md#formats.block-is-a-cache)),
   so a program carrying data is generated like any other. How long a large one
   takes to compile on arrival has not been measured.
-- **Install on a physical calculator.** That step is a drag onto the
+- **Install an app on a physical calculator.** That step is a drag onto the
   calculator in the Connectivity Kit window, and the CK's mirror folder is not
-  a mailbox. The emulator is different: its folder is a real one, so
-  `hpprime install` does the whole job
+  a mailbox. A program can go over the cable with `hpprime send`
+  ([usb.send-program](docs/topics/usb.md#usb.send-program)), and the emulator's
+  folder is a real one, so `hpprime install` does the whole job
   ([deploy.emulator-folder](docs/topics/deploy.md#deploy.emulator-folder)).
 - **Replace testing on the calculator.** It cuts the number of round trips;
   the last one is still a real Prime. `hpprime compare` runs the same calls in
@@ -189,7 +205,7 @@ and an app built end to end by `hpprime build --ppl`
 ([apps.generated-and-verified](docs/topics/apps.md#apps.generated-and-verified)).
 
 ```bash
-python tests/run_all.py     # fourteen suites, none of them needs a calculator
+python tests/run_all.py     # sixteen suites, none of them needs a calculator
 ```
 
 Open, and listed here so that nobody relies on them:
@@ -197,7 +213,7 @@ Open, and listed here so that nobody relies on them:
 | | |
 |---|---|
 | G1 | everything here was measured on a G2 or its emulator. Same firmware, different hardware |
-| MicroPython speed, and an app's memory limit | not measured. The bridge crossing is 0.2 ms |
+| MicroPython speed, and an app's memory limit | not measured. A bridge crossing was timed once at 0.2 ms |
 | `.hplist` | lists as files are neither read nor written. Same family as `.hpmat`, with the type byte in the same slot, `0x16` against `0x14`, but every `.hplist` seen here is empty, and the format will not be guessed from those |
 
 If you measure something new, or build something with this, see

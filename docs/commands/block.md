@@ -53,8 +53,8 @@ was refused again at exactly that line (emulator), which is what separates
 The interpreter accepted it until then, which is how the wrong example came
 to be written, and it refuses it now (emulator).
 
-Every local is declared at the top of the `BEGIN`, before any other
-statement: a `LOCAL` after code does not compile (G2),
+A `LOCAL` does not have to come first in the `BEGIN`: after other statements it
+compiles and works (G2),
 [ppl.locals-at-top](../topics/ppl.md#ppl.locals-at-top). How many
 variables one `LOCAL` may hold is
 [ppl.local-limit](../topics/ppl.md#ppl.local-limit).

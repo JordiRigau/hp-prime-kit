@@ -31,7 +31,7 @@ The colour fills it: a grob created with 0 reads back `#0h` at its pixels,
 and one created with `RGB(255,0,0)` reads back red
 ([GETPIX_P](GETPIX_P.md), [PIXOFF_P](PIXOFF_P.md)) (emulator).
 
-`G0` is the screen and `G1` to `G9` are yours (G2),
+`G0` is the screen and `G1` to `G9` are yours (unverified),
 [interface.offscreen-grob](../../topics/interface.md#interface.offscreen-grob).
 Drawing into one of your own and copying it across with
 [BLIT_P](BLIT_P.md) is the measured way to redraw without flicker.

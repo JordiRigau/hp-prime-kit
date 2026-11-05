@@ -375,13 +375,16 @@ def cli(argv):
                   % (os.path.basename(path), os.path.getsize(path),
                      ppl_sources[0]))
 
-    # The entry point of a Python app is main.py, and its code sits at module
-    # level: that is what the apps that work do. Without it the app starts
-    # and nothing happens.
+    # The calculator imports the app's file and its module-level code runs:
+    # every app that works calls it main.py. A lone start.py ran on the
+    # emulator (apps.main-py); with several files, which one the calculator
+    # imports was not tried, so main.py is the name to keep.
     if modules and not is_ppl and not any(
             os.path.basename(m) == 'main.py' for m in modules):
-        print('WARNING: there is no main.py. The entry point of a Python app '
-              'is\n         main.py, and its code runs on import.')
+        print('WARNING: there is no main.py. A lone file with another name '
+              'ran on the\n         emulator, but with several, which one the '
+              'calculator imports\n         is not known: call the entry point '
+              'main.py (apps.main-py).')
 
     for path, mod in check_imports(modules, [p for p in allowed if p]):
         print('WARNING: %s imports "%s", which MicroPython on the Prime does '

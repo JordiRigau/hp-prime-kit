@@ -10,7 +10,7 @@ and it is an ERROR only as far as that measurement reaches. Where a rule's
 pattern goes further, to cases nobody has run, it is a warning, and the
 finding says so.
 
-    hpprime lint FILE.hpprgm [more files or folders...]
+    hpprime lint FILE.txt [more files or folders...]
     hpprime lint ppl/ --quiet      # errors only, no warnings
     hpprime lint A.txt B.txt --set # the files go onto the calculator
                                    # together: exported names that would
@@ -34,6 +34,12 @@ and found legal:
   - RETURN inside a FOR or a REPEAT.
   - locals made of letter + digit (r2, y1, L12).
   - several locals given initial values on one line.
+  - a LOCAL after other statements.
+  - up to 8 variables in one EXPORT.
+  - a call with no arguments and no parentheses.
+  - a function, a parameter or a local called like one of Home's variables.
+  - a nested LOCAL that repeats an outer one, or is declared again after its
+    block.
 
 They are listed so nobody "fixes" them back in.
 """
@@ -41,22 +47,25 @@ from __future__ import unicode_literals
 import io, os, re, sys
 from collections import OrderedDict
 
-# Variables per LOCAL statement. Measured on a G2, firmware 2.4.15515,
-# against programs that compile on that same calculator: 8 declared in one
-# statement compiles; the functions that failed declared 13, 16 and 18. On
-# the Virtual Calculator 2.4, build 2025-09-15, on 2026-09-24, 9, 10, 11 and
-# 12 failed too. So 9 and more is an error, 13 and more known from the G2 and
-# 9 to 12 from the emulator; and 7-8
-# is the risky band.
-LOCAL_SAFE = 6
+# Variables per LOCAL statement. Measured on a G2, firmware 2.4.15515, on
+# 2026-11-05: 8 in one statement answered and 9 did not compile. Functions that
+# failed before that declared 13, 16 and 18, and on the Virtual Calculator 2.4,
+# build 2025-09-15, on 2026-09-24, 9, 10, 11 and 12 failed too. So 9 and more is
+# an error, and 8 and fewer, which compile, are not flagged.
 LOCAL_MAX = 8                   # the most seen to compile
 LOCAL_FAILS = 9                 # the fewest seen to fail
-LOCAL_FAILS_G2 = 13             # the fewest seen to fail on the G2
 
-# Initialised variables in one EXPORT: seven on one line failed on a G2.
-# Two to six compiled on the Virtual Calculator, on 2026-09-24 and
-# 2026-09-25, so fewer than seven is not flagged.
-EXPORT_FAILS = 7
+# Variables in one EXPORT. Measured on a G2, firmware 2.4.15515, on 2026-11-05,
+# with prefixed names: with initial values 6, 7 and 8 compiled and 9 did not, and
+# with none, 8 compiled and 9 did not. Two to six compiled on the Virtual
+# Calculator, on 2026-09-24 and 2026-09-25. Some with values and some without has
+# not been run.
+EXPORT_MAX = 8                  # the most seen to compile
+EXPORT_FAILS = 9                # the fewest seen to fail
+
+# The calculator's own variables that were measured being exported: none
+# compiled on that G2, each on its own (ppl.export-home-variable).
+EXPORT_REFUSED = ('A', 'Y', 'Z')
 
 # ENDIF, ENDFOR and ENDWHILE were measured to fail on a G2, ENDCASE and
 # ENDFUNC on the Virtual Calculator on 2026-09-24, and ENDPROC on 2026-09-25.
@@ -66,6 +75,19 @@ BAD_BLOCK_ENDS_EMULATOR = ('ENDCASE', 'ENDFUNC', 'ENDPROC')
 # The null-hypothesis mean as HP's list spells it, with the Greek mu, which
 # does not compile; with the micro sign it answers (emulator, 2026-09-25).
 MU_ZERO = '\u03bc\u2080'
+
+# Characters TEXTOUT_P drew as an empty box, in font 3, on the Virtual
+# Calculator 2.4 build 2025-09-15, on 2026-09-29, each with one the same
+# screen drew to write instead (interface.font-glyphs). Fonts 1 and 2, and
+# the other commands that draw text, were not tried with them.
+BOX_GLYPHS = OrderedDict([
+    ('\u25c4', '\u25c0'),       # left pointer -> left triangle
+    ('\u25c2', '\u25c0'),       # small left triangle -> left triangle
+    ('\u25b8', '\u25b6'),       # small right triangle -> right triangle
+    ('\u2bc7', '\u25c0'),       # left-pointing arrowhead -> left triangle
+    ('\u2bc8', '\u25b6'),       # right-pointing arrowhead -> right triangle
+])
+BOX_FONT = '3'
 
 # The drawing commands without _P count the plot window's units, from the
 # middle of the screen: -15.9 to 15.9 across and -10.9 to 10.9 up on a reset
@@ -176,8 +198,9 @@ FACTS = {
     'index-call': 'ppl.index-call',
     'one-based': 'ppl.one-based',
     'local-limit': 'ppl.local-limit',
-    'local-first': 'ppl.locals-at-top',
-    'export-multiple': 'ppl.export-initialised',
+    'local-scope': 'ppl.local-block-scope',
+    'export-limit': 'ppl.export-initialised',
+    'export-home-variable': 'ppl.export-home-variable',
     'expr-empty': 'ppl.expr-empty',
     'textout-width': 'interface.textout-width',
     'end-semicolon': 'ppl.end-semicolon',
@@ -189,7 +212,9 @@ FACTS = {
     'draw-units': 'interface.draw-units',
     'draw-then-return': 'interface.draw-then-return',
     'wait-undrained': 'interface.drain-then-wait',
+    'wait-touch': 'interface.wait-events',
     'expr-in-loop': 'ppl.expr-dynamic-access',
+    'font-glyph': 'interface.font-glyphs',
 }
 
 NO_FACT = {
@@ -225,6 +250,7 @@ _T_EMU = 'tests/test_emulator.py'
 _T_PRG = 'tests/test_program.py'
 _T_NUM = 'tests/test_numbers.py'
 _T_RUN = 'tests/test_interp.py'
+_T_USB = 'tests/test_usb.py'
 CAUGHT = OrderedDict([
     # apps
     ('apps.hpappdir-contents',
@@ -295,8 +321,10 @@ CAUGHT = OrderedDict([
      [('no', 'installing on a physical calculator is a person dragging the '
              'file in the Connectivity Kit')]),
     ('deploy.content-library-send', [('no', _HANDS)]),
+    ('deploy.ck-offers-firmware', [('no', _HANDS)]),
     ('deploy.usb-without-the-ck',
-     [('no', 'it is a route nobody has, so there is nothing to check')]),
+     [('command', 'send', _T_USB,
+       'send sends the reports and then the report that lets them act')]),
     ('deploy.drag-refused-when-elevated',
      [('no', "it is Windows' settings for the Connectivity Kit")]),
     ('deploy.no-manual-compile',
@@ -381,6 +409,7 @@ CAUGHT = OrderedDict([
     ('interface.two-themes', [('no', _SCREEN)]),
     ('interface.textout-width', [('rule', 'textout-width')]),
     ('interface.text-measure', [('no', _ANSWER)]),
+    ('interface.font-glyphs', [('rule', 'font-glyph')]),
     ('interface.input-fields',
      [('no', 'it is how a form looks on the screen, and only two label '
              'positions were measured')]),
@@ -396,6 +425,7 @@ CAUGHT = OrderedDict([
     ('interface.wait-minus-one',
      [('no', 'it waited on the emulator and once did not on a G2, for a '
              'reason not known, so there is no form to flag')]),
+    ('interface.wait-events', [('rule', 'wait-touch')]),
     ('interface.mouse-lists',
      [('command', 'build', _T_APP, 'warns about MOUSE handed to Python raw')]),
     ('interface.touch-readings',
@@ -423,7 +453,7 @@ CAUGHT = OrderedDict([
      [('no', 'it says what works across the bridge, and there is nothing '
              'in it to get wrong')]),
     ('micropython.eval-parentheses',
-     [('no', 'which form is required is not known')]),
+     [('no', 'both forms answer, so neither is a mistake to flag')]),
     ('micropython.list-with-string-closes-the-app',
      [('command', 'build', _T_APP, 'warns about MOUSE handed to Python raw'),
       ('no', 'for any other call, what it returns is known only when it '
@@ -448,11 +478,16 @@ CAUGHT = OrderedDict([
      [('rule', 'local-limit'),
       ('command', 'run', _T_RUN,
        '9 variables in one LOCAL, which does not compile')]),
-    ('ppl.locals-at-top', [('rule', 'local-first')]),
+    ('ppl.local-block-scope',
+     [('rule', 'local-scope'),
+      ('command', 'run', _T_RUN, 'a LOCAL read after its block ends')]),
     ('ppl.index-call', [('rule', 'index-call')]),
     ('ppl.export-initialised',
-     [('rule', 'export-multiple'),
-      ('command', 'run', _T_RUN, '7 initialised variables in one EXPORT')]),
+     [('rule', 'export-limit'),
+      ('command', 'run', _T_RUN, '9 initialised variables in one EXPORT')]),
+    ('ppl.export-home-variable',
+     [('rule', 'export-home-variable'),
+      ('command', 'run', _T_RUN, 'Z exported, on its own')]),
     ('ppl.no-end-keywords', [('rule', 'single-end')]),
     ('ppl.minus-sign', [('no', _ANSWER)]),
     ('ppl.one-based',
@@ -463,6 +498,9 @@ CAUGHT = OrderedDict([
       ('command', 'run', _T_RUN, 'a string indexed answers the character code')]),
     ('ppl.names-ignore-case', [('quiet',)]),
     ('ppl.equality-operators', [('rule', 'equality-statement')]),
+    ('ppl.short-circuit',
+     [('quiet',),
+      ('command', 'run', _T_RUN, 'AND and OR skip the side that does not decide')]),
     ('ppl.end-semicolon',
      [('rule', 'end-semicolon'),
       ('command', 'run', _T_RUN, 'a function whose END has no semicolon')]),
@@ -471,6 +509,9 @@ CAUGHT = OrderedDict([
     ('ppl.letter-digit-names', [('quiet',)]),
     ('ppl.local-m-matrices', [('quiet',)]),
     ('ppl.locals-initialised-one-line', [('quiet',)]),
+    ('ppl.locals-at-top',
+     [('quiet',),
+      ('command', 'run', _T_RUN, 'a LOCAL after other statements')]),
     ('ppl.i-e-as-locals',
      [('quiet',),
       ('command', 'run', _T_RUN, 'i and e can be local names')]),
@@ -482,6 +523,9 @@ CAUGHT = OrderedDict([
      [('command', 'run', _T_RUN, 'no RETURN, ending in a call')]),
     ('ppl.home-no-parentheses',
      [('no', 'it is what a person types on Home, which is not in a file')]),
+    ('ppl.call-no-parentheses',
+     [('quiet',),
+      ('command', 'run', _T_RUN, 'a call without parentheses')]),
     ('ppl.getkey-no-parentheses', [('quiet',)]),
     ('ppl.matrices-by-value',
      [('command', 'run', _T_RUN, 'matrices are passed BY VALUE')]),
@@ -498,6 +542,46 @@ CAUGHT = OrderedDict([
      [('no', "it is what the calculator's editor shows")]),
     ('ppl.speed-anchor', [('no', _TIMING)]),
     ('ppl.mu-zero-spelling', [('rule', 'mu-zero')]),
+    # usb
+    ('usb.device',
+     [('no', 'it is what Windows reads from a calculator, and no test has '
+             'one')]),
+    ('usb.one-program-at-a-time',
+     [('command', 'screen', _T_USB,
+       'a calculator held by the Connectivity Kit is an error that says so')]),
+    ('usb.frames',
+     [('command', 'screen', _T_USB,
+       'a reply across several reports comes back whole')]),
+    ('usb.screen',
+     [('command', 'screen', _T_USB, 'white stored as FF7F is white')]),
+    ('usb.keys',
+     [('command', 'press', _T_USB,
+       'press sends each key and then the report that makes it act'),
+      ('no', 'that a key acted is for the calculator to show, and it '
+             'acknowledges nothing')]),
+    ('usb.letters',
+     [('command', 'type', _T_USB,
+       'every letter here is on the key the documentation gives it')]),
+    ('usb.start-by-name',
+     [('no', 'what a name starts is for the calculator to show')]),
+    ('usb.program-message',
+     [('command', 'send', _T_USB,
+       'with the checksum the G2 itself put on SELFTEST')]),
+    ('usb.compile-check',
+     [('no', 'whether it compiled is for the calculator to show, and no test '
+             'has one')]),
+    ('usb.send-program',
+     [('command', 'send', _T_USB,
+       'send sends the reports and then the report that lets them act'),
+      ('no', 'that a program arrived is for the calculator to show, and it '
+             'acknowledges nothing')]),
+    ('usb.file-request',
+     [('no', 'no command asks for a file, and it is not known when one is '
+             'answered')]),
+    ('usb.status-area', [('no', _SCREEN)]),
+    ('usb.newer-framing',
+     [('no', 'no command uses that framing')]),
+    ('usb.kit-window', [('no', _HANDS)]),
 ])
 
 # How a finding is known, in docs/format.md's words. Where a rule matches
@@ -579,6 +663,68 @@ def _strip_noise(line):
         out.append(c)
         i += 1
     return ''.join(out)
+
+
+def _literals(line):
+    """-> [(start, end, contents)] for the string literals on a line, before
+    any // comment, with start and end the positions of their quotes. A
+    string left open runs to the end of the line, as in _strip_noise."""
+    out, i, n = [], 0, len(line)
+    while i < n:
+        c = line[i]
+        if c == '"':
+            j = line.find('"', i + 1)
+            j = n if j < 0 else j
+            out.append((i, j, line[i + 1:j]))
+            i = j + 1
+            continue
+        if c == '/' and i + 1 < n and line[i + 1] == '/':
+            break
+        i += 1
+    return out
+
+
+def _box_glyphs(path, num, line):
+    """-> a font-glyph Finding for each character on the line that TEXTOUT_P
+    was seen to draw as an empty box (interface.font-glyphs). What was
+    measured is a string drawn by TEXTOUT_P in font 3: a literal inside such
+    a call carries the fact's label, and one anywhere else -- a constant, a
+    menu, another font -- says unverified."""
+    every = _literals(line)
+    literals = [l for l in every if any(g in l[2] for g in BOX_GLYPHS)]
+    if not literals:
+        return []
+    # The line with each string's contents masked, so that positions still
+    # match and a comma or a parenthesis inside a string counts for nothing.
+    masked = list(line)
+    for start, end, _ in every:
+        masked[start + 1:end] = 'x' * (end - start - 1)
+    masked = ''.join(masked)
+    measured = []           # the spans of TEXTOUT_P calls in font 3
+    for m in re.finditer(r'\bTEXTOUT_P\s*\(', masked, re.I):
+        args = _call_args(masked, m.end() - 1)
+        if args is None:
+            continue
+        parts = _split_top_level(args)
+        font = 4 if len(parts) > 1 and re.match(r'^G\d$', parts[1].strip(),
+                                                re.I) else 3
+        if len(parts) > font and parts[font].strip() == BOX_FONT:
+            measured.append((m.end(), m.end() + len(args)))
+    found, seen = [], set()
+    for start, _, text in literals:
+        inside = any(a <= start < b for a, b in measured)
+        for g, instead in BOX_GLYPHS.items():
+            if g not in text or (g, inside) in seen:
+                continue
+            seen.add((g, inside))
+            msg = ('U+%04X has no glyph in the font: TEXTOUT_P draws an '
+                   'empty box in its place, and raises no error. U+%04X is '
+                   'drawn' % (ord(g), ord(instead)))
+            if not inside:
+                msg += '. Measured with TEXTOUT_P in font 3 only'
+            found.append(Finding(path, num, 'WARN', 'font-glyph', msg,
+                                 None if inside else UNVERIFIED))
+    return found
 
 
 def _strip_block_comments(text):
@@ -707,12 +853,11 @@ def check_source(path, text):
     found = []
     lines = text.replace('\r\n', '\n').replace('\r', '\n').split('\n')
     clean = [_strip_noise(l) for l in lines]
+    code = _strip_block_comments('\n'.join(lines)).split('\n')
     functions, variables, calls = _scan(text)
 
     exports = []
     in_body = False         # inside a function's BEGIN ... END
-    body_depth = 0          # the depth of that body, below any nested block
-    seen_code = False
     depth = 0
 
     for k, raw in enumerate(clean):
@@ -741,6 +886,9 @@ def check_source(path, text):
                                  'U+03BC, as HP\'s list spells it, and the '
                                  'calculator refuses that name: write it with '
                                  'the micro sign, U+00B5'))
+
+        # ---- a character the font draws as an empty box -------------------
+        found += _box_glyphs(path, num, code[k])
 
         # ---- drawing in units, with numbers that are pixels ----------------
         for m in re.finditer(NOT_NAME + r'(LINE|RECT|TEXTOUT|ARC|PIXON|PIXOFF|'
@@ -820,7 +968,7 @@ def check_source(path, text):
                                      'one; a matrix read at 0 is an error'
                                      % name, EMULATOR))
 
-        # ---- LOCAL: how many variables, and where -------------------------
+        # ---- LOCAL: how many variables --------------------------------------
         if re.match(r'^LOCAL\b', up):
             body = s[5:].split(';')[0]
             nv = len(_split_top_level(body))
@@ -828,37 +976,65 @@ def check_source(path, text):
                 found.append(Finding(path, num, 'ERROR', 'local-limit',
                                      '%d variables in one LOCAL; %d and more '
                                      'do not compile, and %d does. Split it '
-                                     'into several LOCAL statements of %d'
-                                     % (nv, LOCAL_FAILS, LOCAL_MAX,
-                                        LOCAL_SAFE),
-                                     None if nv >= LOCAL_FAILS_G2
-                                     else EMULATOR))
-            elif nv > LOCAL_SAFE:
-                found.append(Finding(path, num, 'WARN', 'local-limit',
-                                     '%d variables in one LOCAL: 8 is the '
-                                     'most that compiles. Groups of %d are '
-                                     'safe'
-                                     % (nv, LOCAL_SAFE)))
-            # A LOCAL half way down a function does not compile (G2). One at
-            # the top of a block nested inside it, after code, compiles and
-            # works (emulator, 2026-09-24), so it is not flagged.
-            if in_body and seen_code and depth <= body_depth:
-                found.append(Finding(path, num, 'ERROR', 'local-first',
-                                     'LOCAL after code: every local goes '
-                                     'together at the top of the BEGIN'))
-        elif in_body and not up.startswith('BEGIN'):
-            seen_code = True
+                                     'into several LOCAL statements'
+                                     % (nv, LOCAL_FAILS, LOCAL_MAX)))
+            # 7 and 8 were a warning here until 8 answered on a G2: a warning
+            # on code that compiles only teaches a habit.
+            # A rule called `local-first` used to sit here, calling a LOCAL
+            # after other statements an error. It rested on one compile error
+            # recorded without its program, and on 2026-11-05 a G2 compiled
+            # and answered every form of it (ppl.locals-at-top). What does not
+            # compile is reading a nested LOCAL after its block: local-scope.
 
-        # ---- EXPORT with several initialised variables --------------------
-        if re.match(r'^EXPORT\b', up) and ':=' in s \
-                and '(' not in s.split(':=')[0]:
+        # ---- EXPORT with too many variables --------------------------------
+        if re.match(r'^EXPORT\b', up) and '(' not in s.split(':=')[0]:
             chunks = _split_top_level(s[6:].split(';')[0])
             valued = [t for t in chunks if ':=' in t]
-            if len(valued) >= EXPORT_FAILS:
-                found.append(Finding(path, num, 'ERROR', 'export-multiple',
-                                     'several variables with initial values '
-                                     'in one EXPORT: one declaration per '
-                                     'line'))
+            if len(chunks) >= EXPORT_FAILS:
+                said = ('%d variables in one EXPORT; %d and more do not compile, '
+                        'with initial values or with none, and %d does. Split it '
+                        'into several EXPORT statements'
+                        % (len(chunks), EXPORT_FAILS, EXPORT_MAX))
+                if len(valued) in (0, len(chunks)):
+                    found.append(Finding(path, num, 'ERROR', 'export-limit', said))
+                else:
+                    found.append(Finding(path, num, 'WARN', 'export-limit',
+                                         said + '. Some with values and some '
+                                         'without has not been tried',
+                                         UNVERIFIED))
+
+        # ---- EXPORT of one of the calculator's own variables ----------------
+        # A function called like one is another matter, and compiles: F(), F(x)
+        # and a private F() answered on a G2 on 2026-11-05. With no arguments it
+        # has a trap of its own, which is below: on Home, F is the variable.
+        m = re.match(r'^EXPORT\s+(\S+?)\s*\(\s*\)', s, re.I)
+        if m and CALC_VARIABLE.match(m.group(1)):
+            found.append(Finding(path, num, 'WARN', 'export-home-variable',
+                                 '%s is one of the calculator\'s own variables. '
+                                 'A function of that name compiles and answers in '
+                                 'a program, but typed on Home F answered the '
+                                 'variable and not the function. Prefix it'
+                                 % m.group(1),
+                                 None if m.group(1) == 'F' else UNVERIFIED))
+        if re.match(r'^EXPORT\b', up):
+            for part in _split_top_level(s[6:].split(';')[0]):
+                pm = re.match(r'^([^\s:=(]+)\s*(:=|$)', part)
+                if not pm or not CALC_VARIABLE.match(pm.group(1)):
+                    continue
+                if pm.group(1) in EXPORT_REFUSED:
+                    found.append(Finding(path, num, 'ERROR',
+                                         'export-home-variable',
+                                         '%s is one of Home\'s variables, and '
+                                         'exporting it does not compile. '
+                                         'Prefix it' % pm.group(1)))
+                else:
+                    found.append(Finding(path, num, 'WARN',
+                                         'export-home-variable',
+                                         '%s is one of the calculator\'s own '
+                                         'variables. Exporting A, Y or Z does '
+                                         'not compile, and this one has not been '
+                                         'tried. Prefix it' % pm.group(1),
+                                         UNVERIFIED))
 
         # ---- exported names, to cross-check between files -----------------
         m = re.match(r'^EXPORT\s+([A-Za-z_]\w*)', s, re.I)
@@ -921,12 +1097,9 @@ def check_source(path, text):
 
         # ---- block balance -------------------------------------------------
         was_in_body = in_body
-        opens_body = re.match(r'^BEGIN\b', up) and not in_body
         if re.match(r'^BEGIN\b', up):
-            in_body, seen_code = True, False
+            in_body = True
         depth += _block_delta(up)
-        if opens_body:
-            body_depth = depth
         if in_body and depth <= 0:
             in_body = False
         # END without its semicolon, a block's or a function's own: neither
@@ -943,6 +1116,7 @@ def check_source(path, text):
                                  'END;'))
 
     found += _function_findings(path, clean, functions, calls)
+    found += _local_scope_findings(path, text, functions)
     found += [Finding(path, n, 'WARN', 'expr-in-loop',
                       'EXPR inside a loop resolves a name on every pass: '
                       'resolve it once, before the loop')
@@ -1017,6 +1191,106 @@ def _functions(clean):
     return out
 
 
+def _local_scope_findings(path, text, functions):
+    """A LOCAL inside a block is gone when that block ends, and a function that
+    uses it afterwards, reading or assigning, does not compile. A THEN and its
+    ELSE are two blocks. All of it measured (ppl.local-block-scope).
+
+    Lines are judged one at a time, so a LOCAL that does not start its line is
+    left alone, and so is a name that means something else once the block has
+    ended: a parameter, an outer LOCAL, this file's own global or function, or
+    one of the calculator's names."""
+    text = text.replace('\r\n', '\n').replace('\r', '\n')
+    clean = [_strip_noise(l) for l in _strip_block_comments(text).split('\n')]
+    spans = _functions(clean)
+    inside = set(k for f in spans for k in range(f[2], f[3] + 1))
+    file_level = set(functions)
+    for k, raw in enumerate(clean):
+        if k not in inside:
+            body = re.sub(r'^\s*EXPORT\s+', '', raw, flags=re.I).split(';')[0]
+            for part in _split_top_level(body):
+                pm = re.match(r'^([A-Za-z_]\w*)\s*(:=|$)', part)
+                if pm:
+                    file_level.add(pm.group(1))
+
+    found = []
+    for _, _, first, last in spans:
+        header = re.match(r'^\s*(?:EXPORT\s+)?\w+\s*\(([^()]*)\)', clean[first],
+                          re.I)
+        params = set(_split_top_level(header.group(1))) if header else set()
+        blocks, gone, pending_if = [], {}, 0    # each block: [kind, its LOCALs]
+
+        def used(name, where, line):
+            found.append(Finding(path, line, 'ERROR', 'local-scope',
+                                 '%s was declared in a block that ended on line '
+                                 '%d, and a LOCAL lasts until the end of its '
+                                 'block. Used here, it does not compile. Declare '
+                                 'it before the block' % (name, where)))
+
+        def outlives(name):
+            return not (name in params or name in file_level
+                        or any(name in b[1] for b in blocks)
+                        or CALC_VARIABLE.match(name)
+                        or name.lower() in known_names())
+        for k in range(first, last + 1):
+            s = clean[k].strip()
+            if not s:
+                continue
+            up = s.upper()
+            declared = []
+            if re.match(r'^LOCAL\b', up):
+                for part in _split_top_level(s[5:].split(';')[0]):
+                    pm = re.match(r'^([A-Za-z_]\w*)', part)
+                    if pm:
+                        declared.append(pm.group(1))
+            for name in sorted(gone):
+                if name in declared or not re.search(
+                        NOT_NAME + re.escape(name) + r'(?![\w→])', s):
+                    continue
+                used(name, gone[name], k + 1)
+                del gone[name]
+            for name in declared:
+                gone.pop(name, None)
+                if blocks:
+                    blocks[-1][1].append(name)
+            ended = []
+            for word in re.findall(r'\b(BEGIN|IFERR|IF|THEN|ELSE|DO|CASE|REPEAT|'
+                                   r'UNTIL|END)\b', up):
+                if word == 'IF':
+                    pending_if += 1
+                elif word == 'THEN':
+                    if pending_if:
+                        pending_if -= 1
+                        blocks.append(['IF', []])
+                    elif blocks:        # IFERR's own: what it tried has ended
+                        ended += blocks[-1][1]
+                        blocks[-1][1] = []
+                elif word == 'ELSE':
+                    if blocks and blocks[-1][0] == 'IF':
+                        ended += blocks[-1][1]
+                        blocks[-1][1] = []
+                elif word == 'UNTIL':
+                    if blocks:
+                        finished = blocks.pop()[1]
+                        ended += finished
+                        # The condition is already outside the block.
+                        after = re.search(r'\bUNTIL\b(.*)$', s, re.I).group(1)
+                        for name in finished:
+                            if outlives(name) and re.search(
+                                    NOT_NAME + re.escape(name) + r'(?![\w→])',
+                                    after):
+                                used(name, k + 1, k + 1)
+                elif word == 'END':
+                    if blocks:
+                        ended += blocks.pop()[1]
+                else:
+                    blocks.append([word, []])
+            for name in ended:
+                if outlives(name):
+                    gone[name] = k + 1
+    return found
+
+
 def _key_loops(text):
     """-> [(offset, 'wait' or 'drain')]: the loops in `text` that read
     GETKEY until a key comes, or until none is left."""
@@ -1082,8 +1356,13 @@ def _function_findings(path, clean, functions, calls):
                         if c not in body and c.lower() not in known)
 
         # ---- draws and returns, and nothing waits ---------------------------
-        if exported and name.upper() not in HOOKS and not strangers and \
-                uses(reach, DRAWS) and not uses(reach, WAITS):
+        # Only a function Home can start by its name, one with no arguments:
+        # an exported helper that draws for its caller returns to a program,
+        # not to Home, and waiting there would be the caller's choice.
+        header = re.match(r'^\s*(?:EXPORT\s+)?\w+\s*\(([^()]*)\)', clean[first])
+        no_args = header is not None and not header.group(1).strip()
+        if exported and no_args and name.upper() not in HOOKS and not strangers \
+                and uses(reach, DRAWS) and not uses(reach, WAITS):
             found.append(Finding(path, first + 1, 'WARN', 'draw-then-return',
                                  '%s draws and returns without waiting: run '
                                  'from Home, the drawing is gone when it '
@@ -1129,6 +1408,30 @@ def _function_findings(path, clean, functions, calls):
                         'from 0 to 50, or -1 for none: it is never %s. '
                         '[Enter] is 30, not 13' % (v, 'text' if lit == '""'
                                                    else lit)))
+
+        # ---- what WAIT(-1) answered compared with a key, TYPE unchecked -----
+        wait = r'WAIT\s*\(\s*-\s*1\s*\)'
+        compare = r'\s*(==|<>|!=|≠|<=|>=|≤|≥|<|>|=(?!=))\s*'
+        held = set(re.findall(NOT_NAME + r'([A-Za-z_]\w*)\s*:=\s*' + wait,
+                              text, re.I))
+        for v in sorted(held) + [None]:
+            if v and re.search(NOT_NAME + r'TYPE\s*\(\s*' + re.escape(v) +
+                               r'\s*\)', text, re.I):
+                continue
+            what = re.escape(v) + r'(?![\w→(])' if v else wait
+            m = re.search(NOT_NAME + what + compare + r'-?\d|' + NOT_NAME +
+                          r'-?\d[\d.]*' + compare + NOT_NAME + what, text,
+                          re.I)
+            if m:
+                found.append(Finding(
+                    path, first + 1 + text[:m.start()].count('\n'), 'WARN',
+                    'wait-touch',
+                    '%s compared with a number, but a touch makes WAIT(-1) '
+                    'answer a list, not a key code. Check TYPE first: only a '
+                    'number is a key, a one-element list is the mouse-up, '
+                    'and type 3 is the click'
+                    % ('%s holds what WAIT(-1) answered and is' % v if v
+                       else 'WAIT(-1) is')))
 
         # ---- a string's element compared with a string ----------------------
         assigned = re.findall(r'([A-Za-z_]\w*)\s*:=\s*(\S)', text)
@@ -1208,9 +1511,14 @@ def lint_files(paths, as_set=False):
         others = set(s[0] for s in places)
         if len(others) > 1:
             f, l = places[0]
-            everything.append(Finding(f, l, 'ERROR', 'export-clash',
-                                      '%s is also exported by %s: exported '
-                                      'names are global and collide'
+            # Not an error: on a G2 both compiled, and a call answered the one
+            # that had been there longest (ppl.global-namespace). So a program
+            # can stop answering what it says, with nothing to show for it.
+            everything.append(Finding(f, l, 'WARN', 'export-clash',
+                                      '%s is also exported by %s: both compile, '
+                                      'and a call answers the one that has been '
+                                      'on the calculator longest, with nothing '
+                                      'to say so. Prefix them'
                                       % (name,
                                          ', '.join(sorted(others - {f})))))
 
@@ -1244,7 +1552,25 @@ def check_files(paths, quiet=False, as_set=False):
         print(str(a))
     print('\n%d file(s): %d error(s), %d warning(s)'
           % (len(files), len(errors), len(warnings)))
+    # In a Claude Code session with the kit's settings, note what passed:
+    # the end of the turn is checked against it (hpkit/gates.py).
+    from hpkit import gates
+    if gates.enabled():
+        failed = set(a.path for a in errors)
+        for f in files:
+            gates.record(f, 'lint', os.path.relpath(f) not in failed
+                         and _decodes(f))
     return 1 if errors else 0
+
+
+def _decodes(path):
+    """Whether lint could read the file at all: one it could not is not
+    one it passed."""
+    try:
+        io.open(path, encoding='utf-8').read()
+        return True
+    except (IOError, OSError, UnicodeDecodeError):
+        return False
 
 
 def cli(argv):

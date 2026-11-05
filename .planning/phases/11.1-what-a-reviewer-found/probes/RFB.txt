@@ -1,0 +1,10 @@
+// a function called F, one argument
+EXPORT F(za)
+BEGIN
+  RETURN 5020 + za;
+END;
+
+EXPORT ZRFB()
+BEGIN
+  RETURN F(1);
+END;

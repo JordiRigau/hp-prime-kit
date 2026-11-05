@@ -132,9 +132,9 @@ EXPORT F() BEGIN LOCAL M; M := [[10,1],[20,2],[30,3],[40,4]]; RETURN FIND(M,1,25
 """, 'F()', 2.0),
 
     ('globals persist between calls', """
-EXPORT G := 5;
-EXPORT BUMP() BEGIN G := G + 1; RETURN G; END;
-EXPORT F() BEGIN BUMP(); BUMP(); RETURN G; END;
+EXPORT ZG := 5;
+EXPORT BUMP() BEGIN ZG := ZG + 1; RETURN ZG; END;
+EXPORT F() BEGIN BUMP(); BUMP(); RETURN ZG; END;
 """, 'F()', 7.0),
 
     ('matrices are passed BY VALUE', """
@@ -154,6 +154,20 @@ EXPORT F() BEGIN LOCAL M; M := EXPR("DATA"); RETURN M(1,2); END;
     ('IFTE only evaluates the branch it takes', """
 EXPORT F(a) BEGIN RETURN IFTE(a > 0, 10, 20); END;
 """, 'F(1)', 10.0),
+
+    # ppl.short-circuit, measured on the emulator: the side that does not
+    # decide is skipped whole, so BUMP never runs and the counter stays at 0
+    ('AND and OR skip the side that does not decide', """
+EXPORT ZN := 0;
+EXPORT BUMP() BEGIN ZN := ZN + 1; RETURN 1; END;
+EXPORT F() BEGIN ZN := 0; IF 0 AND BUMP() == 1 THEN ZN := ZN + 10; END; IF 1 OR BUMP() == 1 THEN ZN := ZN + 0; END; RETURN ZN; END;
+""", 'F()', 0.0),
+
+    ('IFTE does not evaluate the clause that loses', """
+EXPORT ZN := 0;
+EXPORT BUMP() BEGIN ZN := ZN + 1; RETURN 1; END;
+EXPORT F() BEGIN LOCAL zx; ZN := 0; zx := IFTE(1 == 1, 5, BUMP()); zx := IFTE(0 == 1, BUMP(), 6); RETURN ZN; END;
+""", 'F()', 0.0),
 
     ('AND / OR / NOT', """
 EXPORT F() BEGIN IF (1 > 0) AND NOT (2 > 3) OR (0 == 1) THEN RETURN 1; ELSE RETURN 0; END; END;
@@ -372,6 +386,197 @@ EXPORT F() BEGIN LOCAL a,b,c,d,f,g,h,j; a := 8; RETURN a; END;
 EXPORT ZA:=1, ZB:=2, ZC:=3, ZD:=4, ZE:=5, ZF:=6;
 EXPORT F() BEGIN RETURN ZA + ZF; END;
 """, 'F()', 7.0),
+
+    # All of these answered on a G2, with firmware 2.4.15515, on 2026-11-05.
+    ('7 initialised variables in one EXPORT compile', """
+EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7;
+EXPORT F() BEGIN RETURN 4750 + ZV1 + ZV7; END;
+""", 'F()', 4758.0),
+    ('8 initialised variables in one EXPORT compile', """
+EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7, ZV8:=8;
+EXPORT F() BEGIN RETURN 4760 + ZV1 + ZV8; END;
+""", 'F()', 4769.0),
+    ('a prefixed name exported on its own', """
+EXPORT ZV := 4781;
+EXPORT F() BEGIN RETURN ZV; END;
+""", 'F()', 4781.0),
+    ('a LOCAL after other statements', """
+EXPORT F() BEGIN LOCAL za; za := 4730; LOCAL zb; zb := 1; RETURN za + zb; END;
+""", 'F()', 4731.0),
+    ('a LOCAL after other statements, with none before it', """
+EXPORT F() BEGIN IF 1 == 1 THEN 1; END; LOCAL zb; zb := 4732; RETURN zb; END;
+""", 'F()', 4732.0),
+    ('a LOCAL after other statements, with a value', """
+EXPORT F() BEGIN LOCAL za; za := 0; LOCAL zb := 4733; RETURN za + zb; END;
+""", 'F()', 4733.0),
+    ('a LOCAL in a nested block, used inside it', """
+EXPORT F()
+BEGIN
+  LOCAL za;
+  za := 4734;
+  IF za == 4734 THEN
+    LOCAL zb;
+    zb := 1;
+    za := za + zb;
+  END;
+  RETURN za;
+END;
+""", 'F()', 4735.0),
+    ('a call without parentheses, defined earlier', """
+ZPF() BEGIN RETURN 4710; END;
+EXPORT F() BEGIN RETURN ZPF; END;
+""", 'F()', 4710.0),
+    ('a call without parentheses, declared ahead', """
+ZPG();
+EXPORT F() BEGIN RETURN ZPG; END;
+ZPG() BEGIN RETURN 4711; END;
+""", 'F()', 4711.0),
+    ('a call without parentheses, defined later', """
+EXPORT F() BEGIN RETURN ZPH; END;
+ZPH() BEGIN RETURN 4712; END;
+""", 'F()', 4712.0),
+    ('a call with parentheses, defined later', """
+EXPORT F() BEGIN RETURN ZPH(); END;
+ZPH() BEGIN RETURN 4713; END;
+""", 'F()', 4713.0),
+    ('a call without parentheses as a statement really calls', """
+EXPORT ZPCNT := 0;
+ZPI() BEGIN ZPCNT := ZPCNT + 1; END;
+EXPORT F() BEGIN ZPCNT := 0; ZPI; ZPI; RETURN ZPCNT + 4720; END;
+""", 'F()', 4722.0),
+
+    # What a nested LOCAL leaves behind: all of these answered on a G2, on
+    # 2026-11-05 (ppl.local-block-scope).
+    ('a global read after a LOCAL of its name has ended', """
+EXPORT zb := 2;
+EXPORT F()
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb;
+END;
+""", 'F()', 2.0),
+    ('a LOCAL declared again after its block', """
+EXPORT F()
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  LOCAL zb := 4;
+  RETURN zb;
+END;
+""", 'F()', 4.0),
+    ('a nested LOCAL hides an outer one until its block ends', """
+EXPORT F()
+BEGIN
+  LOCAL zb;
+  zb := 1;
+  IF zb == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb + 5200;
+END;
+""", 'F()', 5201.0),
+    ('and what it holds inside the block is its own', """
+EXPORT F()
+BEGIN
+  LOCAL zb, zs;
+  zb := 1;
+  IF zb == 1 THEN
+    zb := 5;
+    LOCAL zb;
+    zb := 3;
+    zs := zb;
+  END;
+  RETURN zb * 10 + zs;
+END;
+""", 'F()', 53.0),
+    ('a LOCAL of a FOR, read inside it', """
+EXPORT F()
+BEGIN
+  LOCAL zi, zs;
+  zs := 0;
+  FOR zi FROM 1 TO 2 DO
+    LOCAL zb;
+    zb := zi;
+    zs := zs + zb;
+  END;
+  RETURN zs + 5210;
+END;
+""", 'F()', 5213.0),
+    ('and in a FOR too', """
+EXPORT F()
+BEGIN
+  LOCAL zi, zb;
+  zb := 1;
+  FOR zi FROM 1 TO 2 DO
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb + 5420;
+END;
+""", 'F()', 5421.0),
+    ('a LOCAL of a WHILE, read inside it', """
+EXPORT F()
+BEGIN
+  LOCAL zi, zs;
+  zi := 0;
+  WHILE zi < 1 DO
+    LOCAL zb;
+    zb := 3;
+    zs := zb;
+    zi := 1;
+  END;
+  RETURN zs + 5230;
+END;
+""", 'F()', 5233.0),
+    ('a LOCAL of a REPEAT, read inside it', """
+EXPORT F()
+BEGIN
+  LOCAL zs;
+  REPEAT
+    LOCAL zb;
+    zb := 3;
+    zs := zb;
+  UNTIL 1;
+  RETURN zs + 5240;
+END;
+""", 'F()', 5243.0),
+    ('a LOCAL of a CASE, read inside it', """
+EXPORT F()
+BEGIN
+  CASE
+    IF 1 == 1 THEN
+      LOCAL zb;
+      zb := 3;
+      RETURN zb + 5220;
+    END;
+  END;
+  RETURN 5221;
+END;
+""", 'F()', 5223.0),
+
+    # Called like one of Home's variables: all compiled and answered on a G2, on
+    # 2026-11-05 (ppl.export-home-variable).
+    ('a function called F, with an argument', """
+EXPORT F(za) BEGIN RETURN 5020 + za; END;
+EXPORT ZRFB() BEGIN RETURN F(1); END;
+""", 'ZRFB()', 5021.0),
+    ('a call with no parentheses is the function and not the variable', """
+EXPORT F() BEGIN RETURN 5012; END;
+EXPORT ZRFN() BEGIN RETURN F; END;
+""", 'ZRFN()', 5012.0),
+    ('a parameter called X', """
+ZRFH(X) BEGIN RETURN X + 5040; END;
+EXPORT ZRFD() BEGIN RETURN ZRFH(1); END;
+""", 'ZRFD()', 5041.0),
+    ('a local called Z', """
+EXPORT ZRFE() BEGIN LOCAL Z; Z := 5050; RETURN Z; END;
+""", 'ZRFE()', 5050.0),
     ('a single = as a statement compares, and assigns nothing', """
 EXPORT F() BEGIN LOCAL za; za := 1; za = 2; RETURN za; END;
 """, 'F()', 1.0),
@@ -555,10 +760,184 @@ EXPORT F() BEGIN LOCAL a,b,c,d,f,g,h,j,k; RETURN 1; END;
     ('a function whose END has no semicolon', """
 EXPORT F() BEGIN RETURN 1; END
 """, 'F()'),
-    ('7 initialised variables in one EXPORT', """
-EXPORT ZA:=1, ZB:=2, ZC:=3, ZD:=4, ZE:=5, ZF:=6, ZG:=7;
-EXPORT F() BEGIN RETURN ZA; END;
+    ('9 initialised variables in one EXPORT', """
+EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7, ZV8:=8, ZV9:=9;
+EXPORT F() BEGIN RETURN ZV1; END;
 """, 'F()'),
+    ('9 variables with no values in one EXPORT', """
+EXPORT ZV1, ZV2, ZV3, ZV4, ZV5, ZV6, ZV7, ZV8, ZV9;
+EXPORT F() BEGIN RETURN 5091; END;
+""", 'F()'),
+    ("Z exported, on its own", """
+EXPORT Z := 4781;
+EXPORT F() BEGIN RETURN Z; END;
+""", 'F()'),
+    ("Z exported with no value", """
+EXPORT Z;
+EXPORT F() BEGIN RETURN 5081; END;
+""", 'F()'),
+    ("Y exported, on its own", """
+EXPORT Y := 5060;
+EXPORT F() BEGIN RETURN 5061; END;
+""", 'F()'),
+    ("A exported, on its own", """
+EXPORT A := 5070;
+EXPORT F() BEGIN RETURN 5071; END;
+""", 'F()'),
+    ("Y and Z exported together", """
+EXPORT Y := 1, Z := 4782;
+EXPORT F() BEGIN RETURN Z + Y; END;
+""", 'F()'),
+    ('a LOCAL read after its block ends', """
+EXPORT F()
+BEGIN
+  LOCAL za;
+  za := 4734;
+  IF za == 4734 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN za + zb;
+END;
+""", 'F()'),
+    ('a LOCAL of a FOR read after it', """
+EXPORT F()
+BEGIN
+  LOCAL zi;
+  FOR zi FROM 1 TO 2 DO
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb + 5100;
+END;
+""", 'F()'),
+    ('a LOCAL of a WHILE read after it', """
+EXPORT F()
+BEGIN
+  LOCAL zi;
+  zi := 0;
+  WHILE zi < 1 DO
+    LOCAL zb;
+    zb := 3;
+    zi := 1;
+  END;
+  RETURN zb + 5110;
+END;
+""", 'F()'),
+    ('a LOCAL of a REPEAT read after it', """
+EXPORT F()
+BEGIN
+  REPEAT
+    LOCAL zb;
+    zb := 3;
+  UNTIL 1;
+  RETURN zb + 5120;
+END;
+""", 'F()'),
+    ('a LOCAL of a CASE read after it', """
+EXPORT F()
+BEGIN
+  CASE
+    IF 1 == 1 THEN
+      LOCAL zb;
+      zb := 3;
+    END;
+  END;
+  RETURN zb + 5130;
+END;
+""", 'F()'),
+    ('a LOCAL of an ELSE read after it', """
+EXPORT F()
+BEGIN
+  IF 0 == 1 THEN
+    1;
+  ELSE
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb + 5140;
+END;
+""", 'F()'),
+    ('a LOCAL of a THEN read in its ELSE', """
+EXPORT F()
+BEGIN
+  IF 0 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  ELSE
+    RETURN zb + 5150;
+  END;
+  RETURN 5151;
+END;
+""", 'F()'),
+    ('a LOCAL of an IFERR read after it', """
+EXPORT F()
+BEGIN
+  IFERR
+    LOCAL zb;
+    zb := 3;
+  THEN
+    1;
+  END;
+  RETURN zb + 5160;
+END;
+""", 'F()'),
+    ('a LOCAL of a REPEAT read in its own UNTIL', """
+EXPORT F()
+BEGIN
+  LOCAL zs;
+  zs := 0;
+  REPEAT
+    LOCAL zb;
+    zb := 3;
+    zs := zb;
+  UNTIL zb == 3;
+  RETURN zs + 5410;
+END;
+""", 'F()'),
+    ('a LOCAL of what an IFERR tries, read in its THEN', """
+EXPORT F()
+BEGIN
+  IFERR
+    LOCAL zb;
+    zb := 3;
+  THEN
+    RETURN zb + 5400;
+  END;
+  RETURN 5401;
+END;
+""", 'F()'),
+    ('a LOCAL assigned after its block ends', """
+EXPORT F()
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  zb := 4;
+  RETURN 5170;
+END;
+""", 'F()'),
+
+    # Not measured, so not answered.
+    ('another of the calculator\'s variables exported', """
+EXPORT B := 1;
+EXPORT F() BEGIN RETURN B; END;
+""", 'F()'),
+    ('9 in one EXPORT, some with values and some without', """
+EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7, ZV8:=8, ZV9;
+EXPORT F() BEGIN RETURN 1; END;
+""", 'F()'),
+    ('a LOCAL in a block that repeats a parameter', """
+EXPORT F(zb)
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb;
+END;
+""", 'F(1)'),
 
     # The calculator refuses the call forms of its operator words when it
     # compiles (emulator), so they must not answer here.
@@ -742,6 +1121,17 @@ def main():
             bad += 1
             print('  FAIL  %-44s gave %r, expected %r'
                   % (name, got, expected))
+
+    # What the calculator refuses is one list, kept in the linter.
+    from hpkit import interp as I, lint as L
+    if I.EXPORT_REFUSED == L.EXPORT_REFUSED and \
+            I.HOME_VARIABLE.pattern == L.CALC_VARIABLE.pattern:
+        ok += 1
+        print('  ok    the interpreter and the linter refuse the same exports')
+    else:
+        bad += 1
+        print('  FAIL  the interpreter and the linter disagree on what cannot '
+              'be exported')
 
     good, why = endless_loop_check()
     if good:

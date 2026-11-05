@@ -1,0 +1,10 @@
+// RETURN F; when F is a function and a Home variable
+EXPORT F()
+BEGIN
+  RETURN 5012;
+END;
+
+EXPORT ZRFN()
+BEGIN
+  RETURN F;
+END;

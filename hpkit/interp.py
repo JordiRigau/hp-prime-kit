@@ -21,8 +21,8 @@ never returns an invented result.
 
 Usage
 -----
-    hpprime run PROG.hpprgm [more files...] --call "F(3,350)"
-    hpprime run lib.hpprgm data.hpprgm --call "LOAD(1)" --call "F(3,350)"
+    hpprime run PROG.hpprgm [more files...] --call "FN(3,350)"
+    hpprime run lib.hpprgm data.hpprgm --call "LOAD(1)" --call "FN(3,350)"
 
 From Python:
 
@@ -144,10 +144,11 @@ def lex(text):
 
 # expressions: ('num',v) ('str',v) ('var',name) ('seq',[e]) ('mat',[[e]])
 #              ('bin',op,a,b) ('un',op,a) ('call',name,[args])
-# statements:  ('local',[(n,e)]) ('assign',target,e) ('if',c,[then],[else])
+# statements:  ('local',[(n,e)],[shadowed]) ('assign',target,e) ('if',c,[then],[else])
 #              ('case',[(c,body)],default_) ('for',v,init,enders,step,body)
 #              ('while',c,body) ('repeat',body,c) ('iferr',a,b,c)
 #              ('break',) ('continue',) ('return',e|None) ('expr',e)
+#              ('scoped',statement,{names}): a statement whose block has LOCALs
 
 
 # The keywords that close a block. A statement ends at its semicolon, at one of
@@ -168,11 +169,22 @@ CLOSERS = ('END', 'ELSE', 'UNTIL', 'THEN', 'DEFAULT')
 INFIX_WORDS = ('MOD', 'NTHROOT')
 INFIX_EXAMPLE = {'MOD': '9 MOD 4', 'NTHROOT': '3 NTHROOT 8'}
 
+# The calculator's own variables: A to Z, θ, and the numbered lists, matrices,
+# graphics and complex variables. Exporting A, Y or Z did not compile on a G2, on
+# 2026-11-05, and the others have not been tried (ppl.export-home-variable).
+# tests/test_interp.py holds these two to hpkit/lint.py's.
+HOME_VARIABLE = re.compile(r'^([A-Z]|θ|[LMGZ][0-9])$')
+EXPORT_REFUSED = ('A', 'Y', 'Z')
+
 
 class Parser(object):
     def __init__(self, toks, filename='<ppl>'):
         self.t, self.i, self.filename = toks, 0, filename
         self.trailing = None        # why the last statement is not covered
+        self.scopes = [set()]       # the LOCALs of each block now open
+        self.params = set()         # the parameters of this function
+        self.gone = {}              # a nested LOCAL -> the line its block ended
+        self.after_block = []       # (name, line, the line its block ended)
 
     # ------------------------------------------------------------- helpers
     def peek(self, k=0):
@@ -258,12 +270,19 @@ class Parser(object):
             name = self.take('ID').val
             if self.at('OP', '('):
                 params = self.param_list()
-                body = self.block()
+                if self.at('OP', ';'):
+                    # Declared ahead, and defined further down: ZPG(); answered
+                    # on a G2 on 2026-11-05 (ppl.call-no-parentheses).
+                    continue
+                body = self.block(params)
                 funcs[name] = (params, body)
             else:
                 # global variable declaration(s)
-                line, valued = self.peek().line, 0
+                line, valued, count = self.peek().line, 0, 0
                 while True:
+                    if exported:
+                        self.check_exported(name, line)
+                    count += 1
                     init = None
                     if self.accept('OP', ':='):
                         init = self.expr()
@@ -272,15 +291,32 @@ class Parser(object):
                     if not self.accept('OP', ','):
                         break
                     name = self.take('ID').val
-                if valued >= 7:
-                    # Seven on one line failed to compile on a G2
-                    # (ppl.export-initialised); six compiled on the emulator.
-                    raise PPLError('%s:%d: %d variables with initial values in '
-                                   'one EXPORT: seven do not compile on the '
-                                   'calculator' % (self.filename, line, valued))
+                if exported and count >= 9:
+                    # On a G2, on 2026-11-05: 8 with values compile, and 9 do
+                    # not, with values or with none (ppl.export-initialised).
+                    if valued not in (0, count):
+                        raise Unsupported('%s:%d: 9 or more variables in one '
+                                          'EXPORT, some with values and some '
+                                          'without, have not been measured'
+                                          % (self.filename, line))
+                    raise PPLError('%s:%d: %d variables in one EXPORT: 9 and '
+                                   'more do not compile on the calculator'
+                                   % (self.filename, line, count))
                 self.semicolon()
             del exported     # everything is visible: there is one namespace
         return funcs, globs
+
+    def check_exported(self, name, line):
+        """What is known about exporting one of the calculator's variables."""
+        if name in EXPORT_REFUSED:
+            raise PPLError('%s:%d: %s is one of Home\'s variables, and exporting '
+                           'it does not compile on the calculator'
+                           % (self.filename, line, name))
+        if HOME_VARIABLE.match(name):
+            raise Unsupported('%s:%d: %s is one of the calculator\'s own '
+                              'variables, and exporting one has not been '
+                              'measured beyond A, Y and Z, which do not compile. '
+                              'Prefix it' % (self.filename, line, name))
 
     def param_list(self):
         self.take('OP', '(')
@@ -293,7 +329,8 @@ class Parser(object):
         self.take('OP', ')')
         return ps
 
-    def block(self):
+    def block(self, params=()):
+        self.scopes, self.gone, self.params = [set(params)], {}, set(params)
         self.take('KW', 'BEGIN')
         body = self.statements(('END',))
         self.take('KW', 'END')
@@ -349,7 +386,7 @@ class Parser(object):
         return ('expr', e)
 
     def _s_local(self):
-        self.take('KW', 'LOCAL')
+        line = self.take('KW', 'LOCAL').line
         decls = []
         while True:
             name = self.take('ID').val
@@ -363,22 +400,58 @@ class Parser(object):
             self._error('%d variables in one LOCAL: 9 and more do not compile '
                         'on the calculator' % len(decls))
         self.end_statement()
-        return ('local', decls)
+        shadows = []
+        for name, _ in decls:
+            if len(self.scopes) > 1 and name in self.params:
+                return ('uncovered', '%s:%d: a LOCAL in a block that repeats the '
+                        'parameter %s has not been measured'
+                        % (self.filename, line, name))
+            if len(self.scopes) > 1 and any(name in s for s in self.scopes[:-1]):
+                shadows.append(name)    # the outer one is back when the block
+            self.gone.pop(name, None)   # ends: ppl.local-block-scope
+            self.scopes[-1].add(name)
+        return ('local', decls, shadows)
+
+    def open_block(self):
+        self.scopes.append(set())
+
+    def end_block(self, line):
+        """-> the LOCALs of the block that ends on this line
+        (ppl.local-block-scope). What uses one after that is held to the file
+        as a whole when it has loaded, unless an outer LOCAL of that name is
+        back in force."""
+        names = self.scopes.pop()
+        for name in names:
+            if not any(name in s for s in self.scopes):
+                self.gone[name] = line
+        return names
+
+    def close_block(self, statement):
+        names = self.end_block(self.t[self.i - 1].line)
+        return ('scoped', statement, names) if names else statement
 
     def _s_if(self):
         self.take('KW', 'IF')
         cond = self.expr()
         self.take('KW', 'THEN')
+        # A THEN and its ELSE are two blocks: a LOCAL of the first read in the
+        # second did not compile on a G2 (ppl.local-block-scope).
+        self.open_block()
         then_ = self.statements(('ELSE', 'END'))
+        names = self.end_block(self.peek().line)
         else_ = []
         if self.accept('KW', 'ELSE'):
+            self.open_block()
             else_ = self.statements(('END',))
+            names = names | self.end_block(self.peek().line)
         self.take('KW', 'END')
         self.end_statement()
-        return ('if', cond, then_, else_)
+        statement = ('if', cond, then_, else_)
+        return ('scoped', statement, names) if names else statement
 
     def _s_case(self):
         self.take('KW', 'CASE')
+        self.open_block()
         branches, default_ = [], None
         while True:
             self.semicolon()
@@ -395,10 +468,11 @@ class Parser(object):
                 break
         self.take('KW', 'END')
         self.end_statement()
-        return ('case', branches, default_)
+        return self.close_block(('case', branches, default_))
 
     def _s_for(self):
         self.take('KW', 'FOR')
+        self.used(self.peek())
         var = self.take('ID').val
         self.take('KW', 'FROM')
         init = self.expr()
@@ -411,39 +485,52 @@ class Parser(object):
         enders = self.expr()
         step = self.expr() if self.accept('KW', 'STEP') else None
         self.take('KW', 'DO')
+        self.open_block()
         body = self.statements(('END',))
         self.take('KW', 'END')
         self.end_statement()
-        return ('for', var, init, enders, step, direction, body)
+        return self.close_block(('for', var, init, enders, step, direction,
+                                 body))
 
     def _s_while(self):
         self.take('KW', 'WHILE')
         cond = self.expr()
         self.take('KW', 'DO')
+        self.open_block()
         body = self.statements(('END',))
         self.take('KW', 'END')
         self.end_statement()
-        return ('while', cond, body)
+        return self.close_block(('while', cond, body))
 
     def _s_repeat(self):
         self.take('KW', 'REPEAT')
+        self.open_block()
         body = self.statements(('UNTIL',))
-        self.take('KW', 'UNTIL')
+        # The condition is already outside the block: a LOCAL of the REPEAT read
+        # in its own UNTIL did not compile on a G2 (ppl.local-block-scope).
+        names = self.end_block(self.take('KW', 'UNTIL').line)
         cond = self.expr()
         self.end_statement()
-        return ('repeat', body, cond)
+        statement = ('repeat', body, cond)
+        return ('scoped', statement, names) if names else statement
 
     def _s_iferr(self):
         self.take('KW', 'IFERR')
+        # What it tries is a block of its own: a LOCAL of it read in the THEN did
+        # not compile on a G2 (ppl.local-block-scope).
+        self.open_block()
         attempt = self.statements(('THEN',))
-        self.take('KW', 'THEN')
+        names = self.end_block(self.take('KW', 'THEN').line)
+        self.open_block()
         on_error = self.statements(('ELSE', 'END'))
         else_ = []
         if self.accept('KW', 'ELSE'):
             else_ = self.statements(('END',))
+        names = names | self.end_block(self.peek().line)
         self.take('KW', 'END')
         self.end_statement()
-        return ('iferr', attempt, on_error, else_)
+        statement = ('iferr', attempt, on_error, else_)
+        return ('scoped', statement, names) if names else statement
 
     def _s_break(self):
         self.take('KW', 'BREAK')
@@ -568,6 +655,11 @@ class Parser(object):
             n = n if n[0] == 'uncovered' else ('call', n, args)
         return n
 
+    def used(self, tk):
+        """A name used: noted if it is a LOCAL whose block has ended."""
+        if tk.kind == 'ID' and tk.val in self.gone:
+            self.after_block.append((tk.val, tk.line, self.gone[tk.val]))
+
     def _primary(self):
         tk = self.peek()
         if tk.kind == 'NUM':
@@ -578,6 +670,7 @@ class Parser(object):
             return ('str', tk.val)
         if tk.kind == 'ID':
             self.i += 1
+            self.used(tk)
             return ('var', tk.val)
         if tk.kind == 'QID':
             self.i += 1
@@ -652,9 +745,10 @@ class Matrix(object):
 
 
 def _copy(v):
-    """PPL passes matrices and lists BY VALUE: handing one to a function
-    copies it. Reproducing that matters, because it is the reason an engine
-    keeps large data in globals instead of passing it as arguments."""
+    """PPL passes matrices and lists BY VALUE: a function that writes to what
+    it was given does not change the caller's. Copying at the call gives the
+    same answers. What it does not reproduce is the cost: on a G2 only a write
+    takes longer for a bigger matrix (ppl.matrices-by-value)."""
     if isinstance(v, Matrix):
         return v.copy()
     if isinstance(v, list):
@@ -749,10 +843,25 @@ class Machine(object):
         self.globals_ = {}
         self.io = []             # what the interface would have drawn
         self.last_line = None
+        self.shadowed = []       # outer LOCALs a nested LOCAL hides for now
 
     # ------------------------------------------------------------ loading
     def load(self, text, filename='<ppl>'):
-        funcs, globs = Parser(lex(text), filename).program()
+        parser = Parser(lex(text), filename)
+        funcs, globs = parser.program()
+        # A LOCAL used after its block does not compile, unless the name means
+        # something else by then, as a global of that name does
+        # (ppl.local-block-scope).
+        known = set(funcs) | set(n for n, _ in globs) | set(self.funcs) \
+            | set(self.globals_)
+        for name, line, ended in parser.after_block:
+            if name not in known and not HOME_VARIABLE.match(name) \
+                    and not _listed(name):
+                raise PPLError('%s:%d: %s was declared in a block that ended on '
+                               'line %d, and a LOCAL lasts until the end of its '
+                               'block. Used after that, it does not compile on '
+                               'the calculator'
+                               % (filename, line, name, ended))
         self.funcs.update(funcs)
         for name, init in globs:
             self.globals_[name] = (self.evaluate(init, {}) if init is not None
@@ -801,7 +910,19 @@ class Machine(object):
         kind = s[0]
         if kind == 'uncovered':
             raise Unsupported(s[1])
+        if kind == 'scoped':
+            mark = len(self.shadowed)
+            try:
+                return self._stmt(s[1], frame)
+            finally:
+                for name in s[2]:
+                    frame.pop(name, None)
+                while len(self.shadowed) > mark:
+                    frame.update(self.shadowed.pop())
         if kind == 'local':
+            if s[2]:
+                self.shadowed.append(dict((n, frame[n]) for n in s[2]
+                                          if n in frame))
             for name, init in s[1]:
                 frame[name] = (self.evaluate(init, frame) if init is not None
                                  else 0.0)
@@ -998,6 +1119,9 @@ class Machine(object):
         raise Unsupported('expression %s' % kind)
 
     def _bin(self, op, ia, ib, frame):
+        # AND and OR stop at the side that decides: the other is not
+        # evaluated, calls and all. Measured on the Virtual Calculator 2.4,
+        # build 2025-09-15, on 2026-10-25 (ppl.short-circuit).
         if op == 'AND':
             return 1.0 if (_truth(self.evaluate(ia, frame)) and
                            _truth(self.evaluate(ib, frame))) else 0.0
@@ -1048,7 +1172,8 @@ class Machine(object):
 
     def _call_node(self, e, frame):
         base, arg_nodes = e[1], e[2]
-        # IFTE is lazy: only the branch that applies is evaluated
+        # IFTE is lazy: only the branch that applies is evaluated, as on the
+        # Virtual Calculator (ppl.short-circuit)
         if base[0] == 'var' and base[1].upper() == 'IFTE' and len(arg_nodes) == 3:
             cond = self.evaluate(arg_nodes[0], frame)
             return self.evaluate(arg_nodes[1] if _truth(cond) else arg_nodes[2], frame)
@@ -1707,6 +1832,18 @@ def cli(argv):
     if not files:
         print(__doc__)
         return 2
+    code = _run(files, calls)
+    # In a Claude Code session with the kit's settings, note whether this
+    # content ran, and whether any call was made: a run with no --call shows
+    # only that it loaded, and the end check says so to the person.
+    from hpkit import gates
+    if gates.enabled():
+        for f in files:
+            gates.record(f, 'run', code == 0, called=bool(calls))
+    return code
+
+
+def _run(files, calls):
     m = Machine()
     for f in files:
         try:

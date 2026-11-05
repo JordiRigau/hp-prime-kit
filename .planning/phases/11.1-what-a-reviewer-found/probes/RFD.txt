@@ -1,0 +1,10 @@
+// a parameter called X
+ZRFH(X)
+BEGIN
+  RETURN X + 5040;
+END;
+
+EXPORT ZRFD()
+BEGIN
+  RETURN ZRFH(1);
+END;

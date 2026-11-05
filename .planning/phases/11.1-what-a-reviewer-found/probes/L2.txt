@@ -1,0 +1,7 @@
+EXPORT ZLNOT()
+BEGIN
+  IF 1 == 1 THEN 1; END;
+  LOCAL zb;
+  zb := 4732;
+  RETURN zb;
+END;

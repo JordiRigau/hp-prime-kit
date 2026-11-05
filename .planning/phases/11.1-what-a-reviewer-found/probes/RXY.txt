@@ -1,0 +1,6 @@
+// Y exported on its own
+EXPORT Y := 5060;
+EXPORT ZRXY()
+BEGIN
+  RETURN 5061;
+END;

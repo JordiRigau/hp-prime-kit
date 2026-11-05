@@ -1,0 +1,4 @@
+EXPORT ZHARG(za)
+BEGIN
+  RETURN 4900 + za;
+END;

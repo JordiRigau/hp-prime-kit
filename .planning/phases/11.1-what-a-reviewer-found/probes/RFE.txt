@@ -1,0 +1,7 @@
+// a local called Z
+EXPORT ZRFE()
+BEGIN
+  LOCAL Z;
+  Z := 5050;
+  RETURN Z;
+END;

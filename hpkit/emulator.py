@@ -615,8 +615,8 @@ The emulator reads its folder when it starts, so a file copied into a
 running one changes nothing until it is restarted. Rather than let that
 happen quietly, this refuses -- pass --restart and it does the whole thing.
 
-For a real calculator over USB there is still no way round the Connectivity
-Kit: see docs/topics/deploy.md.
+For a real calculator, `hpprime send` installs a program on a G2 on its cable,
+and an app is a drag in the Connectivity Kit: see docs/topics/deploy.md.
 """
 
 USAGE_PULL = """hpprime pull [NAME] [--calc NAME] [-o FILE] [--diff SRC.txt]

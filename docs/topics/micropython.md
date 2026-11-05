@@ -8,46 +8,13 @@ The Prime has carried MicroPython since the 2021 firmware, and with it a
 module of its own, `hpprime`, which gives direct drawing and an `eval()` that
 runs arbitrary PPL and returns the result. That makes Python a practical way
 to write an app's interface and logic, leaning on PPL for what the calculator
-does not otherwise expose. One consequence is worth more than the rest:
-
-> The file that computes can be exactly the same on the PC and on the
-> calculator. The only thing that changes underneath is the module that looks
-> data up. With that, PC tests say something real about what runs on the G2.
+does not otherwise expose. A Python file that imports only what both sides have
+runs unchanged on the PC and on the calculator, and one way to build an app
+around that is in [patterns.md](../patterns.md#one-python-file-in-both-places).
 
 There is no official HP documentation for any of this. What follows was
 measured on a G2 with firmware 2.4 revision 15515, or read from apps that run
 on one, and each fact says which.
-
-## The architecture that makes this useful
-
-The bridge on its own is not much. What turns it into a way of working is the
-split:
-
-```
-      PC                                   calculator
-   ---------                            -----------------
-   engine.py   \                       /   LIB (PPL)
-                >   data.py (2 faces) <
-                                       \   hpprime.eval
-                       |
-                    app.py      <-- THE SAME FILE in both places
-                       |
-                 main / screen         <-- pixels only here
-```
-
-`app.py` is the same file in the repository and in the app, copied with a
-command, and `hpprime verify` confirms that the two have not drifted apart.
-`data.py` has two versions with the same face: one calls the PC engine, the
-other crosses the bridge, and it is the one piece deliberately duplicated.
-Whatever touches pixels and keys is isolated in a module as thin as you can
-make it, because it is the only part that cannot be tested from the PC.
-
-The discipline pays off in a specific way: a synchronisation test of this kind
-is what catches a serialised form that silently drops a field. On the Python
-side a round trip can pass because the defaults happen to match; the PPL side,
-which has no defaults, gives it away at once.
-
----
 
 <a name="micropython.modules"></a>
 ## What is there and what is not
@@ -56,7 +23,7 @@ which has no defaults, gives it away at once.
 |---|---|
 | Identifier | `micropython.modules` |
 | Kind | rule |
-| Known from | G2 |
+| Known from | unverified |
 
 | | |
 |---|---|
@@ -75,7 +42,9 @@ same calculator -- the Markdown Viewer starts with `from hpprime import eval,
 fillrect` -- and the method generalises: on a thinly documented platform, find
 working code before concluding anything.
 
-**Evidence.** Run on a G2 with firmware 2.4.15515.
+**Evidence.** Seen on a G2 with firmware 2.4.15515 while writing apps, with no
+probe kept. One app trying each import would settle it, and `hpprime build` warns
+about `import time` in the meantime.
 
 <a name="micropython.community-modules"></a>
 ## The modules the community documents and nobody here has run
@@ -163,21 +132,28 @@ That is all you need to call a well-written PPL library.
 form above.
 
 <a name="micropython.eval-parentheses"></a>
-## Whether the parentheses matter on the Python side is not known
+## On the Python side, TICKS and GETKEY answer with or without parentheses
 
 | | |
 |---|---|
 | Identifier | `micropython.eval-parentheses` |
 | Kind | rule |
-| Known from | unverified |
+| Known from | emulator |
 
-The examples here write `ticks()` and `GETKEY()`, and a published library
-writes `eval('ticks')` bare. In PPL source `GETKEY` compiles and answers
-with and without them
-([ppl.getkey-no-parentheses](ppl.md#ppl.getkey-no-parentheses)), so on the
-Python side too one form may be tolerated rather than required.
+`ev('TICKS')` and `ev('TICKS()')` answer the same number, and so do
+`ev('ticks')` and `ev('ticks()')`, the lowercase spelling a published library
+uses. `ev('GETKEY')` and `ev('GETKEY()')` both answer −1 with no key
+pending. Every answer comes back as a Python `float`: `1151588.0`, `-1.0`.
+That is how PPL source treats them too
+([ppl.getkey-no-parentheses](ppl.md#ppl.getkey-no-parentheses)), so
+either form is safe; whether the same holds for other commands of no
+arguments was not tried.
 
-**Evidence.** None: nobody has run the two side by side.
+**Evidence.** Measured on the Virtual Calculator 2.4, build 2025-09-15, on 2026-10-04, in an app
+whose `main.py` evaluated the six forms in a row, each inside `try`, and
+printed what each answered with its Python type: `TICKS` and `TICKS()`
+answered `1151588.0`, `ticks` and `ticks()` `1151589.0`, `GETKEY` and
+`GETKEY()` `-1.0`, all `float`, and none raised.
 
 <a name="micropython.list-with-string-closes-the-app"></a>
 ## A list with a string inside closes the app
@@ -218,12 +194,12 @@ pass by [micropython.mark-debugging](#micropython.mark-debugging).
 |---|---|
 | Identifier | `micropython.string-quotes` |
 | Kind | rule |
-| Known from | G2 |
+| Known from | unverified |
 
 Clean them before concatenating: `s = str(s).replace('"', "'")`.
 
-**Evidence.** Measured on a G2 with firmware 2.4.15515, while building `eval`
-strings from user data.
+**Evidence.** Seen on a G2 with firmware 2.4.15515, while building `eval`
+strings from user data, with no program kept.
 
 <a name="micropython.number-notation"></a>
 ## Pass numbers through repr(float(x)), not scientific notation
@@ -240,18 +216,33 @@ misread by the Prime's HOME environment. What is in use and works is
 parser understands. If you are going to move very large or very small
 magnitudes, check it with a probe before trusting it.
 
+Two things are measured on the emulator. Past the normal range,
+`repr(float(x))` is no way round it: on the Prime `repr(1e20)` is `1e+20`,
+the very form reported. And `ev('1e20')` answers `1e+20` and `ev('1e-20')`
+answers `1e-20`, both right. What `ev` answers for a text with `e+` in it
+is still not known: in the probe below every one of them left its line of
+the screen blank, while the app went on to the end.
+
 **Evidence.** The failure is reported by the community, whose workaround is
-`cas.caseval`; it has not been reproduced here. That `repr(float(x))` works in
-the normal range is measured, on a G2 with firmware 2.4.15515.
+`cas.caseval`. That `repr(float(x))` works in the normal range is measured,
+on a G2 with firmware 2.4.15515. The rest was measured on the Virtual Calculator 2.4, build 2025-09-15, on
+2026-10-04, by an app whose `main.py` evaluated `1e+20`, `1e20`,
+`repr(float(1e20))`, `1e-20`, `repr(float(1e-20))`, `1e+20/1e+19` and
+`2.5e+300` in turn, each inside `try`, and printed what came back and
+whether it was the number written. The lines for `1e20`, `1e-20` and
+`repr(float(1e-20))` said it was; the four with `e+` printed nothing, and
+the app reached its last step, as the mark it left in a PPL global showed.
+Whether the eval answered wrongly, raised, or broke the line that printed
+it, that probe cannot tell.
 
 <a name="micropython.bridge-cost"></a>
-## A bridge crossing costs 0.2 ms
+## A bridge crossing was timed at 0.2 ms
 
 | | |
 |---|---|
 | Identifier | `micropython.bridge-cost` |
 | Kind | rule |
-| Known from | G2 |
+| Known from | unverified |
 
 A calculation making 30 to 40 lookups spends about 8 ms on the bridge. There
 is nothing to optimise there: write the clear code and cross as often as you
@@ -259,7 +250,8 @@ need. Next to PPL's own speed
 ([ppl.speed-anchor](ppl.md#ppl.speed-anchor)) it is nothing, which is what
 makes moving heavy computation into Python a real option.
 
-**Evidence.** Timed on a G2 with firmware 2.4.15515.
+**Evidence.** Timed once on a G2 with firmware 2.4.15515, and neither the
+program nor how it was timed was kept.
 
 <a name="micropython.imports"></a>
 ## A shared module can only import what MicroPython has
@@ -274,7 +266,7 @@ The symptom on the calculator is that the app closes without a word, so it is
 worth a test on the PC:
 
 ```python
-ALLOWED = ('math', 'engine', 'data', 'list', 'views', 'screen', 'hpprime')
+ALLOWED = ('math', 'hpprime', 'micropython')   # and the app's own modules
 ```
 
 Imports inside a function do not count; only top-level ones. `hpprime build`

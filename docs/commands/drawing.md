@@ -209,7 +209,7 @@ pixel back from each afterwards is the probe that would confirm it
 
 **This is the second half of drawing without flicker**: build the picture in
 a grob of your own with [DIMGROB_P](drawing/DIMGROB_P.md), then copy it to `G0`, the
-screen, in one go (G2),
+screen, in one go (unverified),
 [interface.offscreen-grob](../topics/interface.md#interface.offscreen-grob).
 Painting straight onto `G0` shows the work row by row.
 
@@ -369,7 +369,7 @@ The colour fills it: a grob created with 0 reads back `#0h` at its pixels,
 and one created with `RGB(255,0,0)` reads back red
 ([GETPIX_P](drawing/GETPIX_P.md), [PIXOFF_P](drawing/PIXOFF_P.md)) (emulator).
 
-`G0` is the screen and `G1` to `G9` are yours (G2),
+`G0` is the screen and `G1` to `G9` are yours (unverified),
 [interface.offscreen-grob](../topics/interface.md#interface.offscreen-grob).
 Drawing into one of your own and copying it across with
 [BLIT_P](drawing/BLIT_P.md) is the measured way to redraw without flicker.
@@ -538,8 +538,9 @@ Keeps what is on the screen until a key is pressed.
 
 ### Behaviour
 
-**No parentheses**, like [GETKEY](io/GETKEY.md) and `TICKS` (emulator): it
-is written `FREEZE;`.
+**Written without parentheses**, `FREEZE;` (emulator), as a call with no
+arguments can be in source,
+[ppl.call-no-parentheses](../topics/ppl.md#ppl.call-no-parentheses).
 
 It answered 1 in a batch and did not stop the program (emulator), so whatever
 it froze was released without anybody pressing a key. What it does in a
@@ -1558,6 +1559,12 @@ the next column and keeps going off the screen, and nothing raises an error
 `hpprime lint` catches the missing argument in both forms, as
 `textout-width`.
 
+**Some characters come out as an empty box.** In font 3, ◄ U+25C4 is drawn
+as an empty box while its pair ► is drawn, and so are ◂ ▸ and ⯇ ⯈; ◀ ▶ and
+← → are drawn, and nothing raises an error (emulator),
+[interface.font-glyphs](../topics/interface.md#interface.font-glyphs).
+`hpprime lint` flags those five, as `font-glyph`.
+
 Fonts run 1 small, 2 normal, 3 large, up to 7 (HP help). The colour is an
 integer of the kind [RGB](drawing/RGB.md) answers (emulator).
 
@@ -1569,7 +1576,8 @@ interface without one and cannot check what it looked like
 ### Related
 
 [RGB](drawing/RGB.md) · [GROBW_P](drawing/GROBW_P.md) ·
-[interface.textout-width](../topics/interface.md#interface.textout-width)
+[interface.textout-width](../topics/interface.md#interface.textout-width) ·
+[interface.font-glyphs](../topics/interface.md#interface.font-glyphs)
 
 ---
 

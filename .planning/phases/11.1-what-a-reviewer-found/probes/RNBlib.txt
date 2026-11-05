@@ -1,0 +1,10 @@
+// one name in two programs: ZQLIB sent again
+EXPORT ZRCLH()
+BEGIN
+  RETURN 5321;
+END;
+
+EXPORT ZRCLU()
+BEGIN
+  RETURN 5324;
+END;

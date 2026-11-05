@@ -1,0 +1,11 @@
+// IFERR: read after
+EXPORT ZRLI()
+BEGIN
+  IFERR
+    LOCAL zb;
+    zb := 3;
+  THEN
+    1;
+  END;
+  RETURN zb + 5160;
+END;

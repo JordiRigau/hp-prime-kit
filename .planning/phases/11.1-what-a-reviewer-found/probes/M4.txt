@@ -1,0 +1,64 @@
+// ms for 1000 calls: read 10x10, read 100x100, write 10x10, write 100x100,
+// read a global 100x100. A step that fails answers -1 and the rest still run.
+EXPORT ZMGL;
+
+ZMR(zp)
+BEGIN
+  RETURN zp(1,1);
+END;
+
+ZMW(zp)
+BEGIN
+  zp(1,1) := 2;
+  RETURN 0;
+END;
+
+ZMG()
+BEGIN
+  RETURN ZMGL(1,1);
+END;
+
+EXPORT ZMCSB()
+BEGIN
+  LOCAL zs, zl, zi, zt, zr;
+  zs := MAKEMAT(1, 10, 10);
+  zl := MAKEMAT(1, 100, 100);
+  ZMGL := zl;
+  zr := {-1, -1, -1, -1, -1};
+  IFERR
+    zt := TICKS;
+    FOR zi FROM 1 TO 1000 DO ZMR(zs); END;
+    zr(1) := TICKS - zt;
+  THEN
+    zi := 0;
+  END;
+  IFERR
+    zt := TICKS;
+    FOR zi FROM 1 TO 1000 DO ZMR(zl); END;
+    zr(2) := TICKS - zt;
+  THEN
+    zi := 0;
+  END;
+  IFERR
+    zt := TICKS;
+    FOR zi FROM 1 TO 1000 DO ZMW(zs); END;
+    zr(3) := TICKS - zt;
+  THEN
+    zi := 0;
+  END;
+  IFERR
+    zt := TICKS;
+    FOR zi FROM 1 TO 1000 DO ZMW(zl); END;
+    zr(4) := TICKS - zt;
+  THEN
+    zi := 0;
+  END;
+  IFERR
+    zt := TICKS;
+    FOR zi FROM 1 TO 1000 DO ZMG(); END;
+    zr(5) := TICKS - zt;
+  THEN
+    zi := 0;
+  END;
+  RETURN zr;
+END;

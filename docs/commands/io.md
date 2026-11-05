@@ -164,8 +164,8 @@ The key waiting to be read, or −1 when there is none.
 
 ### Behaviour
 
-**Written without parentheses in PPL**, `zk := GETKEY;` (G2), and
-`GETKEY()` compiles and answers the same (emulator),
+**In PPL it works with and without parentheses**: `zk := GETKEY;` and
+`zk := GETKEY();` compile and answer the same (G2),
 [ppl.getkey-no-parentheses](../topics/ppl.md#ppl.getkey-no-parentheses).
 From Python, across the bridge, the examples here write `GETKEY()`.
 
@@ -224,7 +224,7 @@ which also holds what the field descriptions mean: the position is
 clipped to a dot while `x=22` fitted, and `[0]` is a real field whose number
 is typed without quotes while a text field demands them.
 
-**It is modal and builds its labels once** (G2),
+**It is modal and builds its labels once** (unverified),
 [interface.input-modal](../topics/interface.md#interface.input-modal): a
 label that depends on another field of the same form cannot change while the
 form is open. Asking one value at a time is the measured way round that, and
@@ -460,6 +460,14 @@ started it and after the keyboard had been drained, and answered 42, the key
 One program on a G2 saw it not wait at all, and why is not known
 (unverified).
 
+**A touch answers a list, one event per call** (emulator): down `{0,x,y}`,
+move `{1,x,y}`, up `{2}` with no position, and click `{3,x,y}` after the up,
+each element a `#` integer. A wheel notch and a drag bring a down and no
+click, so a program acts on type 3, and a one-element list is an up, not a
+key,
+[interface.wait-events](../topics/interface.md#interface.wait-events).
+What a finger on a G2 sends was not measured (unverified).
+
 What does work, measured, is to drain and then wait with
 [GETKEY](io/GETKEY.md) (G2),
 [interface.drain-then-wait](../topics/interface.md#interface.drain-then-wait).
@@ -469,4 +477,5 @@ the G2 reading is the reason to check it in your own program.
 ### Related
 
 [GETKEY](io/GETKEY.md) · [FREEZE](drawing/FREEZE.md) ·
-[interface.wait-minus-one](../topics/interface.md#interface.wait-minus-one)
+[interface.wait-minus-one](../topics/interface.md#interface.wait-minus-one) ·
+[interface.wait-events](../topics/interface.md#interface.wait-events)

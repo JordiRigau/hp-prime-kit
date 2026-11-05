@@ -1,0 +1,320 @@
+# The G2's probe programs of 2026-11-05, unchanged, for the Virtual Calculator:
+#   hpprime examples --compile THIS_FILE --probe ...   (each `# --probe` line below)
+# Programs that share an exported name on the G2, one replacing the other there,
+# are in different batches here, since a batch leaves them all on the calculator.
+# --probe ppl.export-initialised=EXPR("ZRXO")
+# --probe ppl.export-home-variable=EXPR("ZRFC")
+# --probe ppl.home-no-parentheses=EXPR("ZHOK()")
+# --probe ppl.home-no-parentheses=EXPR("ZHEXP")
+# --probe ppl.home-no-parentheses=EXPR("ZHEXN")
+# --probe ppl.call-no-parentheses=EXPR("ZPLTP")
+# --probe MAKEMAT=EXPR("ZMSIZ")
+# --probe ppl.matrices-by-value=EXPR("ZMCSB")
+# --probe ppl.expr-empty=EXPR("ZREM")
+# --probe ppl.expr-dynamic-access=EXPR("ZRTM")
+# --probe ppl.return-in-loop=EXPR("ZRRL")
+# --probe ppl.letter-digit-names=EXPR("ZRRD")
+# --probe ppl.local-m-matrices=EXPR("ZRRM")
+# --probe ppl.global-namespace=EXPR("ZRCLT")
+# --probe ppl.global-namespace=EXPR("ZRCLH")
+# --probe ppl.compilation-order=EXPR("ZROCA")
+# --probe ppl.compilation-order=EXPR("ZROTH")
+# --probe ppl.local-block-scope=EXPR("ZRLD")
+# --probe ppl.local-block-scope=EXPR("ZRLG")
+# --probe ppl.local-block-scope=EXPR("ZRLO")
+# --probe ppl.local-block-scope=EXPR("ZRLS")
+# --probe ppl.matrices-by-value=EXPR("ZMCSB"+"")
+# --probe ppl.matrices-by-value=EXPR(""+"ZMCSB")
+# --probe ppl.expr-dynamic-access=EXPR("ZRTM"+"")
+# --probe ppl.expr-dynamic-access=EXPR(""+"ZRTM")
+
+# RXO.txt
+[ppl.export-initialised] ZQD01
+// 8 exported with no values
+EXPORT ZV1, ZV2, ZV3, ZV4, ZV5, ZV6, ZV7, ZV8;
+EXPORT ZRXO()
+BEGIN
+  RETURN 5092;
+END;
+
+# RFC.txt
+[ppl.export-home-variable] ZQD02
+// a private function called F
+F()
+BEGIN
+  RETURN 5030;
+END;
+
+EXPORT ZRFC()
+BEGIN
+  RETURN F();
+END;
+
+# H3.txt
+[ppl.home-no-parentheses] ZQD03
+EXPORT ZHOK()
+BEGIN
+  RETURN 4703;
+END;
+
+EXPORT ZHEXP()
+BEGIN
+  RETURN EXPR("ZHOK()") + 1;
+END;
+
+EXPORT ZHEXN()
+BEGIN
+  RETURN EXPR("ZHOK") + 2;
+END;
+
+# P4.txt
+[ppl.call-no-parentheses] ZQD04
+EXPORT ZPLTP()
+BEGIN
+  RETURN ZPH();
+END;
+
+ZPH()
+BEGIN
+  RETURN 4713;
+END;
+
+# M3.txt
+[MAKEMAT] ZQD05
+// Which step ran out of memory on the G2? 1 made it, 0 refused.
+EXPORT ZMSIZ()
+BEGIN
+  LOCAL zr, zn, zi, zm;
+  zn := {50, 100, 150, 200};
+  zr := {};
+  FOR zi FROM 1 TO 4 DO
+    IFERR
+      zm := MAKEMAT(1, zn(zi), zn(zi));
+      zr(zi) := 1;
+    THEN
+      zr(zi) := 0;
+    END;
+  END;
+  RETURN zr;
+END;
+
+# M4.txt
+[ppl.matrices-by-value] ZQD06
+// ms for 1000 calls: read 10x10, read 100x100, write 10x10, write 100x100,
+// read a global 100x100. A step that fails answers -1 and the rest still run.
+EXPORT ZMGL;
+
+ZMR(zp)
+BEGIN
+  RETURN zp(1,1);
+END;
+
+ZMW(zp)
+BEGIN
+  zp(1,1) := 2;
+  RETURN 0;
+END;
+
+ZMG()
+BEGIN
+  RETURN ZMGL(1,1);
+END;
+
+EXPORT ZMCSB()
+BEGIN
+  LOCAL zs, zl, zi, zt, zr;
+  zs := MAKEMAT(1, 10, 10);
+  zl := MAKEMAT(1, 100, 100);
+  ZMGL := zl;
+  zr := {-1, -1, -1, -1, -1};
+  IFERR
+    zt := TICKS;
+    FOR zi FROM 1 TO 1000 DO ZMR(zs); END;
+    zr(1) := TICKS - zt;
+  THEN
+    zi := 0;
+  END;
+  IFERR
+    zt := TICKS;
+    FOR zi FROM 1 TO 1000 DO ZMR(zl); END;
+    zr(2) := TICKS - zt;
+  THEN
+    zi := 0;
+  END;
+  IFERR
+    zt := TICKS;
+    FOR zi FROM 1 TO 1000 DO ZMW(zs); END;
+    zr(3) := TICKS - zt;
+  THEN
+    zi := 0;
+  END;
+  IFERR
+    zt := TICKS;
+    FOR zi FROM 1 TO 1000 DO ZMW(zl); END;
+    zr(4) := TICKS - zt;
+  THEN
+    zi := 0;
+  END;
+  IFERR
+    zt := TICKS;
+    FOR zi FROM 1 TO 1000 DO ZMG(); END;
+    zr(5) := TICKS - zt;
+  THEN
+    zi := 0;
+  END;
+  RETURN zr;
+END;
+
+# RZE.txt
+[ppl.expr-empty] ZQD07
+// EXPR of an empty string
+EXPORT ZREM()
+BEGIN
+  LOCAL zr;
+  zr := 5330;
+  IFERR
+    zr := EXPR("");
+  THEN
+    zr := 5331;
+  END;
+  RETURN zr;
+END;
+
+# RZT.txt
+[ppl.expr-dynamic-access] ZQD08
+// EXPR against a direct read, ms for 1000
+EXPORT ZRVA := 1;
+EXPORT ZRTM()
+BEGIN
+  LOCAL zi, zt, zd, ze, zs;
+  zt := TICKS;
+  FOR zi FROM 1 TO 1000 DO zs := ZRVA; END;
+  zd := TICKS - zt;
+  zt := TICKS;
+  FOR zi FROM 1 TO 1000 DO zs := EXPR("ZRVA"); END;
+  ze := TICKS - zt;
+  RETURN {zd, ze};
+END;
+
+# RRL.txt
+[ppl.return-in-loop] ZQD09
+// RETURN inside a FOR
+EXPORT ZRRL()
+BEGIN
+  LOCAL zi;
+  FOR zi FROM 1 TO 3 DO
+    IF zi == 2 THEN RETURN 5340 + zi; END;
+  END;
+  RETURN 5349;
+END;
+
+# RRD.txt
+[ppl.letter-digit-names] ZQD10
+// a local of a letter and two digits
+EXPORT ZRRD()
+BEGIN
+  LOCAL L12;
+  L12 := 5350;
+  RETURN L12;
+END;
+
+# RRM.txt
+[ppl.local-m-matrices] ZQD11
+// a local called m
+EXPORT ZRRM()
+BEGIN
+  LOCAL m;
+  m := 5360;
+  RETURN m;
+END;
+
+# RNAlib.txt
+[ppl.global-namespace] ZQD12
+// one name in two programs: ZQLIB, then ZQTEST
+EXPORT ZRCLH()
+BEGIN
+  RETURN 5321;
+END;
+
+# RNA.txt
+[ppl.global-namespace] ZQD13
+// one name in two programs: ZQLIB, then ZQTEST
+EXPORT ZRCLH()
+BEGIN
+  RETURN 5322;
+END;
+
+EXPORT ZRCLT()
+BEGIN
+  RETURN 5323;
+END;
+
+# ROA.txt
+[ppl.compilation-order] ZQD14
+// the order: nothing to call yet
+EXPORT ZROCA()
+BEGIN
+  RETURN ZROTH();
+END;
+
+# ROBlib.txt
+[ppl.compilation-order] ZQD15
+// the order: the callee arrives, the caller not sent again
+EXPORT ZROTH()
+BEGIN
+  RETURN 5310;
+END;
+
+# RLD.txt
+[ppl.local-block-scope] ZQD16
+// IF: declared again after
+EXPORT ZRLD()
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  LOCAL zb := 4;
+  RETURN zb + 5180;
+END;
+
+# RLG.txt
+[ppl.local-block-scope] ZQD17
+// IF: a global of that name read after
+EXPORT ZRVB := 2;
+EXPORT ZRLG()
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL ZRVB;
+    ZRVB := 3;
+  END;
+  RETURN ZRVB + 5190;
+END;
+
+# RLO.txt
+[ppl.local-block-scope] ZQD18
+// IF: repeats an outer LOCAL
+EXPORT ZRLO()
+BEGIN
+  LOCAL zb;
+  zb := 1;
+  IF zb == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb + 5200;
+END;
+
+# RLS.txt
+[ppl.local-block-scope] ZQD19
+// FOR: repeats an outer LOCAL
+EXPORT ZRLS()
+BEGIN
+  LOCAL zi, zb;
+  zb := 1;
+  FOR zi FROM 1 TO 2 DO
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb + 5420;
+END;

@@ -29,6 +29,12 @@ the next column and keeps going off the screen, and nothing raises an error
 `hpprime lint` catches the missing argument in both forms, as
 `textout-width`.
 
+**Some characters come out as an empty box.** In font 3, ◄ U+25C4 is drawn
+as an empty box while its pair ► is drawn, and so are ◂ ▸ and ⯇ ⯈; ◀ ▶ and
+← → are drawn, and nothing raises an error (emulator),
+[interface.font-glyphs](../../topics/interface.md#interface.font-glyphs).
+`hpprime lint` flags those five, as `font-glyph`.
+
 Fonts run 1 small, 2 normal, 3 large, up to 7 (HP help). The colour is an
 integer of the kind [RGB](RGB.md) answers (emulator).
 
@@ -40,4 +46,5 @@ interface without one and cannot check what it looked like
 ## Related
 
 [RGB](RGB.md) · [GROBW_P](GROBW_P.md) ·
-[interface.textout-width](../../topics/interface.md#interface.textout-width)
+[interface.textout-width](../../topics/interface.md#interface.textout-width) ·
+[interface.font-glyphs](../../topics/interface.md#interface.font-glyphs)

@@ -30,6 +30,14 @@ started it and after the keyboard had been drained, and answered 42, the key
 One program on a G2 saw it not wait at all, and why is not known
 (unverified).
 
+**A touch answers a list, one event per call** (emulator): down `{0,x,y}`,
+move `{1,x,y}`, up `{2}` with no position, and click `{3,x,y}` after the up,
+each element a `#` integer. A wheel notch and a drag bring a down and no
+click, so a program acts on type 3, and a one-element list is an up, not a
+key,
+[interface.wait-events](../../topics/interface.md#interface.wait-events).
+What a finger on a G2 sends was not measured (unverified).
+
 What does work, measured, is to drain and then wait with
 [GETKEY](GETKEY.md) (G2),
 [interface.drain-then-wait](../../topics/interface.md#interface.drain-then-wait).
@@ -39,4 +47,5 @@ the G2 reading is the reason to check it in your own program.
 ## Related
 
 [GETKEY](GETKEY.md) · [FREEZE](../drawing/FREEZE.md) ·
-[interface.wait-minus-one](../../topics/interface.md#interface.wait-minus-one)
+[interface.wait-minus-one](../../topics/interface.md#interface.wait-minus-one) ·
+[interface.wait-events](../../topics/interface.md#interface.wait-events)

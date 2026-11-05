@@ -1,0 +1,10 @@
+// a private function called F
+F()
+BEGIN
+  RETURN 5030;
+END;
+
+EXPORT ZRFC()
+BEGIN
+  RETURN F();
+END;

@@ -1,0 +1,232 @@
+# The G2's probe programs of 2026-11-05, unchanged, for the Virtual Calculator:
+#   hpprime examples --compile THIS_FILE --probe ...   (each `# --probe` line below)
+# Programs that share an exported name on the G2, one replacing the other there,
+# are in different batches here, since a batch leaves them all on the calculator.
+# --probe ppl.export-initialised=EXPR("ZENIN")
+# --probe ppl.export-initialised=EXPR("ZESIX")
+# --probe ppl.export-home-variable=EXPR("ZRFA")
+# --probe ppl.export-home-variable=EXPR("ZRFD")
+# --probe ppl.export-home-variable=EXPR("ZRFE")
+# --probe ppl.export-home-variable=EXPR("ZNONE")
+# --probe ppl.export-home-variable=EXPR("ZNTWO")
+# --probe ppl.export-home-variable=EXPR("ZNPRE")
+# --probe ppl.export-home-variable=EXPR("ZRXY")
+# --probe ppl.export-home-variable=EXPR("ZRXA")
+# --probe ppl.export-home-variable=EXPR("ZRXZ")
+# --probe ppl.locals-at-top=EXPR("ZLMID")
+# --probe ppl.locals-at-top=EXPR("ZLTOP")
+# --probe ppl.locals-at-top=EXPR("ZLNOT")
+# --probe ppl.locals-at-top=EXPR("ZLINI")
+# --probe ppl.local-block-scope=EXPR("ZLSCP")
+# --probe ppl.local-block-scope=EXPR("ZLNST")
+# --probe ppl.matrices-by-value=EXPR("ZMVAL")
+# --probe ppl.getkey-no-parentheses=EXPR("ZGKP")
+# --probe ppl.getkey-no-parentheses=EXPR("ZGKN")
+# --probe ppl.export-home-variable=EXPR("Z")
+# --probe ppl.export-home-variable=EXPR("Y")
+# --probe ppl.export-home-variable=EXPR("A")
+
+# E9.txt
+[ppl.export-initialised] ZQA01
+EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7, ZV8:=8, ZV9:=9;
+EXPORT ZENIN()
+BEGIN
+  RETURN 4770 + ZV1 + ZV9;
+END;
+
+# E6.txt
+[ppl.export-initialised] ZQA02
+EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6;
+EXPORT ZESIX()
+BEGIN
+  RETURN 4740 + ZV1 + ZV6;
+END;
+
+# RFA.txt
+[ppl.export-home-variable] ZQA03
+// a function called F, no arguments
+EXPORT F()
+BEGIN
+  RETURN 5010;
+END;
+
+EXPORT ZRFA()
+BEGIN
+  RETURN F() + 1;
+END;
+
+# RFD.txt
+[ppl.export-home-variable] ZQA04
+// a parameter called X
+ZRFH(X)
+BEGIN
+  RETURN X + 5040;
+END;
+
+EXPORT ZRFD()
+BEGIN
+  RETURN ZRFH(1);
+END;
+
+# RFE.txt
+[ppl.export-home-variable] ZQA05
+// a local called Z
+EXPORT ZRFE()
+BEGIN
+  LOCAL Z;
+  Z := 5050;
+  RETURN Z;
+END;
+
+# N1.txt
+[ppl.export-home-variable] ZQA06
+EXPORT Z := 4781;
+EXPORT ZNONE()
+BEGIN
+  RETURN Z;
+END;
+
+# N2.txt
+[ppl.export-home-variable] ZQA07
+EXPORT Y := 1, Z := 4782;
+EXPORT ZNTWO()
+BEGIN
+  RETURN Z + Y;
+END;
+
+# N0.txt
+[ppl.export-home-variable] ZQA08
+EXPORT ZV := 4781;
+EXPORT ZNPRE()
+BEGIN
+  RETURN ZV;
+END;
+
+# RXY.txt
+[ppl.export-home-variable] ZQA09
+// Y exported on its own
+EXPORT Y := 5060;
+EXPORT ZRXY()
+BEGIN
+  RETURN 5061;
+END;
+
+# RXA.txt
+[ppl.export-home-variable] ZQA10
+// A exported on its own
+EXPORT A := 5070;
+EXPORT ZRXA()
+BEGIN
+  RETURN 5071;
+END;
+
+# RXZ.txt
+[ppl.export-home-variable] ZQA11
+// Z exported with no value
+EXPORT Z;
+EXPORT ZRXZ()
+BEGIN
+  RETURN 5081;
+END;
+
+# L1.txt
+[ppl.locals-at-top] ZQA12
+EXPORT ZLMID()
+BEGIN
+  LOCAL za;
+  za := 4730;
+  LOCAL zb;
+  zb := 1;
+  RETURN za + zb;
+END;
+
+# L6.txt
+[ppl.locals-at-top] ZQA13
+EXPORT ZLTOP()
+BEGIN
+  LOCAL za, zb;
+  za := 4730;
+  zb := 6;
+  RETURN za + zb;
+END;
+
+# L2.txt
+[ppl.locals-at-top] ZQA14
+EXPORT ZLNOT()
+BEGIN
+  IF 1 == 1 THEN 1; END;
+  LOCAL zb;
+  zb := 4732;
+  RETURN zb;
+END;
+
+# L3.txt
+[ppl.locals-at-top] ZQA15
+EXPORT ZLINI()
+BEGIN
+  LOCAL za;
+  za := 0;
+  LOCAL zb := 4733;
+  RETURN za + zb;
+END;
+
+# L4.txt
+[ppl.local-block-scope] ZQA16
+EXPORT ZLSCP()
+BEGIN
+  LOCAL za;
+  za := 4734;
+  IF za == 4734 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN za + zb;
+END;
+
+# L5.txt
+[ppl.local-block-scope] ZQA17
+EXPORT ZLNST()
+BEGIN
+  LOCAL za;
+  za := 4734;
+  IF za == 4734 THEN
+    LOCAL zb;
+    zb := 1;
+    za := za + zb;
+  END;
+  RETURN za;
+END;
+
+# M1.txt
+[ppl.matrices-by-value] ZQA18
+ZMW(zp)
+BEGIN
+  zp(1,1) := 999;
+  RETURN zp(1,1);
+END;
+
+EXPORT ZMVAL()
+BEGIN
+  LOCAL zm;
+  zm := [[4790,2],[3,4]];
+  ZMW(zm);
+  RETURN zm(1,1);
+END;
+
+# G1.txt
+[ppl.getkey-no-parentheses] ZQA19
+EXPORT ZGKP()
+BEGIN
+  LOCAL zk;
+  zk := GETKEY();
+  RETURN zk + 4800;
+END;
+
+# G2.txt
+[ppl.getkey-no-parentheses] ZQA20
+EXPORT ZGKN()
+BEGIN
+  LOCAL zk;
+  zk := GETKEY;
+  RETURN zk + 4810;
+END;

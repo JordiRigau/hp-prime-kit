@@ -1,0 +1,12 @@
+// EXPR of an empty string
+EXPORT ZREM()
+BEGIN
+  LOCAL zr;
+  zr := 5330;
+  IFERR
+    zr := EXPR("");
+  THEN
+    zr := 5331;
+  END;
+  RETURN zr;
+END;

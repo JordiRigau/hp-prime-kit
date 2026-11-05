@@ -1,0 +1,11 @@
+// a local of THEN read in its ELSE
+EXPORT ZRLT()
+BEGIN
+  IF 0 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  ELSE
+    RETURN zb + 5150;
+  END;
+  RETURN 5151;
+END;

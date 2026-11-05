@@ -26,20 +26,24 @@ Exported names share one namespace with Home, so two programs exporting
 Prefixing them is the habit that avoids it, and `hpprime lint --set` flags
 names that would clash between files installed together.
 
-Several exported variables with initial values on one line failed with seven
-of them (G2):
-[ppl.export-initialised](../../topics/ppl.md#ppl.export-initialised). One
-declaration per line compiles. Locals are the opposite case, where HP's own
-syntax puts several initial values on one line
-([LOCAL](LOCAL.md)).
+One `EXPORT` statement holds up to 8 variables, with initial values or with none,
+and 9 do not compile (G2):
+[ppl.export-initialised](../../topics/ppl.md#ppl.export-initialised). Locals have
+their own limit ([LOCAL](LOCAL.md)).
+
+One of Home's variables cannot be exported: `EXPORT Z := 1;` does not compile,
+and neither does `EXPORT Z;` (G2). A function called `F` compiles, but typed on
+Home `F` answers the variable (G2),
+[ppl.export-home-variable](../../topics/ppl.md#ppl.export-home-variable).
 
 A program only sees another's functions if it was compiled afterwards (G2):
 [ppl.compilation-order](../../topics/ppl.md#ppl.compilation-order). Install
 the data first, then the engine, then the app.
 
-On Home an exported function with no arguments is called without parentheses
-(G2):
-[ppl.home-no-parentheses](../../topics/ppl.md#ppl.home-no-parentheses).
+On Home, type an exported function with no arguments without parentheses (G2):
+[ppl.home-no-parentheses](../../topics/ppl.md#ppl.home-no-parentheses). In source
+they are optional (G2):
+[ppl.call-no-parentheses](../../topics/ppl.md#ppl.call-no-parentheses).
 
 `hpprime run` reads `EXPORT` at the top of a program -- that is how every
 example in this documentation is run -- but not as a statement inside a body,

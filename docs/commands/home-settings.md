@@ -124,8 +124,14 @@ Home's entry mode, 0 on a reset calculator.
 
 ### Behaviour
 
-**What the values mean is not measured** (unverified): HP's list gives the
-name and nothing more. It is how Home takes what is typed, so it is not
+**2 is the RPN stack** (G2): Home shows numbered stack levels in place of its
+history, and what is typed goes on the stack. Set back to 0, the history
+returned. What 0 and 1 are called is not measured (unverified): HP's list gives
+the name and nothing more.
+
+It is how Home takes what is typed, and it decides whether `MYFUNC()` is read at all:
+with no arguments it is a syntax error at 0 and at 1, and answers at 2 (G2 and emulator),
+[ppl.home-no-parentheses](../topics/ppl.md#ppl.home-no-parentheses). It is not
 expected to change what a program computes, and no row looked for that.
 
 **It reads 0 on a reset calculator, and a program can set it** (emulator):

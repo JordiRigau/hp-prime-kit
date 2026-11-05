@@ -1,0 +1,8 @@
+// control: ENDIF, does not compile
+EXPORT ZRCBD()
+BEGIN
+  IF 1 == 1 THEN
+    RETURN 5002;
+  ENDIF;
+  RETURN 5002;
+END;

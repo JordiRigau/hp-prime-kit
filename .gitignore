@@ -21,3 +21,9 @@ __pycache__/
 # them, and only the note that says what goes there ships.
 programs/*
 !programs/README.md
+
+# Claude Code: what the gates recorded in a session, and a person's own
+# settings. The kit's .claude/settings.json ships.
+.claude/hpprime-gates.json
+.claude/hpprime-gates.json.tmp
+.claude/settings.local.json

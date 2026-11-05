@@ -131,6 +131,12 @@ BREAKS = [
     ('a fact with no evidence',
      lambda r: edit(r, 'docs/topics/ppl.md', '**Evidence.** A program that runs',
                     'A program that runs'), 'Evidence'),
+    ('a G2 fact whose evidence says only that it was measured',
+     lambda r: edit(r, 'docs/topics/ppl.md',
+                    '**Evidence.** A program that runs on a G2 has two `RETURN` '
+                    'statements inside\nloops.',
+                    '**Evidence.** Measured on a G2 with firmware 2.4.15515.'),
+     'what was run'),
     ('an entry whose name is not on the list',
      lambda r: entry_named(r, 'NOSUCH'), 'is not on the list of names'),
     ('an entry in a folder the list does not give it',

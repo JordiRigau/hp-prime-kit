@@ -1,0 +1,11 @@
+// CASE: read after
+EXPORT ZRLC()
+BEGIN
+  CASE
+    IF 1 == 1 THEN
+      LOCAL zb;
+      zb := 3;
+    END;
+  END;
+  RETURN zb + 5130;
+END;

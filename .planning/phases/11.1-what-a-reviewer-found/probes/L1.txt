@@ -1,0 +1,8 @@
+EXPORT ZLMID()
+BEGIN
+  LOCAL za;
+  za := 4730;
+  LOCAL zb;
+  zb := 1;
+  RETURN za + zb;
+END;

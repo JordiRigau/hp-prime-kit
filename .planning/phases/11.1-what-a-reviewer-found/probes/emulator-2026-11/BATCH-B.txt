@@ -1,0 +1,250 @@
+# The G2's probe programs of 2026-11-05, unchanged, for the Virtual Calculator:
+#   hpprime examples --compile THIS_FILE --probe ...   (each `# --probe` line below)
+# Programs that share an exported name on the G2, one replacing the other there,
+# are in different batches here, since a batch leaves them all on the calculator.
+# --probe ppl.export-initialised=EXPR("ZRXN")
+# --probe ppl.export-initialised=EXPR("ZESEV")
+# --probe ppl.export-home-variable=EXPR("ZRFB")
+# --probe ppl.local-block-scope=EXPR("ZRLA")
+# --probe ppl.local-block-scope=EXPR("ZRLE")
+# --probe ppl.local-block-scope=EXPR("ZRLT")
+# --probe ppl.local-block-scope=EXPR("ZRLF")
+# --probe ppl.local-block-scope=EXPR("ZRLFP")
+# --probe ppl.local-block-scope=EXPR("ZRLW")
+# --probe ppl.local-block-scope=EXPR("ZRLWP")
+# --probe ppl.local-block-scope=EXPR("ZRLR")
+# --probe ppl.local-block-scope=EXPR("ZRLRP")
+# --probe ppl.local-block-scope=EXPR("ZRLU")
+# --probe ppl.local-block-scope=EXPR("ZRLC")
+# --probe ppl.local-block-scope=EXPR("ZRLCP")
+# --probe ppl.local-block-scope=EXPR("ZRLI")
+# --probe ppl.local-block-scope=EXPR("ZRLJ")
+# --probe ppl.export-home-variable=EXPR("F(2)")
+
+# RXN.txt
+[ppl.export-initialised] ZQB01
+// 9 exported with no values
+EXPORT ZV1, ZV2, ZV3, ZV4, ZV5, ZV6, ZV7, ZV8, ZV9;
+EXPORT ZRXN()
+BEGIN
+  RETURN 5091;
+END;
+
+# E7.txt
+[ppl.export-initialised] ZQB02
+EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7;
+EXPORT ZESEV()
+BEGIN
+  RETURN 4750 + ZV1 + ZV7;
+END;
+
+# RFB.txt
+[ppl.export-home-variable] ZQB03
+// a function called F, one argument
+EXPORT F(za)
+BEGIN
+  RETURN 5020 + za;
+END;
+
+EXPORT ZRFB()
+BEGIN
+  RETURN F(1);
+END;
+
+# RLA.txt
+[ppl.local-block-scope] ZQB04
+// IF: only assigned after
+EXPORT ZRLA()
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  zb := 4;
+  RETURN 5170;
+END;
+
+# RLE.txt
+[ppl.local-block-scope] ZQB05
+// ELSE: read after
+EXPORT ZRLE()
+BEGIN
+  IF 0 == 1 THEN
+    1;
+  ELSE
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb + 5140;
+END;
+
+# RLT.txt
+[ppl.local-block-scope] ZQB06
+// a local of THEN read in its ELSE
+EXPORT ZRLT()
+BEGIN
+  IF 0 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  ELSE
+    RETURN zb + 5150;
+  END;
+  RETURN 5151;
+END;
+
+# RLF.txt
+[ppl.local-block-scope] ZQB07
+// FOR: read after
+EXPORT ZRLF()
+BEGIN
+  LOCAL zi;
+  FOR zi FROM 1 TO 2 DO
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb + 5100;
+END;
+
+# RLFP.txt
+[ppl.local-block-scope] ZQB08
+// FOR: read inside, its pair
+EXPORT ZRLFP()
+BEGIN
+  LOCAL zi, zs;
+  zs := 0;
+  FOR zi FROM 1 TO 2 DO
+    LOCAL zb;
+    zb := zi;
+    zs := zs + zb;
+  END;
+  RETURN zs + 5210;
+END;
+
+# RLW.txt
+[ppl.local-block-scope] ZQB09
+// WHILE: read after
+EXPORT ZRLW()
+BEGIN
+  LOCAL zi;
+  zi := 0;
+  WHILE zi < 1 DO
+    LOCAL zb;
+    zb := 3;
+    zi := 1;
+  END;
+  RETURN zb + 5110;
+END;
+
+# RLWP.txt
+[ppl.local-block-scope] ZQB10
+// WHILE: read inside, its pair
+EXPORT ZRLWP()
+BEGIN
+  LOCAL zi, zs;
+  zi := 0;
+  WHILE zi < 1 DO
+    LOCAL zb;
+    zb := 3;
+    zs := zb;
+    zi := 1;
+  END;
+  RETURN zs + 5230;
+END;
+
+# RLR.txt
+[ppl.local-block-scope] ZQB11
+// REPEAT: read after
+EXPORT ZRLR()
+BEGIN
+  REPEAT
+    LOCAL zb;
+    zb := 3;
+  UNTIL 1;
+  RETURN zb + 5120;
+END;
+
+# RLRP.txt
+[ppl.local-block-scope] ZQB12
+// REPEAT: read inside, its pair
+EXPORT ZRLRP()
+BEGIN
+  LOCAL zs;
+  REPEAT
+    LOCAL zb;
+    zb := 3;
+    zs := zb;
+  UNTIL 1;
+  RETURN zs + 5240;
+END;
+
+# RLU.txt
+[ppl.local-block-scope] ZQB13
+// REPEAT: read in its own UNTIL
+EXPORT ZRLU()
+BEGIN
+  LOCAL zs;
+  zs := 0;
+  REPEAT
+    LOCAL zb;
+    zb := 3;
+    zs := zb;
+  UNTIL zb == 3;
+  RETURN zs + 5410;
+END;
+
+# RLC.txt
+[ppl.local-block-scope] ZQB14
+// CASE: read after
+EXPORT ZRLC()
+BEGIN
+  CASE
+    IF 1 == 1 THEN
+      LOCAL zb;
+      zb := 3;
+    END;
+  END;
+  RETURN zb + 5130;
+END;
+
+# RLCP.txt
+[ppl.local-block-scope] ZQB15
+// CASE: read inside, its pair
+EXPORT ZRLCP()
+BEGIN
+  CASE
+    IF 1 == 1 THEN
+      LOCAL zb;
+      zb := 3;
+      RETURN zb + 5220;
+    END;
+  END;
+  RETURN 5221;
+END;
+
+# RLI.txt
+[ppl.local-block-scope] ZQB16
+// IFERR: read after
+EXPORT ZRLI()
+BEGIN
+  IFERR
+    LOCAL zb;
+    zb := 3;
+  THEN
+    1;
+  END;
+  RETURN zb + 5160;
+END;
+
+# RLJ.txt
+[ppl.local-block-scope] ZQB17
+// IFERR: a local of the attempt read in its THEN
+EXPORT ZRLJ()
+BEGIN
+  IFERR
+    LOCAL zb;
+    zb := 3;
+  THEN
+    RETURN zb + 5400;
+  END;
+  RETURN 5401;
+END;

@@ -118,26 +118,15 @@ BEGIN
 END;
 ```
 
-## Keeping the screen out of the logic
+## What can be tested on the PC
 
-You cannot test drawing on your PC. You can test everything that decides what
-gets drawn and what each key does, which is most of the work:
+You cannot test drawing on your PC. What `hpprime run` can test is any function
+that decides without drawing: which row is selected, what text goes in it, what
+a key means. Keeping those apart from the drawing is one way to build a screen,
+and [patterns.md](../patterns.md#logic-apart-from-pixels) says what it solves
+and what it costs.
 
-```
-  pure logic          |  pixels
-  --------------------|-------------------
-  which row is        |  TEXTOUT_P
-  selected            |  RECT
-  what text goes      |  GETKEY
-  in each row         |  DRAWMENU
-  what a key means    |
-```
-
-Keep the right-hand column thin. Then `hpprime run` exercises the left-hand
-one, and the calculator only has to confirm the drawing
-([interface.md](../topics/interface.md#what-the-design-of-a-screen-comes-down-to)).
-
-The interpreter on the PC is built for that: `TEXTOUT_P`, `RECT`, `INPUT`,
+The interpreter on the PC is built for it: `TEXTOUT_P`, `RECT`, `INPUT`,
 `CHOOSE`, `MSGBOX`, `WAIT` and `GETKEY` are recorded instead of drawn and
 return a neutral value, so a program with an interface still runs end to end
 ([`tools.md`](../tools.md#run)). `GETKEY`'s neutral value is "no key", so a

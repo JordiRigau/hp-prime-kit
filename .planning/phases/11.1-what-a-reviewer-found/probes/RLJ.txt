@@ -1,0 +1,11 @@
+// IFERR: a local of the attempt read in its THEN
+EXPORT ZRLJ()
+BEGIN
+  IFERR
+    LOCAL zb;
+    zb := 3;
+  THEN
+    RETURN zb + 5400;
+  END;
+  RETURN 5401;
+END;

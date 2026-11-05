@@ -1,0 +1,12 @@
+// WHILE: read after
+EXPORT ZRLW()
+BEGIN
+  LOCAL zi;
+  zi := 0;
+  WHILE zi < 1 DO
+    LOCAL zb;
+    zb := 3;
+    zi := 1;
+  END;
+  RETURN zb + 5110;
+END;

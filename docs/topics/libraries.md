@@ -22,12 +22,10 @@ somebody has usually written the missing piece.
 
 Two of those rows are worth expanding before you commit to a design. `INPUT`
 is modal and builds its labels once, and a text field makes the user type
-quotes: both are measured, and both decide layouts
+quotes: the second is measured, the first was only seen, and both decide layouts
 ([interface.input-fields](interface.md#interface.input-fields),
-[interface.input-modal](interface.md#interface.input-modal)). And a table
-beats a form when a value can be unknown, because a form has no way to say "I
-do not know this one"
-([interface.md](interface.md#what-the-design-of-a-screen-comes-down-to)).
+[interface.input-modal](interface.md#interface.input-modal)). And a form has no way to say "I do not know this one", which is why some apps
+use a table instead ([patterns.md](../patterns.md#a-table-for-values-that-can-be-unknown)).
 
 ## Using somebody else's library
 
@@ -50,15 +48,10 @@ has to fetch them.
 
 ## When to write your own
 
-Once, and then use it four times. The list with a window -- selection, paging,
-a scrollbar, digit jump, touch -- is the same widget as your data screen, your
-results screen and your diagnostics screen. The pattern, and the behaviour
-worth copying, is in
-[interface.md](interface.md#what-the-design-of-a-screen-comes-down-to).
-Whatever you write, keep the split: selection, paging and what each key means
-are pure logic and can be tested on your PC with `hpprime run`, and the module
-that touches pixels stays as thin as you can make it, because it is the only
-part that cannot be.
+When none of them fits, the widget apps most often write is a list with a
+window: selection, paging, a scrollbar, digit jump and touch. What apps that
+work give it, and what it costs, is in
+[patterns.md](../patterns.md#a-windowed-list).
 
 ---
 

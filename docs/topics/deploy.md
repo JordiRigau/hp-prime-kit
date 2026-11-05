@@ -6,15 +6,17 @@ and is stated here once.
 
 They do not work the same way. The emulator has a folder you can write into,
 so that route stays on the PC and is one command. A physical calculator does
-not, and that step is a drag in the Connectivity Kit window, with two traps
+not. A program can go over its cable with one command, on a G2 from Windows,
+and otherwise that step is a drag in the Connectivity Kit window, with two traps
 that cost an afternoon each.
 
 ```bash
 hpprime install CIRCLE.hpprgm --restart     # into the emulator
 hpprime pull MYPROG --diff ppl/MYPROG.txt   # and read back what it has
+hpprime send programs/CIRCLE/CIRCLE.txt     # a program, to a G2 on its cable
 ```
 
-The procedure for hardware, which no command here replaces: open the
+The procedure for hardware by hand, and the only one for an app: open the
 Connectivity Kit with the calculator connected, or with the Virtual Calculator
 running; drag the `.hpprgm` file, or the whole `.hpappdir` folder, from the
 file manager onto the calculator in the CK window; then `[Shift][Program]` for
@@ -174,10 +176,17 @@ and your file disappears.
 | Paste the text into the CK's editor | works, but it is the slow road |
 | Copy the file into `Calculators\<calculator>\` | does not install: the CK overwrites it on connecting |
 
+Nor does it always hold everything. On connecting, it held the built-in apps
+and little else; the programs, lists and matrices arrived when the calculator
+was expanded in the CK's tree. So a program missing from the folder is not a
+program missing from the calculator.
+
 **Evidence.** Verified the hard way on a G2 with firmware 2.4.15515: two
 corrected binaries were copied there, and the emulator still opened the old
 version. The files left in the folder afterwards were the ones the calculator
-had written, compiled block and all.
+had written, compiled block and all. Measured on 2026-11-04 on the same
+calculator: `SELFTEST.hpprgm`, installed and run, left the folder when the CK
+reconnected, and came back when the tree was expanded.
 
 <a name="deploy.content-library-send"></a>
 ## A physical calculator can receive a file without a drag
@@ -196,28 +205,58 @@ drag is refused
 ([deploy.drag-refused-when-elevated](#deploy.drag-refused-when-elevated)) or
 when something other than a hand is doing it.
 
-**Evidence.** Done once, on 2026-09-09, with `TAULES.hpappdir`, driven through
-Windows UI Automation, and verified by reading the installed source back:
-identical, 409,575 characters. It took five attempts to get the sequence
-right. Nothing beyond that one run has been measured -- not a second file, not
-a `.hpprgm` rather than an app, and not the same steps by hand.
+**Evidence.** Done twice, on a G2 on firmware 2.4.15515, and verified each time
+by reading the installed source back, which was identical. On 2026-09-09 with
+`TAULES.hpappdir`, 409,575 characters, driven through Windows UI Automation, in
+five attempts. On 2026-11-04 with `SELFTEST.hpprgm`, 1,141 characters, from
+messages posted to the CK's windows: a right-click on its row and a click on the
+last entry of the menu, in two attempts, the first lost when the menu closed.
+The file showed in the CK's list as soon as it was copied, the mirror had it
+within 3 s of the click with a compiled block, and it ran with no compile by
+hand ([usb.start-by-name](usb.md#usb.start-by-name)). The same steps by hand were
+not measured.
+
+<a name="deploy.ck-offers-firmware"></a>
+## The Connectivity Kit can open a firmware update with its update button focused
+
+| | |
+|---|---|
+| Identifier | `deploy.ck-offers-firmware` |
+| Kind | rule |
+| Known from | G2 |
+
+Once the CK has downloaded a firmware, opening it with a calculator connected can
+open a window titled *Update firmware* (`Actualizar firmware`), with the update
+button holding the focus. Its own text warns that the calculator's data can be
+lost, and offers a backup first. The X on its title bar closes it and the
+calculator keeps its firmware. A script that opens the CK has to expect this
+window, and has to send no key to it. Everything measured here is on 2.4.15515, so
+an update also means measuring again.
+
+**Evidence.** Seen on 2026-11-05 with the CK 2.4 and a G2 on 20250915, offered
+20260909, on the first launch after the download. Closed with a window-close
+request; the calculator still reported build 15515 afterwards. Whether it opens on
+every launch was not measured, and the update itself was not tried.
 
 <a name="deploy.usb-without-the-ck"></a>
-## Pushing a file over USB without the Connectivity Kit is not a route here
+## A program can be pushed over USB without the Connectivity Kit
 
 | | |
 |---|---|
 | Identifier | `deploy.usb-without-the-ck` |
 | Kind | rule |
-| Known from | unverified |
+| Known from | G2 |
 
-The protocol has been reverse-engineered before -- PrimeComm, 2014 -- and what
-is written about those efforts says they no longer work against current
-firmware. Nothing here has tried it, and the tools here have no route that does: on
-hardware, the drag in the CK window is the way. On the emulator there is a
-real one, [deploy.emulator-folder](#deploy.emulator-folder).
+`hpprime send` does it, with the CK closed, on a G2 from Windows:
+[usb.send-program](usb.md#usb.send-program) says what was measured and
+[usb.program-message](usb.md#usb.program-message) what travels. An app has not
+been tried, so for an app the drag in the CK window is the way. On the emulator
+the route is [deploy.emulator-folder](#deploy.emulator-folder).
 
-**Evidence.** Reported, not measured.
+**Evidence.** Measured on 2026-11-04 on a G2 on firmware 2.4.15515: five versions
+of one program, each run on the calculator afterwards. What is written about
+PrimeComm, 2014, says it no longer works against current firmware; that one was
+not tried.
 
 <a name="deploy.drag-refused-when-elevated"></a>
 ## A drag refused with the no-entry cursor is Windows, not the file

@@ -1,0 +1,11 @@
+// FOR: repeats an outer LOCAL
+EXPORT ZRLS()
+BEGIN
+  LOCAL zi, zb;
+  zb := 1;
+  FOR zi FROM 1 TO 2 DO
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb + 5420;
+END;

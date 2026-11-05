@@ -40,7 +40,7 @@ refusals recorded in [NTHROOT](../catalog/NTHROOT.md),
 [NEG](../catalog/NEG.md) and [INVERSE](../catalog/INVERSE.md) could be
 measured at all, and it pairs with
 [ppl.check-last-error](../../topics/ppl.md#ppl.check-last-error), which says a
-refused program names only its last bad line.
+refused program names one bad line at a time.
 
 ## Related
 

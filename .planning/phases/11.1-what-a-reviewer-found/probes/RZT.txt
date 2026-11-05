@@ -1,0 +1,13 @@
+// EXPR against a direct read, ms for 1000
+EXPORT ZRVA := 1;
+EXPORT ZRTM()
+BEGIN
+  LOCAL zi, zt, zd, ze, zs;
+  zt := TICKS;
+  FOR zi FROM 1 TO 1000 DO zs := ZRVA; END;
+  zd := TICKS - zt;
+  zt := TICKS;
+  FOR zi FROM 1 TO 1000 DO zs := EXPR("ZRVA"); END;
+  ze := TICKS - zt;
+  RETURN {zd, ze};
+END;

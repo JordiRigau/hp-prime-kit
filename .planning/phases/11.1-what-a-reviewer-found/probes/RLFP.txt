@@ -1,0 +1,12 @@
+// FOR: read inside, its pair
+EXPORT ZRLFP()
+BEGIN
+  LOCAL zi, zs;
+  zs := 0;
+  FOR zi FROM 1 TO 2 DO
+    LOCAL zb;
+    zb := zi;
+    zs := zs + zb;
+  END;
+  RETURN zs + 5210;
+END;

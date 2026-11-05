@@ -7,7 +7,7 @@ Every entry in this group, in full. Each one is written in its own file, and tha
 | | |
 |---|---|
 | [EXPORT](#EXPORT) | Makes a function or a variable visible from Home and from other programs. |
-| [LOCAL](#LOCAL) | Declares the variables that belong to one function. |
+| [LOCAL](#LOCAL) | Declares variables that last until the end of their block. |
 
 ---
 
@@ -41,20 +41,24 @@ Exported names share one namespace with Home, so two programs exporting
 Prefixing them is the habit that avoids it, and `hpprime lint --set` flags
 names that would clash between files installed together.
 
-Several exported variables with initial values on one line failed with seven
-of them (G2):
-[ppl.export-initialised](../topics/ppl.md#ppl.export-initialised). One
-declaration per line compiles. Locals are the opposite case, where HP's own
-syntax puts several initial values on one line
-([LOCAL](variable/LOCAL.md)).
+One `EXPORT` statement holds up to 8 variables, with initial values or with none,
+and 9 do not compile (G2):
+[ppl.export-initialised](../topics/ppl.md#ppl.export-initialised). Locals have
+their own limit ([LOCAL](variable/LOCAL.md)).
+
+One of Home's variables cannot be exported: `EXPORT Z := 1;` does not compile,
+and neither does `EXPORT Z;` (G2). A function called `F` compiles, but typed on
+Home `F` answers the variable (G2),
+[ppl.export-home-variable](../topics/ppl.md#ppl.export-home-variable).
 
 A program only sees another's functions if it was compiled afterwards (G2):
 [ppl.compilation-order](../topics/ppl.md#ppl.compilation-order). Install
 the data first, then the engine, then the app.
 
-On Home an exported function with no arguments is called without parentheses
-(G2):
-[ppl.home-no-parentheses](../topics/ppl.md#ppl.home-no-parentheses).
+On Home, type an exported function with no arguments without parentheses (G2):
+[ppl.home-no-parentheses](../topics/ppl.md#ppl.home-no-parentheses). In source
+they are optional (G2):
+[ppl.call-no-parentheses](../topics/ppl.md#ppl.call-no-parentheses).
 
 `hpprime run` reads `EXPORT` at the top of a program -- that is how every
 example in this documentation is run -- but not as a statement inside a body,
@@ -71,7 +75,7 @@ which is what the field above is saying no to (unverified).
 
 ## LOCAL
 
-Declares the variables that belong to one function.
+Declares variables that last until the end of their block.
 
 | | |
 |---|---|
@@ -90,28 +94,27 @@ Declares the variables that belong to one function.
 
 ### Behaviour
 
-Every local goes at the top of the `BEGIN`, before any other statement: a
-`LOCAL` after code does not compile (G2), which is
-[ppl.locals-at-top](../topics/ppl.md#ppl.locals-at-top).
+A `LOCAL` can go after other statements, not only at the top of the `BEGIN` (G2):
+[ppl.locals-at-top](../topics/ppl.md#ppl.locals-at-top). It lasts until the end
+of the block that declares it, and used after that it does not compile (G2):
+[ppl.local-block-scope](../topics/ppl.md#ppl.local-block-scope).
 
-One `LOCAL` statement holds at most 7 or 8 variables, and past that the
+One `LOCAL` statement holds at most 8 variables, and past that the
 compiler answers *syntax error* on that line without saying why (G2):
 [ppl.local-limit](../topics/ppl.md#ppl.local-limit). Several `LOCAL`
-statements in a row do work, so the habit is groups of six.
+statements in a row do work, so a longer list is split across several.
 
 A local declared and never assigned starts at 0, which is the fourth example
 (emulator). A `LOCAL` can also give initial values: one on its own and two on
 one line both compile and keep their values, the second and third examples
-(emulator), which is
+(emulator), and so do three (emulator), which is
 [ppl.locals-initialised-one-line](../topics/ppl.md#ppl.locals-initialised-one-line).
-HP's syntax allows up to eight (HP help), and more than two on one line has
-not been run (unverified). Exported globals are the opposite case: several
-initialised on one line failed (G2),
+HP's syntax allows up to eight (HP help). Exported globals can too, up to 8 in
+one statement (G2),
 [ppl.export-initialised](../topics/ppl.md#ppl.export-initialised).
 
 Prefixed names (`zi`, `zs`, `za`) cost nothing and keep a local away from the
-calculator's own variables. Whether `i` and `e` work as local names is not
-known (unverified):
+calculator's own variables. `i` and `e` work as local names (emulator):
 [ppl.i-e-as-locals](../topics/ppl.md#ppl.i-e-as-locals).
 
 ### Related

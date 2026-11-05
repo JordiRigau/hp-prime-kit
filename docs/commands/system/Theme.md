@@ -19,13 +19,17 @@ The display theme, as a list of two integers.
 ## Behaviour
 
 **It is a list of two based integers** (emulator): `{#1:64h,#5:64h}` on a
-reset calculator. What each one selects was not measured (unverified).
+reset calculator, and `{#2:64h,#5:64h}` with the colour theme set to dark by
+hand (emulator). So the first number is the theme, 2 for dark; that 1 is the
+light one is taken from the reset calculator rather than seen (unverified),
+and what the second selects was not measured (unverified).
 
 **A program can assign it** (emulator): given its own value back, it was
 accepted and read back the same.
 
-**The theme decides whether black text on white is readable** (unverified),
-which is
+**In the dark theme `RECT()` clears to near-black** (emulator), so black
+text on it can hardly be read, while black on a rectangle the program fills
+white reads fine:
 [interface.two-themes](../../topics/interface.md#interface.two-themes).
 
 The interpreter does not implement it, so `hpprime run` cannot check a program

@@ -1,0 +1,114 @@
+// ===================================================================
+// TOUCH - what the touch screen sends, as events and as readings
+//
+// Two programs in one file, for the two ways a program hears a finger:
+//
+//   TOUCHEV   WAIT(-1): one line per event, until Esc twice
+//   TOUCHMS   MOUSE: one line each time the reading changes, until Esc
+//
+// What they settle is in docs/topics/interface.md: interface.wait-events
+// and interface.touch-readings.
+//
+//   hpprime write examples/touch/TOUCH.txt -o TOUCH.hpprgm
+//   drag it over, then on Home type:  TOUCHEV   or   TOUCHMS
+//   (no parentheses: Home rejects TOUCHEV())
+//
+// Enter starts a fresh screen in both, so each thing you try gets a screen
+// of its own to photograph. A full screen clears and carries on.
+//
+// Do NOT run these with `hpprime run`: on the PC no key ever ends them.
+// ===================================================================
+
+// A clean screen with its title. -> the y of the first line.
+TOUCHHD(zt)
+BEGIN
+  RECT();
+  TEXTOUT_P(zt, G0, 4, 2, 1, RGB(0,0,0), 314);
+  RETURN 18;
+END;
+
+// A # integer as an ordinary number; anything else as it is. If B→R
+// refuses it, the answer is the text "B→R refused", so the probe goes on
+// and says so rather than stopping at the first touch.
+TOUCHR(zv)
+BEGIN
+  LOCAL zr;
+  IF TYPE(zv) <> 1 THEN RETURN zv; END;
+  IFERR
+    zr := B→R(zv);
+  THEN
+    zr := "B→R refused";
+  END;
+  RETURN zr;
+END;
+
+EXPORT TOUCHEV()
+BEGIN
+  LOCAL ze, zs, zi, zy, zn;
+  LOCAL zq, zk, zc, zh;
+  zh := "TOUCHEV  WAIT(-1)  Enter: new screen  Esc twice: leave";
+  zy := TOUCHHD(zh);
+  zn := 0;
+  zq := 0;
+  REPEAT
+    ze := WAIT(-1);
+    zn := zn + 1;
+    zk := -1;
+    IF TYPE(ze) == 6 THEN
+      // The list as ordinary numbers, whether its first element equals
+      // its own conversion, and the list as the calculator prints it.
+      zs := "";
+      FOR zi FROM 1 TO SIZE(ze) DO
+        zs := zs + " " + STRING(TOUCHR(ze(zi)));
+      END;
+      IFERR
+        zc := STRING(ze(1) == TOUCHR(ze(1)));
+      THEN
+        zc := "error";
+      END;
+      zs := "list" + zs + "  eq " + zc + "  " + STRING(ze);
+      zq := 0;
+    ELSE
+      zk := TOUCHR(ze);
+      zs := "number " + STRING(ze) + "  TYPE " + STRING(TYPE(ze));
+      IF zk == 4 THEN zq := zq + 1; ELSE zq := 0; END;
+    END;
+    IF zk == 30 THEN
+      zy := TOUCHHD(zh);
+    ELSE
+      IF zy > 214 THEN zy := TOUCHHD(zh); END;
+      TEXTOUT_P(STRING(zn) + ") " + zs, G0, 4, zy, 1, RGB(0,0,0), 314);
+      zy := zy + 14;
+    END;
+  UNTIL zq >= 2;
+  RETURN zn;
+END;
+
+EXPORT TOUCHMS()
+BEGIN
+  LOCAL zm, zs, zp, zy;
+  LOCAL zn, zk, zt, zh;
+  zh := "TOUCHMS  MOUSE  Enter: new screen  Esc: leave";
+  zy := TOUCHHD(zh);
+  zn := 0;
+  zp := "";
+  zt := TICKS;
+  REPEAT zk := GETKEY; UNTIL zk < 0;     // drain what is pending
+  REPEAT
+    zm := MOUSE;
+    zs := STRING(zm);
+    IF zs <> zp THEN
+      // Milliseconds since the previous change, and the new reading.
+      zn := zn + 1;
+      IF zy > 214 THEN zy := TOUCHHD(zh); END;
+      TEXTOUT_P(STRING(zn) + ") +" + STRING(TICKS - zt) + " " + zs, G0, 4,
+                zy, 1, RGB(0,0,0), 314);
+      zy := zy + 14;
+      zp := zs;
+      zt := TICKS;
+    END;
+    zk := GETKEY;
+    IF zk == 30 THEN zy := TOUCHHD(zh); END;
+  UNTIL zk == 4;
+  RETURN zn;
+END;

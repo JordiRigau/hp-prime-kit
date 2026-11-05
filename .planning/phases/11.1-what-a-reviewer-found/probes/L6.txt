@@ -1,0 +1,7 @@
+EXPORT ZLTOP()
+BEGIN
+  LOCAL za, zb;
+  za := 4730;
+  zb := 6;
+  RETURN za + zb;
+END;

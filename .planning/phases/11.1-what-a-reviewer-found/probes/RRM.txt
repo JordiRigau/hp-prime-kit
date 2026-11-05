@@ -1,0 +1,7 @@
+// a local called m
+EXPORT ZRRM()
+BEGIN
+  LOCAL m;
+  m := 5360;
+  RETURN m;
+END;

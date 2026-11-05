@@ -1,0 +1,12 @@
+// CASE: read inside, its pair
+EXPORT ZRLCP()
+BEGIN
+  CASE
+    IF 1 == 1 THEN
+      LOCAL zb;
+      zb := 3;
+      RETURN zb + 5220;
+    END;
+  END;
+  RETURN 5221;
+END;

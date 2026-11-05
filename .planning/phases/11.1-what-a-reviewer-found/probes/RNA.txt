@@ -1,0 +1,10 @@
+// one name in two programs: ZQLIB, then ZQTEST
+EXPORT ZRCLH()
+BEGIN
+  RETURN 5322;
+END;
+
+EXPORT ZRCLT()
+BEGIN
+  RETURN 5323;
+END;

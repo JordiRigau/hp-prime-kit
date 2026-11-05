@@ -1,0 +1,13 @@
+// WHILE: read inside, its pair
+EXPORT ZRLWP()
+BEGIN
+  LOCAL zi, zs;
+  zi := 0;
+  WHILE zi < 1 DO
+    LOCAL zb;
+    zb := 3;
+    zs := zb;
+    zi := 1;
+  END;
+  RETURN zs + 5230;
+END;

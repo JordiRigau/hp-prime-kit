@@ -20,6 +20,12 @@ of four labels, always in the same words:
 | `HP help` | stated in the calculator's built-in help | the topic. Unless an entry says otherwise, this is the help dumped as Command Tree 13217 |
 | `unverified` | none of the above | where it came from: a forum post, somebody's program, an inference |
 
+A label says where a claim was seen, and the evidence says how far that
+goes: a program and its pair with controls, or one program seen once, which
+is weaker and says so. A claim whose evidence cannot name what was run and
+what came back is not `G2`, however sure anybody is: it is `unverified`, and
+says what was seen.
+
 They are listed from strongest to weakest. The emulator runs HP's own
 firmware, so it is closer to the calculator than anything written for the PC,
 but it is not the calculator. What the interpreter in this repository answers
@@ -142,7 +148,7 @@ concerns links to it.
 
 ```markdown
 <a name="ppl.local-limit"></a>
-## One LOCAL statement holds at most 7 or 8 variables
+## One LOCAL statement holds at most 8 variables
 
 | | |
 |---|---|

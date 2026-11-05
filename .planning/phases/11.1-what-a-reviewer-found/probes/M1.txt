@@ -1,0 +1,13 @@
+ZMW(zp)
+BEGIN
+  zp(1,1) := 999;
+  RETURN zp(1,1);
+END;
+
+EXPORT ZMVAL()
+BEGIN
+  LOCAL zm;
+  zm := [[4790,2],[3,4]];
+  ZMW(zm);
+  RETURN zm(1,1);
+END;

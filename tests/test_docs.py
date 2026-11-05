@@ -15,7 +15,9 @@ ROOT = os.path.dirname(HERE)
 
 LINK = re.compile(r'\[[^\]]*\]\(([^)]+)\)')
 HEADING = re.compile(r'^#{1,6}\s+(.*?)\s*$', re.M)
-SKIP_DIRS = {'.git', '__pycache__'}
+# .claude holds the worktrees of any desktop-app session: other copies of all of
+# this, which are not what a person gets, and which this used to count too.
+SKIP_DIRS = {'.git', '__pycache__', '.claude'}
 
 # Where a person's programs go. The folder ships with its note and nothing
 # else, and git keeps out of the rest, so an update never meets their files.

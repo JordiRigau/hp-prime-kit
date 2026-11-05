@@ -1,0 +1,6 @@
+// Z exported with no value
+EXPORT Z;
+EXPORT ZRXZ()
+BEGIN
+  RETURN 5081;
+END;

@@ -19,7 +19,7 @@ need from there. Whether a name exists at all is in
 [`docs/commands/names.tsv`](docs/commands/names.tsv), HP's own list.
 
 Then read [`docs/topics/ppl.md`](docs/topics/ppl.md): the limits that break
-compilation, and five hypotheses that look reasonable and are false, each
+compilation, and six hypotheses that look reasonable and are false, each
 marked `refuted hypothesis`. Writing PPL from memory means inventing
 restrictions that do not exist and missing the ones that do.
 
@@ -35,8 +35,10 @@ Then, depending on the task:
 | writing it in Python | [`docs/topics/micropython.md`](docs/topics/micropython.md) |
 | the binary formats, or moving a lot of data | [`docs/topics/formats.md`](docs/topics/formats.md) |
 | getting it onto the calculator | [`docs/topics/deploy.md`](docs/topics/deploy.md) |
+| seeing a connected G2's screen, or pressing its keys | [`docs/topics/usb.md`](docs/topics/usb.md) |
 | one PPL command | its entry, linked from [`docs/llms.txt`](docs/llms.txt) |
 | every `hpprime` command | [`docs/tools.md`](docs/tools.md) |
+| how other apps are laid out, as options | [`docs/patterns.md`](docs/patterns.md) |
 
 The non-negotiables, as a checklist. Each names the fact that holds it, with
 its evidence, in `ppl.md`:
@@ -47,20 +49,31 @@ its evidence, in `ppl.md`:
 - `:=` assigns, `==` compares, `<>` is not-equal (`ppl.equality-operators`).
 - `END` closes every block. `ENDIF`, `ENDFOR` and `ENDWHILE` do not exist
   (`ppl.no-end-keywords`), and `END` takes its `;` (`ppl.end-semicolon`).
-- All `LOCAL`s at the top of the `BEGIN` (`ppl.locals-at-top`), at most 8
-  per statement (`ppl.local-limit`).
+- At most 8 variables per `LOCAL` statement (`ppl.local-limit`). A `LOCAL` can
+  go after other statements (`ppl.locals-at-top`), and used after the end of its
+  block it does not compile (`ppl.local-block-scope`).
 - `x = 2;` as a statement assigns nothing, silently: assign with `:=`
   (`ppl.equality-operators`).
 - You cannot index the result of a call: `SIZE(M)(1)` does not compile
   (`ppl.index-call`).
 - Exported names are global and collide, with each other and with HP's own
-  names. Prefix them (`ppl.global-namespace`).
-- On Home, a zero-argument function is called without parentheses: `MYFUNC`,
-  not `MYFUNC()`. In source, the parentheses are required. Get this right
-  whenever you tell somebody how to test on the calculator
-  (`ppl.home-no-parentheses`).
+  names. Prefix them (`ppl.global-namespace`). One of Home's variables does not
+  even compile: `EXPORT Z := 1;`, and a function called `F` compiles, but typed on
+  Home `F` is the variable (`ppl.export-home-variable`). One `EXPORT` holds at most
+  8 variables (`ppl.export-initialised`).
+- On Home, tell somebody to type a zero-argument function without parentheses,
+  `MYFUNC`: `MYFUNC()` is a syntax error there, except on the RPN stack. Get this
+  right whenever you tell somebody how to test on the calculator
+  (`ppl.home-no-parentheses`). In source, both forms work
+  (`ppl.call-no-parentheses`).
 
 ## 2. The workflow to follow
+
+How the app is built is the person's choice. The documentation says what the
+calculator does, and [`docs/patterns.md`](docs/patterns.md) holds ways other
+apps are built, each with its costs. Do not present a pattern as a rule, and do
+not restructure somebody's program to fit one unless they ask.
+
 
 A person's programs go in [`programs/`](programs/README.md), one folder each:
 `programs/NAME/` holds the source and the `.hpprgm` built from it. Never write
@@ -77,8 +90,8 @@ commands.
 Never hand over PPL that has not been through both gates:
 
 ```bash
-hpprime lint FILE.txt                    # 0 errors, or fix and repeat
-hpprime run  FILE.txt --call "F(2)"      # the right answer, not just no error
+hpprime lint FILE.txt                       # 0 errors, or fix and repeat
+hpprime run  FILE.txt --call "CIRCAREA(2)"   # the right answer, not just no error
 ```
 
 Then, and only then:
@@ -89,7 +102,10 @@ hpprime write FILE.txt -o PROG.hpprgm
 
 `lint` catches what the compiler will not explain. `run` executes the actual
 file, and raises rather than inventing a result when a command is not covered,
-so a clean run means something.
+so a clean run means something. A program that is all screen and keys may have
+nothing `run` can answer on the PC: then `hpprime run FILE.txt`, with no
+`--call`, shows that it loads, and what it does is for the calculator to show.
+Say so plainly.
 
 For an app, `hpprime build` and then `hpprime verify`.
 
@@ -104,18 +120,44 @@ hpprime pull PROG --diff FILE.txt       # what is really installed; exits 1 if
 Do not claim that the PC run and the calculator agree unless you have checked:
 
 ```bash
-hpprime compare FILE.txt --call "F(2)"   # both columns, side by side
+hpprime compare FILE.txt --call "CIRCAREA(2)"   # both columns, side by side
 ```
 
 That needs the user to type `HPKCMP` on the calculator once and close the
 emulator. Ask for it rather than asserting that the two agree.
 
-A physical calculator is still the user dragging the file onto it in the
-Connectivity Kit window. Do not tell them to copy into the CK's mirror folder:
-that installs nothing.
+On a G2 on its cable, on Windows and with the Kit closed, you can install a
+program, see the screen and press the keys yourself. Ask before closing the
+Kit, before sending, which replaces a program of that name without asking, and
+before any key that changes what the calculator holds:
+
+```bash
+hpprime send FILE.txt           # installs; a clean exit says only that it was sent
+hpprime screen -o now.png       # what it is showing; open the picture and look
+hpprime type CIRCAREA --enter   # a name and Enter: letters and digits only
+hpprime press up                # keys; a clean exit says only that they were sent
+```
+
+The person may be using the calculator for their own work: look at the screen
+before any key, and if you leave a view, go back to it. Opening the Kit can open a
+firmware update with its button focused (`deploy.ck-offers-firmware`, `G2`): send
+that window no key, and leave the decision to the person.
+
+An app on a physical calculator is still the user dragging its folder onto it in
+the Connectivity Kit window, and so is a program for anyone who prefers that. Do
+not tell them to copy into the CK's mirror folder: that installs nothing.
 
 If you have shell access, run these yourself. Do not ask the user to relay
 output you could have obtained.
+
+In Claude Code, hooks in [`.claude/settings.json`](.claude/settings.json)
+hold you to this for programs in `programs/`: after every edit `lint`
+answers, and your turn cannot end until every program you edited has passed
+`lint` on its current content and `run` has at least loaded it, and every fact
+you cite exists. A program you only loaded is named to the person.
+Switching them off is the person's decision (`"disableAllHooks": true` in
+their `.claude/settings.local.json`), never yours. They start `python`, so where
+only `python3` starts they do not run: then the gates are yours to keep.
 
 ## 3. What you must not claim
 
@@ -124,11 +166,15 @@ Nothing works until a command says it does.
 - Do not say a program compiles. Say the linter is clean, and paste what it
   printed.
 - Do not say it computes correctly. Say what `hpprime run --call` returned.
-- Do not say it is installed on hardware. You cannot do that: dragging the
-  file onto the calculator in the Connectivity Kit window is the human's job,
-  and the mirror folder is not a mailbox. On the emulator you can, and then
-  `hpprime pull` says what is really there. See
-  [`deploy.md`](docs/topics/deploy.md).
+- Do not say a program is installed on hardware because `hpprime send` exited
+  0. Nothing acknowledges it (`usb.send-program`, `G2`): say what it answered
+  when you ran it. An app you cannot install: dragging it onto the calculator in
+  the Connectivity Kit window is the human's job, and the mirror folder is not a
+  mailbox. On the emulator you can do either, and then `hpprime pull` says what
+  is really there. See [`deploy.md`](docs/topics/deploy.md).
+- Do not say a key did something because `hpprime press` exited 0. Nothing
+  acknowledges a key (`usb.keys`, `G2`): say what `hpprime screen` shows after
+  it.
 - Do not report a platform fact without evidence. If it is in
   `docs/topics/`, cite the fact by its identifier and its label; if it is
   about one command, cite its entry. If you measured it, say how. If neither,
@@ -149,6 +195,10 @@ that:
   case nobody has measured. Ask the user for the exact message and line,
   compare against code known to compile, and when you find the rule, add it
   (see §6).
+- If the linter refuses what you have reason to believe compiles, the rule may
+  be the mistake: `ppl.locals-at-top` was one. Read its fact's evidence. On a G2
+  you can ask the calculator, with the person's approval: `hpprime send --no-lint`
+  and `usb.compile-check` (`G2`).
 - If a Python app closes on startup with no message, do not guess. Use a probe
   that leaves a mark in a PPL global after each step, in order of increasing
   risk: [`micropython.md`](docs/topics/micropython.md#micropython.mark-debugging), with one ready
@@ -163,7 +213,8 @@ that:
   codes and the menu geometry documented here all came from downloading apps
   and reading them.
 - `time` does not exist in MicroPython on the Prime. If `import time` fails,
-  the bridge is fine and the module is not there (`micropython.modules`).
+  the bridge is fine and the module is not there (`micropython.modules`,
+  `unverified`).
 - The Calculators folder is a mirror, and it is often empty. That is not a
   broken installation.
 
@@ -189,11 +240,17 @@ that:
 
 Say so plainly when you reach these, instead of implying you have done them:
 
-- installing on a physical calculator (the emulator you can do yourself, with
+- installing an app on a physical calculator (a program you can send yourself
+  to a G2 with `hpprime send`, and the emulator you can do with
   `hpprime install`);
-- running a program on the calculator: `hpprime compare` sends one and reads
-  its numbers back, but somebody has to press the key that starts it;
-- confirming a program runs on hardware. The emulator is close, not identical,
-  and every fact in `docs/topics/` labelled `unverified` is waiting for
-  exactly this;
+- running a program on the emulator: `hpprime compare` sends one and reads
+  its numbers back, but somebody has to press the key that starts it. On a G2
+  on its cable you can start one yourself with `hpprime type NAME --enter`, at
+  about 3 s a key, and read its answer with `hpprime screen`. Read that answer:
+  Home does not always refuse a name it does not know (`usb.start-by-name`,
+  `G2`);
+- confirming a program runs on hardware, beyond typing its name and reading its
+  answer: what it draws and how it takes keys has not been watched over USB.
+  The emulator is close, not identical, and every fact in `docs/topics/`
+  labelled `unverified` is waiting for exactly this;
 - timing anything, and judging whether an interface is usable in practice.

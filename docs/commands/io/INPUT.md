@@ -26,7 +26,7 @@ which also holds what the field descriptions mean: the position is
 clipped to a dot while `x=22` fitted, and `[0]` is a real field whose number
 is typed without quotes while a text field demands them.
 
-**It is modal and builds its labels once** (G2),
+**It is modal and builds its labels once** (unverified),
 [interface.input-modal](../../topics/interface.md#interface.input-modal): a
 label that depends on another field of the same form cannot change while the
 form is open. Asking one value at a time is the measured way round that, and

@@ -1,0 +1,7 @@
+EXPORT ZLINI()
+BEGIN
+  LOCAL za;
+  za := 0;
+  LOCAL zb := 4733;
+  RETURN za + zb;
+END;

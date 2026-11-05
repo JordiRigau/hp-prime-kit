@@ -1,0 +1,7 @@
+// 9 in one LOCAL
+EXPORT ZRVN()
+BEGIN
+  LOCAL za,zb,zc,zd,zf,zg,zh,zj,zk;
+  za := 5381;
+  RETURN za;
+END;

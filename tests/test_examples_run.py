@@ -212,6 +212,36 @@ def the_results_file():
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def the_program_measured_again():
+    """A compile question's call is the program's source, line breaks and
+    all, and results.tsv holds it cleaned: a line break as the two characters
+    \\n, a tab as a space. The same program measured again replaces its row
+    rather than adding a second one."""
+    tmp = tempfile.mkdtemp(prefix='hpexagain-')
+    try:
+        os.makedirs(os.path.dirname(X.results_path(tmp)))
+        source = 'EXPORT ZQL09()\nBEGIN\n\tRETURN 1;\nEND;\n'
+
+        def measured(date):
+            return OrderedDict([
+                ('entry', 'test.compile-one'), ('call', source),
+                ('answer', X.COMPILES), ('type', ''), ('firmware', VERSION),
+                ('date', date)])
+        X.write_results(tmp, [measured('2026-11-06')])
+        X.write_results(tmp, [measured('2026-11-07')])
+        mine = [r for k, r in X.read_results(tmp).items()
+                if k[0] == 'test.compile-one']
+        ok(len(mine) == 1 and mine[0]['date'] == '2026-11-07',
+           'a program measured again reads back as one row, the newer one',
+           [r['date'] for r in mine])
+        with open(X.results_path(tmp), encoding='utf-8') as f:
+            lines = [line for line in f
+                     if line.startswith('test.compile-one\t')]
+        ok(len(lines) == 1, 'and the file holds it once', lines)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def the_next_window():
     """Which calculator a window launched now would open, from the locks the
     windows already open are holding."""
@@ -682,6 +712,8 @@ def main():
     the_never_stored()
     print('\n-- results.tsv and relabelling')
     the_results_file()
+    print('\n-- a program measured again')
+    the_program_measured_again()
     print('\n-- which calculator the next window opens')
     the_next_window()
     print('\n-- the run, with a stand-in for the emulator')

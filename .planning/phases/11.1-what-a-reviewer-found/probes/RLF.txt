@@ -1,0 +1,10 @@
+// FOR: read after
+EXPORT ZRLF()
+BEGIN
+  LOCAL zi;
+  FOR zi FROM 1 TO 2 DO
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb + 5100;
+END;

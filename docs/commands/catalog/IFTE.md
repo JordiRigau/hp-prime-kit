@@ -6,7 +6,7 @@ Answers one of two values, depending on a test.
 |---|---|
 | Syntax | `IFTE(Expr, TrueClause, FalseClause)` |
 | Group | catalog |
-| Runs on the PC | no |
+| Runs on the PC | yes |
 
 ## Examples
 
@@ -29,14 +29,15 @@ takes up to eight test-and-value pairs and answers the first that holds.
 Where a program has exactly one condition, this is the shorter spelling of
 the same thing.
 
-Whether both clauses are evaluated before the test decides, or only the one
-that wins, was not measured (unverified). It matters when a clause is
-expensive or changes something.
-
-The interpreter does not implement it, so `hpprime run` cannot check a program
-that uses it (unverified).
+**Only the clause that wins is evaluated** (emulator): the other is skipped
+whole, calls and all. So `IFTE(SIZE(L) == 0, 0, L(1))` is safe with an empty
+list, and a clause that is slow or changes something costs nothing when it
+loses. The measurement is in
+[ppl.short-circuit](../../topics/ppl.md#ppl.short-circuit), which says the
+same of `AND` and `OR`.
 
 ## Related
 
 [PIECEWISE](PIECEWISE.md) · [IF](../branch/IF.md) ·
-[ppl.type-codes](../../topics/ppl.md#ppl.type-codes)
+[ppl.type-codes](../../topics/ppl.md#ppl.type-codes) ·
+[ppl.short-circuit](../../topics/ppl.md#ppl.short-circuit)

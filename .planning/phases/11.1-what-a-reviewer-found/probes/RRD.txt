@@ -1,0 +1,7 @@
+// a local of a letter and two digits
+EXPORT ZRRD()
+BEGIN
+  LOCAL L12;
+  L12 := 5350;
+  RETURN L12;
+END;

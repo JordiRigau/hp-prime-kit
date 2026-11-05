@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Run the same calls here and on the calculator, and compare the numbers.
 
-    hpprime compare lib.txt --call "CIRCAREA(2)" --call "F(3,350)"
+    hpprime compare lib.txt --call "CIRCAREA(2)" --call "FN(3,350)"
 
 `hpprime run` executes PPL on the PC. It is the same file the calculator
 gets, but it is not the calculator's interpreter, and the only way to know
@@ -224,12 +224,12 @@ def clean_up(calc):
 
 # --------------------------------------------------------------------- cli
 
-USAGE = """hpprime compare FILES... --call "F(2)" [--call ...] [options]
+USAGE = """hpprime compare FILES... --call "FN(2)" [--call ...] [options]
 hpprime compare --collect
 
 Run the same calls here and on the emulator, and compare the numbers.
 
-  --call "F(2)"   a call to make on both sides. Repeatable
+  --call "FN(2)"  a call to make on both sides. Repeatable
   --calc NAME     which calculator
   --mat N         which matrix carries the results back (default 9)
   --tol X         how close counts as the same (default 1e-9, relative)

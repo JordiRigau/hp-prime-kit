@@ -105,22 +105,13 @@ BEGIN  PRINT("what this app does");  END;
 `Info()` has been seen to accept `PRINT`; what else it accepts has not been
 tried.
 
-## Keep the app a launcher
+## One app, or an app with programs beside it
 
-Keep the engine and the interface as catalogue programs and have the app call
-them. Two reasons:
-
-1. What an app's program exports is tied to that app, so an engine that has
-   to be reusable from elsewhere has to live in a catalogue program
-   ([apps.exports-tied](../topics/apps.md#apps.exports-tied)).
-2. Exported names are global and collide, so the app and the interface need
-   different names anyway
-   ([ppl.global-namespace](../topics/ppl.md#ppl.global-namespace)).
-
-The cost is installing three things instead of one, in dependency order
-([ppl.compilation-order](../topics/ppl.md#ppl.compilation-order)). The gain is
-that the part which never changes, your data, is not touched when you fix the
-interface.
+An app can hold all of its code, or launch programs installed beside it. One
+app is the simplest to install. A launcher pays off when other apps or Home
+call the same engine, or when large data should not be sent again with every
+change to the interface, and it costs several installs in the right order:
+[patterns.md](../patterns.md#the-app-as-a-launcher).
 
 ## What has been checked
 

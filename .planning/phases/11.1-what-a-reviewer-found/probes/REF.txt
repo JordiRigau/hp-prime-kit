@@ -1,0 +1,9 @@
+// ENDFOR
+EXPORT ZREF()
+BEGIN
+  LOCAL zi;
+  FOR zi FROM 1 TO 2 DO
+    zi;
+  ENDFOR;
+  RETURN 5250;
+END;

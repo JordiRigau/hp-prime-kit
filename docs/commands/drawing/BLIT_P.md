@@ -25,7 +25,7 @@ pixel back from each afterwards is the probe that would confirm it
 
 **This is the second half of drawing without flicker**: build the picture in
 a grob of your own with [DIMGROB_P](DIMGROB_P.md), then copy it to `G0`, the
-screen, in one go (G2),
+screen, in one go (unverified),
 [interface.offscreen-grob](../../topics/interface.md#interface.offscreen-grob).
 Painting straight onto `G0` shows the work row by row.
 

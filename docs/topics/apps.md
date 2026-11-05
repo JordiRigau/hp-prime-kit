@@ -6,21 +6,12 @@ once.
 
 A loose program lives in the catalogue and opens with `[Shift][Program]`,
 navigate, `[Enter]`. An app has an icon under `[Apps]`, so opening it is two
-presses. Under exam pressure that is the whole difference, and it is close to
-the only reason to wrap something as an app.
+presses, and it can have views and hooks of its own
+([apps.hooks](#apps.hooks)).
 
-> Develop as a program and wrap it as an app at the end. The engine and the
-> interface are identical either way, the `.hpappdir` is only a container, and
-> iterating on a program is much faster.
-
-## The launcher pattern
-
-Keep the app as a launcher: the engine and the interface stay as catalogue
-programs, and the app calls them. Two reasons, both facts below --
-[apps.exports-tied](#apps.exports-tied) and
-[ppl.global-namespace](ppl.md#ppl.global-namespace). The cost is installing
-three things; the benefit is that the block which never changes, the data,
-which can be hundreds of kilobytes, is not touched when you fix the interface.
+How an app can be laid out -- everything in its own program, or a launcher
+for programs installed beside it -- and what each way costs, is in
+[patterns.md](../patterns.md). None of it is required.
 
 For the bridge between PPL and Python, see
 [micropython.md](micropython.md). Building and checking one from the PC:
@@ -220,14 +211,17 @@ end by `hpprime build`.
 |---|---|
 | Identifier | `apps.exports-tied` |
 | Kind | rule |
-| Known from | G2 |
+| Known from | unverified |
 
 An engine that has to be reusable from another app, or from Home, has to live
 in a catalogue program rather than inside the app.
 
-**Evidence.** Measured on a G2 with firmware 2.4.15515. Together with
+**Evidence.** Seen on a G2 with firmware 2.4.15515 while building an app, with
+no program kept, so what exactly was tried is not known. One app and one program
+calling what it exports would settle it. Together with
 [ppl.global-namespace](ppl.md#ppl.global-namespace), it is why the app, the
-interface and the engine are three installs rather than one.
+interface and the engine are separate installs in the launcher pattern of
+[patterns.md](../patterns.md#the-app-as-a-launcher).
 
 <a name="apps.wrappers-are-portable"></a>
 ## The wrappers carry no name, so four templates cover every app
@@ -256,17 +250,24 @@ text inside, so they bring nothing from the app they came from beyond its
 settings.
 
 <a name="apps.main-py"></a>
-## A Python app's entry point is main.py, and it runs on import
+## A Python app runs its file by importing it, and a lone file need not be main.py
 
 | | |
 |---|---|
 | Identifier | `apps.main-py` |
 | Kind | rule |
-| Known from | unverified |
+| Known from | emulator |
 
 In every Python app examined the file is called `main.py` and its code is at
-module level rather than inside an `if __name__` block. The Markdown Viewer
-ends with:
+module level rather than inside an `if __name__` block. That is how it runs:
+the calculator imports the file, and what is at module level runs on import.
+An app whose only Python file was `start.py` ran it, and its Numeric view
+showed the console line `>import start`, so the name `main.py` is not what
+the calculator looks for when there is one file. With several, which one it
+imports was not tried, and `main.py`, the name every published app uses, is
+the one to keep.
+
+The Markdown Viewer ends with:
 
 ```python
 try:
@@ -275,11 +276,16 @@ except KeyboardInterrupt:
     clear_screen()
 ```
 
-`KeyboardInterrupt` is the `[ON]` key, which is how you break out of a loop.
+`KeyboardInterrupt` is the `[ON]` key, which is how you break out of a loop
+(unverified: read from that app).
 
-**Evidence.** Read from published apps that run on a G2, not measured here.
-What would settle whether the name is required: an app whose entry point is
-called something else.
+**Evidence.** The name and the module-level code are read from published
+apps that run on a G2. The lone `start.py` was measured on the Virtual Calculator 2.4, build 2025-09-15, on
+2026-10-04: an app built by `hpprime build` from that one file, whose
+wrappers are the same template for every app and name no file, drew the
+line the file draws when it runs and set the PPL global `PZ` to
+`"ZPYENT start.py ran"`, which Home then showed; its Numeric view showed
+`>import start`.
 
 <a name="apps.install"></a>
 ## An app is installed by dragging the folder, never by copying into the mirror

@@ -1,0 +1,11 @@
+// ELSE: read after
+EXPORT ZRLE()
+BEGIN
+  IF 0 == 1 THEN
+    1;
+  ELSE
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb + 5140;
+END;

@@ -1,0 +1,9 @@
+// ENDWHILE
+EXPORT ZREW()
+BEGIN
+  LOCAL zi;
+  WHILE zi < 1 DO
+    zi := 1;
+  ENDWHILE;
+  RETURN 5260;
+END;

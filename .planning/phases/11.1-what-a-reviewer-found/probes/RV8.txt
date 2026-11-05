@@ -1,0 +1,7 @@
+// 8 in one LOCAL
+EXPORT ZRVE()
+BEGIN
+  LOCAL za,zb,zc,zd,zf,zg,zh,zj;
+  za := 5380;
+  RETURN za;
+END;

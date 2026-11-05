@@ -1,0 +1,32 @@
+{
+  "env": {
+    "HPPRIME_GATES": "1"
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python",
+            "args": ["${CLAUDE_PROJECT_DIR}/hpprime.py", "hook", "post-edit"],
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python",
+            "args": ["${CLAUDE_PROJECT_DIR}/hpprime.py", "hook", "stop"],
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}

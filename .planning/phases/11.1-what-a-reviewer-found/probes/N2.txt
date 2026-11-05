@@ -1,0 +1,5 @@
+EXPORT Y := 1, Z := 4782;
+EXPORT ZNTWO()
+BEGIN
+  RETURN Z + Y;
+END;

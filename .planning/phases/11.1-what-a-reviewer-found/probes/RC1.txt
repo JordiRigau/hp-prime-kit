@@ -1,0 +1,5 @@
+// control: compiles
+EXPORT ZRCOK()
+BEGIN
+  RETURN 5000;
+END;

@@ -1,0 +1,12 @@
+// REPEAT: read in its own UNTIL
+EXPORT ZRLU()
+BEGIN
+  LOCAL zs;
+  zs := 0;
+  REPEAT
+    LOCAL zb;
+    zb := 3;
+    zs := zb;
+  UNTIL zb == 3;
+  RETURN zs + 5410;
+END;

@@ -364,7 +364,7 @@ Every name PPL has, from [the list of names](names.tsv): what kind of name it is
 | [ListToMat](matrix/ListToMat.md) | function | [matrix](matrix.md) | Turns a list of lists into a matrix. | emulator |
 | [LN](catalog/LN.md) | function | [catalog](catalog.md) | The natural logarithm. | emulator |
 | [LNP1](arithmetic/LNP1.md) | function | [arithmetic](arithmetic.md) | The natural logarithm of one plus the value. | emulator |
-| [LOCAL](variable/LOCAL.md) | statement | [variable](variable.md) | Declares the variables that belong to one function. | emulator |
+| [LOCAL](variable/LOCAL.md) | statement | [variable](variable.md) | Declares variables that last until the end of their block. | emulator |
 | [locus](geometry/locus.md) | app function | [geometry](geometry.md) | The path a point traces, refused for the two points given. | emulator |
 | [LOG](catalog/LOG.md) | function | [catalog](catalog.md) | The logarithm, base ten unless another base is given. | emulator |
 | [LOWER](strings/LOWER.md) | command | [strings](strings.md) | The string in lower case. | emulator |

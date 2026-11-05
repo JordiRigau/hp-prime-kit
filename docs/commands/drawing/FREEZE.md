@@ -16,8 +16,9 @@ Keeps what is on the screen until a key is pressed.
 
 ## Behaviour
 
-**No parentheses**, like [GETKEY](../io/GETKEY.md) and `TICKS` (emulator): it
-is written `FREEZE;`.
+**Written without parentheses**, `FREEZE;` (emulator), as a call with no
+arguments can be in source,
+[ppl.call-no-parentheses](../../topics/ppl.md#ppl.call-no-parentheses).
 
 It answered 1 in a batch and did not stop the program (emulator), so whatever
 it froze was released without anybody pressing a key. What it does in a

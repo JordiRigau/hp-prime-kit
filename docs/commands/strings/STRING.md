@@ -38,7 +38,7 @@ example above because the interpreter formats decimals its own way and
 changing that would change concatenation too; the measurement is in
 [results.tsv](../results.tsv) and the change is a decision of its own.
 Source is a different matter: there the separator is always a dot, whatever
-the calculator displays (G2),
+the calculator displays (unverified),
 [ppl.decimal-point](../../topics/ppl.md#ppl.decimal-point).
 
 HP's help gives three optional arguments -- a mode, a precision and a

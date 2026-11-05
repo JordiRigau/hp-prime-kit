@@ -41,7 +41,8 @@ to close it, as defined in `milestone-2-CONTEXT.md`, approved and revised on
 - [x] **Phase 9: Guided path, index and README** - The way in, for a person and for a model (completed 2026-09-24; counted again in Phase 10)
 - [x] **Phase 9.1: Tools that keep their promise** (INSERTED) - The interpreter never answers wrong in silence, and a batch never loses evidence in silence (completed 2026-09-24)
 - [x] **Phase 10: What a PC can catch** - Every fact a PC could catch has a lint rule or says why not, and milestone 1 closes (completed 2026-09-25)
-- [ ] **Phase 11: The working folder** - Downloaded and opened, nothing installed; a person's programs in `programs/`, kept through an update
+- [x] **Phase 11: The working folder** - Downloaded and opened, nothing installed; a person's programs in `programs/`, kept through an update (completed 2026-09-29)
+- [x] **Phase 11.1: What a reviewer found** (INSERTED) - Five facts disputed on the HP forum, tested on a G2 and corrected, with the linter and the interpreter following (completed 2026-11-05)
 - [ ] **Phase 12: Checks the agent cannot skip** - `lint` after every PPL edit, blocking on an error; claims no command backs caught; every citation resolves
 - [ ] **Phase 13: From an idea to the calculator** - Questions before any PPL, a writer and a verifier, and a fixed hand-over
 - [ ] **Phase 14: The other jobs** - Port, debug, screen, app, deploy and measure, and the paste block generated from the documentation
@@ -245,7 +246,21 @@ Plans:
 Plans:
 - [x] 11-01: The folder: `programs/`, and the README's two ways in
 - [x] 11-02: `hpprime update`
-- [ ] 11-03: Downloaded and tried
+- [x] 11-03: Downloaded and tried
+
+### Phase 11.1: What a reviewer found (INSERTED)
+**Goal**: The five facts a reader disputed on the HP forum rest on programs run on a G2, each with its pair, and the linter and the interpreter follow them
+**Depends on**: Phase 11. Inserted on 2026-11-05 at the user's word, ahead of plan 12-03, since Phase 12's hooks make a false lint error block an agent
+**Success Criteria** (what must be TRUE):
+  1. Each disputed claim has a program and a pair behind it on a G2, with a control that compiles and one that does not coming out as they must
+  2. A fact the G2 refuted says so, and what the G2 did answer is stated instead, with what was not measured marked `unverified`
+  3. `hpprime lint` and `hpprime run` give the G2's verdict on every one of those programs, and a test holds each case
+  4. `AGENTS.md`, the paste block, the guided path and the entries say the same as the facts
+**Plans**: 2, complete on 2026-11-05
+
+Plans:
+- [x] 11.1-01: Tested on the G2 and corrected
+- [x] 11.1-02: The review before the commit: the same fault looked for everywhere, 45 more probes on the G2
 
 ### Phase 12: Checks the agent cannot skip
 **Goal**: The gates of `AGENTS.md` run without depending on the agent remembering them
@@ -255,7 +270,12 @@ Plans:
   1. After an edit to a PPL file, `lint` runs by itself; an error stops the agent until it is fixed, and a warning is shown without stopping it
   2. A report claiming a program compiles, works on the calculator or is installed, with no command's output behind it, is caught when the agent finishes; cases it must let pass are held by tests, and the person, not the agent, can switch it off
   3. Every identifier the kit's skills and agents cite resolves, and a test fails on one that does not
-**Plans**: TBD
+**Plans**: 3, questioned and planned on 2026-09-29; 2 complete
+
+Plans:
+- [x] 12-01: Lint after an edit, and the ledger
+- [x] 12-02: The end check
+- [ ] 12-03: Tried in a session
 
 ### Phase 13: From an idea to the calculator
 **Goal**: A person with an idea and no PPL gets a program running on the calculator
@@ -314,8 +334,9 @@ Plans:
 | 9. Guided path, index and README | 4/4 | Complete, counted again in Phase 10 on 2026-09-25 | 2026-09-24 |
 | 9.1. Tools that keep their promise | 2/2 | Complete (INSERTED) | 2026-09-24 |
 | 10. What a PC can catch | 3/3 | Complete: milestone 1 closed | 2026-09-25 |
-| 11. The working folder | 2/3 | In progress: `programs/`, the two ways in, `hpprime update`; trying a download is next | - |
-| 12. Checks the agent cannot skip | 0/TBD | Not started | - |
+| 11. The working folder | 3/3 | Complete, verified | 2026-09-29 |
+| 11.1. What a reviewer found | 2/2 | Complete (INSERTED); what it left is in `11.1-02-SUMMARY.md` | 2026-11-05 |
+| 12. Checks the agent cannot skip | 2/3 | In progress: lint after an edit, the ledger, the end check; tried in a session next | - |
 | 13. From an idea to the calculator | 0/TBD | Not started | - |
 | 14. The other jobs | 0/TBD | Not started | - |
 | 15. Projects across sessions | 0/TBD | Not started | - |

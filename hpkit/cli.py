@@ -36,7 +36,7 @@ Getting started
 
 Writing code
   lint FILES...           the errors the Prime's compiler will not explain
-  run FILES... --call "F(3)"    run the PPL here, on the PC
+  run FILES... --call "FN(3)"   run the PPL here, on the PC
 
 Getting it onto the calculator
   write SRC.txt -o PROG.hpprgm  build the binary a calculator accepts
@@ -46,7 +46,13 @@ Getting it onto the calculator
   install FILES... [--restart]  put them in the Virtual Calculator
   pull [NAME] [--diff SRC.txt]  read back what it actually has
   emu new|list|reset|remove     calculators to experiment on
-  compare FILES... --call "F(2)"  the same call here and on the calculator
+  compare FILES... --call "FN(2)" the same call here and on the calculator
+
+A G2 on its USB cable, with the Connectivity Kit closed
+  screen [-o FILE.png]          what it is showing, as a picture
+  press KEYS...                 press its keys from here
+  type TEXT [--enter]           type letters and digits on it
+  send FILE [--name NAME]       install a program on it
 
 Data
   matrix read|write|nums ...    .hpmat files and the internal number format
@@ -151,14 +157,14 @@ def _doctor():
 
     # End to end, with no calculator: source -> binary -> source.
     if tpl:
-        code = 'EXPORT F()\nBEGIN\n  RETURN 42;\nEND;'
+        code = 'EXPORT ZF()\nBEGIN\n  RETURN 42;\nEND;'
         try:
             out = program.write(open(tpl, 'rb').read(), code)
             assert program.read(out)[0] == code
             from hpkit import interp
             m = interp.Machine()
             m.load(code)
-            assert m.call('F') == 42.0
+            assert m.call('ZF') == 42.0
             print('self test        source -> .hpprgm -> source, and the PPL '
                   'runs: ok')
         except Exception as e:
@@ -290,6 +296,9 @@ def main(argv=None):
     if cmd == 'update':
         from hpkit import update
         return update.cli(rest)
+    if cmd == 'hook':
+        from hpkit import gates
+        return gates.cli(rest)
     if cmd == 'verify':
         return _verify(rest)
     if cmd == 'lint':
@@ -319,6 +328,18 @@ def main(argv=None):
     if cmd == 'compare':
         from hpkit import compare
         return compare.cli(rest)
+    if cmd == 'screen':
+        from hpkit import usb
+        return usb.cli_screen(rest)
+    if cmd == 'press':
+        from hpkit import usb
+        return usb.cli_press(rest)
+    if cmd == 'type':
+        from hpkit import usb
+        return usb.cli_type(rest)
+    if cmd == 'send':
+        from hpkit import usb
+        return usb.cli_send(rest)
     if cmd == 'docs':
         from hpkit import docs
         return docs.cli(rest)

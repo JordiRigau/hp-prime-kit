@@ -1,0 +1,6 @@
+// 8 exported with no values
+EXPORT ZV1, ZV2, ZV3, ZV4, ZV5, ZV6, ZV7, ZV8;
+EXPORT ZRXO()
+BEGIN
+  RETURN 5092;
+END;

@@ -1,7 +1,7 @@
 ---
 phase: 11-the-working-folder
 plan: 03
-status: in progress; the GitHub leg is open
+status: complete
 started: 2026-09-28
 ---
 
@@ -9,7 +9,7 @@ started: 2026-09-28
 
 ## The download
 
-`C:\Users\jordi\Desktop\hp-prime-kit-main`, unzipped from tree 3607984 (the
+`hp-prime-kit-main` on the Desktop, unzipped from tree 3607984 (the
 working tree on 2026-09-27, through a temporary index), archived with
 `git -c core.autocrlf=false -c core.eol=lf`: 1,020 entries, no CRLF, no
 `.git`, `programs/` holding only its note, `doctor` passing. No `CLAUDE.md`
@@ -66,7 +66,29 @@ the reference, not written into it here: `Time.md` and `deploy.md` take a
 measurement the harness can repeat, a row in `results.tsv`, and `RELOJ` is
 not in the repository.
 
-## Open
+## From GitHub, 2026-09-29
 
-- **The GitHub leg**: once committed and pushed at the user's word, the
-  ZIP from GitHub and `hpprime update` against it.
+Committed as 7581215 and pushed at the user's word.
+
+- **GitHub's ZIP is the commit, byte for byte**: downloaded by
+  `hpkit.update.download()`, its 948 files matched a `git -c
+  core.autocrlf=false -c core.eol=lf archive` of HEAD, none only on one
+  side, none different; no text file with CRLF; the comment the full hash
+  `7581215282b7a90d13718ca761b4ce55aa7e8c20`. So the ZIP 11-03 was tried
+  with, made the same way, stands for GitHub's.
+- **`hpprime update` from GitHub, in a copy of the tried download**, with
+  `programs/RELOJ/` in it, using the copy's own `hpprime.py`: `--dry-run`
+  named 4 changed and 1 added, the files edited after the download was
+  made, and wrote nothing; the update wrote those 5 and said `commit
+  7581215`; `RELOJ.txt` kept its MD5, `0a1da33e...`; a second run found
+  nothing to do, 947 unchanged. The Desktop folder itself was not touched.
+
+## Found: `hpprime` is not executable
+
+`git ls-files -s hpprime` gives mode `100644`, since the file was added on
+2026-09-16, and GitHub's ZIP records no mode for it. On macOS and Linux a
+clone or a download therefore checks it out without its executable bit, and
+`./hpprime`, which step 1 and `docs/tools.md` give for those systems, is
+refused. Not run on either system: it follows from the mode git stores.
+`python hpprime.py` is unaffected. The fix is `git update-index --chmod=+x
+hpprime` and a commit. **Not applied, at the user's word on 2026-09-29.**

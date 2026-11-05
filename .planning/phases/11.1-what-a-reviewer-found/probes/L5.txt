@@ -1,0 +1,11 @@
+EXPORT ZLNST()
+BEGIN
+  LOCAL za;
+  za := 4734;
+  IF za == 4734 THEN
+    LOCAL zb;
+    zb := 1;
+    za := za + zb;
+  END;
+  RETURN za;
+END;

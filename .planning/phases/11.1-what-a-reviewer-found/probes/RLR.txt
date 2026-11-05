@@ -1,0 +1,9 @@
+// REPEAT: read after
+EXPORT ZRLR()
+BEGIN
+  REPEAT
+    LOCAL zb;
+    zb := 3;
+  UNTIL 1;
+  RETURN zb + 5120;
+END;

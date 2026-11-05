@@ -1,0 +1,26 @@
+# micropython.ppl-calls-python: does PYTHON compile, and does a #PYTHON block?
+[micropython.ppl-calls-python] ZQPY1
+EXPORT ZQPY1()
+BEGIN
+  PYTHON("ZQNONE");
+  RETURN 1;
+END;
+
+[micropython.ppl-calls-python] ZQPY2
+#PYTHON ZQPYS
+x = 1
+#END
+EXPORT ZQPY2()
+BEGIN
+  RETURN 1;
+END;
+
+[micropython.ppl-calls-python] ZQPY3
+#PYTHON ZQPYT
+x = 1
+#END
+EXPORT ZQPY3()
+BEGIN
+  PYTHON(ZQPYT);
+  RETURN 1;
+END;

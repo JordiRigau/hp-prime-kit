@@ -1,0 +1,7 @@
+// SIZE(M)(1)
+EXPORT ZRIC()
+BEGIN
+  LOCAL zm;
+  zm := [[1,2],[3,4]];
+  RETURN SIZE(zm)(1) + 5270;
+END;

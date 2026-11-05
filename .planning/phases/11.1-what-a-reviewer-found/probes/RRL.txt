@@ -1,0 +1,9 @@
+// RETURN inside a FOR
+EXPORT ZRRL()
+BEGIN
+  LOCAL zi;
+  FOR zi FROM 1 TO 3 DO
+    IF zi == 2 THEN RETURN 5340 + zi; END;
+  END;
+  RETURN 5349;
+END;

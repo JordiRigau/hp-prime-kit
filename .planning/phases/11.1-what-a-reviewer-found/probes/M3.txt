@@ -1,0 +1,16 @@
+// Which step ran out of memory on the G2? 1 made it, 0 refused.
+EXPORT ZMSIZ()
+BEGIN
+  LOCAL zr, zn, zi, zm;
+  zn := {50, 100, 150, 200};
+  zr := {};
+  FOR zi FROM 1 TO 4 DO
+    IFERR
+      zm := MAKEMAT(1, zn(zi), zn(zi));
+      zr(zi) := 1;
+    THEN
+      zr(zi) := 0;
+    END;
+  END;
+  RETURN zr;
+END;

@@ -1,0 +1,35 @@
+// ===================================================================
+// GLYPHS - which symbols does TEXTOUT_P draw, and which come out as an
+// empty box?
+//
+// The font has no glyph for some characters, and TEXTOUT_P draws a box
+// in their place without an error. This draws eight left/right pairs
+// in font 3 and a reference line in font 2, then waits for a key, so
+// the screen can be read. The table it produced is in
+// docs/topics/interface.md (interface.font-glyphs).
+//
+//   hpprime write examples/glyphs/GLYPHS.txt -o GLYPHS.hpprgm
+//   drag it over, then on Home type:  GLYPHS
+//   (no parentheses: Home rejects GLYPHS())
+//
+// To try other characters, change the two lists: one pair per row,
+// eight rows fit above the reference line.
+//
+// Do NOT run this with `hpprime run`: on the PC GETKEY always reports
+// "no key", so the wait loop never ends.
+// ===================================================================
+
+EXPORT GLYPHS()
+BEGIN
+  LOCAL zl, zr, zi, zk;
+  zl := {"◄","◀","←","◂","⇐","⯇","«","<"};
+  zr := {"►","▶","→","▸","⇒","⯈","»",">"};
+  RECT();
+  FOR zi FROM 1 TO SIZE(zl) DO
+    TEXTOUT_P(STRING(zi) + ")   " + zl(zi) + "  text  " + zr(zi), 12, 4 + zi * 22, 3, RGB(0,0,0), 300);
+  END;
+  TEXTOUT_P("reference:  ▲ ▼ ° ω", 12, 204, 2, RGB(0,0,0), 300);
+  REPEAT zk := GETKEY; UNTIL zk < 0;      // drain what is pending
+  REPEAT zk := GETKEY; UNTIL zk >= 0;     // and now wait for a real one
+  RETURN zk;
+END;

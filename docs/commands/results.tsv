@@ -592,6 +592,8 @@ LSystem	LOCAL o, r; o := EXPR("Linear_Solver.LSystem"); IFERR EXPR("Linear_Solve
 LU	LU([[1,2],[3,4]])	{[[1,0],[0.333333333333,1]],[[3,4],[0,0.666666666667]],[[0,1],[1,0]]}	6	Virtual Calculator 2.4, build 2025-09-15	2026-09-13
 Macaulay	EXPR("Macaulay")	0	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-15
 MAKELIST	MAKELIST(X^2,X,1,5)	{1,4,9,16,25}	6	Virtual Calculator 2.4, build 2025-09-15	2026-09-13
+MAKEMAT	// Which step ran out of memory on the G2? 1 made it, 0 refused.\nEXPORT ZMSIZ()\nBEGIN\n  LOCAL zr, zn, zi, zm;\n  zn := {50, 100, 150, 200};\n  zr := {};\n  FOR zi FROM 1 TO 4 DO\n    IFERR\n      zm := MAKEMAT(1, zn(zi), zn(zi));\n      zr(zi) := 1;\n    THEN\n      zr(zi) := 0;\n    END;\n  END;\n  RETURN zr;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+MAKEMAT	EXPR("ZMSIZ")	{1,1,0,0}	6	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 MAKEMAT	MAKEMAT(1,2,3)	[[1,1,1],[1,1,1]]	4	Virtual Calculator 2.4, build 2025-09-15	2026-09-13
 MANT	MANT(123.45)	1.2345	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-13
 Margin	EXPR("Margin")	0	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-15
@@ -783,53 +785,212 @@ polygon	EXPR("polygon(point(0,0),point(1,0),point(0,1))")	polygon(point(0,0),poi
 POLYROOT	POLYROOT([1,0,-4])	{−2.82353141256,−0.552220307199-1.1052954935*,−0.552220307199+1.1052954935*,0.927972026959}	6	Virtual Calculator 2.4, build 2025-09-15	2026-09-13
 Pooled	EXPR("Pooled")	0	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-14
 POS	POS({3,5,7},5)	2	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-13
+ppl.call-no-parentheses	EXPORT ZPCNT := 0;\n\nZPI()\nBEGIN\n  ZPCNT := ZPCNT + 1;\nEND;\n\nEXPORT ZPSTM()\nBEGIN\n  ZPCNT := 0;\n  ZPI;\n  ZPI;\n  RETURN ZPCNT + 4720;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.call-no-parentheses	EXPORT ZPLAT()\nBEGIN\n  RETURN ZPH;\nEND;\n\nZPH()\nBEGIN\n  RETURN 4712;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.call-no-parentheses	EXPORT ZPLTP()\nBEGIN\n  RETURN ZPH();\nEND;\n\nZPH()\nBEGIN\n  RETURN 4713;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.call-no-parentheses	EXPORT ZPOTH()\nBEGIN\n  RETURN ZPX;\nEND;\n\nEXPORT ZPOTP()\nBEGIN\n  RETURN ZPX();\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.call-no-parentheses	EXPORT ZPX()\nBEGIN\n  RETURN 4714;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.call-no-parentheses	EXPR("ZPEAR")	4710	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.call-no-parentheses	EXPR("ZPFWD")	4711	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.call-no-parentheses	EXPR("ZPLAT")	4712	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.call-no-parentheses	EXPR("ZPLTP")	4713	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.call-no-parentheses	EXPR("ZPOTH")	4714	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.call-no-parentheses	EXPR("ZPOTP")	4714	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.call-no-parentheses	EXPR("ZPSTM")	4722	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.call-no-parentheses	EXPR("ZPX")	4714	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.call-no-parentheses	ZPF()\nBEGIN\n  RETURN 4710;\nEND;\n\nEXPORT ZPEAR()\nBEGIN\n  RETURN ZPF;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.call-no-parentheses	ZPG();\n\nEXPORT ZPFWD()\nBEGIN\n  RETURN ZPG;\nEND;\n\nZPG()\nBEGIN\n  RETURN 4711;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.check-last-error	EXPORT ZQTWO()\nBEGIN\n  LOCAL za;\n  za := za + ;\n  za := 1;\n  za := za + 1;\n  za := za + 1;\n  za := za + 1;\n  za := za + 1;\n  za := za + 1;\n  za := za + 1;\n  za := za + ;\n  RETURN za;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
+ppl.compilation-order	// the order: nothing to call yet\nEXPORT ZROCA()\nBEGIN\n  RETURN ZROTH();\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.compilation-order	// the order: the callee arrives, the caller not sent again\nEXPORT ZROTH()\nBEGIN\n  RETURN 5310;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.compilation-order	// the order: the caller sent again\nEXPORT ZROCA()\nBEGIN\n  RETURN ZROTH();\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.compilation-order	EXPR("ZROCA")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.compilation-order	EXPR("ZROCA()")	5310	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.compilation-order	EXPR("ZROTH")	5310	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.compilation-order	EXPR("ZROTH()")	5310	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.end-semicolon	EXPORT ZQFE()\nBEGIN\n  RETURN 5;\nEND\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.end-semicolon	EXPR("ZQFE")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.end-semicolon	EXPR("ZQFE2")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.end-semicolon	ZQG()\nBEGIN\n  RETURN 6;\nEND\nEXPORT ZQFE2()\nBEGIN\n  RETURN ZQG();\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.equality-operators	EXPORT ZQEQ()\nBEGIN\n  LOCAL za;\n  za := 1;\n  za = 2;\n  RETURN za;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.equality-operators	EXPR("ZQEQ")	1	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-24
+ppl.export-home-variable	// A exported on its own\nEXPORT A := 5070;\nEXPORT ZRXA()\nBEGIN\n  RETURN 5071;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	// RETURN F; when F is a function and a Home variable\nEXPORT F()\nBEGIN\n  RETURN 5012;\nEND;\n\nEXPORT ZRFN()\nBEGIN\n  RETURN F;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	// Y exported on its own\nEXPORT Y := 5060;\nEXPORT ZRXY()\nBEGIN\n  RETURN 5061;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	// Z exported with no value\nEXPORT Z;\nEXPORT ZRXZ()\nBEGIN\n  RETURN 5081;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	// a function called F, no arguments\nEXPORT F()\nBEGIN\n  RETURN 5010;\nEND;\n\nEXPORT ZRFA()\nBEGIN\n  RETURN F() + 1;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	// a function called F, one argument\nEXPORT F(za)\nBEGIN\n  RETURN 5020 + za;\nEND;\n\nEXPORT ZRFB()\nBEGIN\n  RETURN F(1);\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	// a local called Z\nEXPORT ZRFE()\nBEGIN\n  LOCAL Z;\n  Z := 5050;\n  RETURN Z;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	// a parameter called X\nZRFH(X)\nBEGIN\n  RETURN X + 5040;\nEND;\n\nEXPORT ZRFD()\nBEGIN\n  RETURN ZRFH(1);\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	// a private function called F\nF()\nBEGIN\n  RETURN 5030;\nEND;\n\nEXPORT ZRFC()\nBEGIN\n  RETURN F();\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPORT Y := 1, Z := 4782;\nEXPORT ZNTWO()\nBEGIN\n  RETURN Z + Y;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPORT Z := 4781;\nEXPORT ZNONE()\nBEGIN\n  RETURN Z;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPORT ZV := 4781;\nEXPORT ZNPRE()\nBEGIN\n  RETURN ZV;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("A")	0	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("F")	0	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("F()")	0	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("F(2)")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("Y")	0	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("Z")	0	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("ZNONE")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("ZNPRE")	4781	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("ZNTWO")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("ZRFA")	5011	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("ZRFB")	5021	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("ZRFC")	5030	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("ZRFD")	5041	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("ZRFE")	5050	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("ZRFN")	5012	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("ZRXA")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("ZRXY")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-home-variable	EXPR("ZRXZ")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-initialised	// 8 exported with no values\nEXPORT ZV1, ZV2, ZV3, ZV4, ZV5, ZV6, ZV7, ZV8;\nEXPORT ZRXO()\nBEGIN\n  RETURN 5092;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-initialised	// 9 exported with no values\nEXPORT ZV1, ZV2, ZV3, ZV4, ZV5, ZV6, ZV7, ZV8, ZV9;\nEXPORT ZRXN()\nBEGIN\n  RETURN 5091;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.export-initialised	EXPORT ZQX2A:=1, ZQX2B:=2;\nEXPORT ZQX2()\nBEGIN\n  RETURN ZQX2A + ZQX2B;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.export-initialised	EXPORT ZQX3A:=1, ZQX3B:=2, ZQX3C:=3;\nEXPORT ZQX3()\nBEGIN\n  RETURN ZQX3A + ZQX3C;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-25
 ppl.export-initialised	EXPORT ZQX4A:=1, ZQX4B:=2, ZQX4C:=3, ZQX4D:=4;\nEXPORT ZQX4()\nBEGIN\n  RETURN ZQX4A + ZQX4D;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.export-initialised	EXPORT ZQX5A:=1, ZQX5B:=2, ZQX5C:=3, ZQX5D:=4, ZQX5E:=5;\nEXPORT ZQX5()\nBEGIN\n  RETURN ZQX5A + ZQX5E;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-25
 ppl.export-initialised	EXPORT ZQX6A:=1, ZQX6B:=2, ZQX6C:=3, ZQX6D:=4, ZQX6E:=5, ZQX6F:=6;\nEXPORT ZQX6()\nBEGIN\n  RETURN ZQX6A + ZQX6F;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
+ppl.export-initialised	EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7, ZV8:=8, ZV9:=9;\nEXPORT ZENIN()\nBEGIN\n  RETURN 4770 + ZV1 + ZV9;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-initialised	EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7, ZV8:=8;\nEXPORT ZEEIG()\nBEGIN\n  RETURN 4760 + ZV1 + ZV8;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-initialised	EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7;\nEXPORT ZESEV()\nBEGIN\n  RETURN 4750 + ZV1 + ZV7;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-initialised	EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6;\nEXPORT ZESIX()\nBEGIN\n  RETURN 4740 + ZV1 + ZV6;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-initialised	EXPR("ZEEIG")	4769	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-initialised	EXPR("ZENIN")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-initialised	EXPR("ZESEV")	4758	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-initialised	EXPR("ZESIX")	4747	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.export-initialised	EXPR("ZQX3()")	4	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-25
 ppl.export-initialised	EXPR("ZQX5()")	6	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-25
 ppl.export-initialised	EXPR("ZQX6")	7	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-24
+ppl.export-initialised	EXPR("ZRXN")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.export-initialised	EXPR("ZRXO")	5092	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.expr-dynamic-access	// EXPR against a direct read, ms for 1000\nEXPORT ZRVA := 1;\nEXPORT ZRTM()\nBEGIN\n  LOCAL zi, zt, zd, ze, zs;\n  zt := TICKS;\n  FOR zi FROM 1 TO 1000 DO zs := ZRVA; END;\n  zd := TICKS - zt;\n  zt := TICKS;\n  FOR zi FROM 1 TO 1000 DO zs := EXPR("ZRVA"); END;\n  ze := TICKS - zt;\n  RETURN {zd, ze};\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.expr-dynamic-access	EXPR(""+"ZRTM")	{0,2}	6	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.expr-dynamic-access	EXPR("ZRTM")	{1,2}	6	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.expr-dynamic-access	EXPR("ZRTM"+"")	{0,3}	6	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.expr-empty	// EXPR of an empty string\nEXPORT ZREM()\nBEGIN\n  LOCAL zr;\n  zr := 5330;\n  IFERR\n    zr := EXPR("");\n  THEN\n    zr := 5331;\n  END;\n  RETURN zr;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.expr-empty	EXPR("ZREM")	5331	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.getkey-no-parentheses	EXPORT ZGKN()\nBEGIN\n  LOCAL zk;\n  zk := GETKEY;\n  RETURN zk + 4810;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.getkey-no-parentheses	EXPORT ZGKP()\nBEGIN\n  LOCAL zk;\n  zk := GETKEY();\n  RETURN zk + 4800;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.getkey-no-parentheses	EXPORT ZQGK0()\nBEGIN\n  LOCAL zk;\n  zk := GETKEY;\n  RETURN zk;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-25
 ppl.getkey-no-parentheses	EXPORT ZQGK1()\nBEGIN\n  LOCAL zk;\n  zk := GETKEY();\n  RETURN zk;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-25
+ppl.getkey-no-parentheses	EXPR("ZGKN")	4809	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.getkey-no-parentheses	EXPR("ZGKP")	4799	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.getkey-no-parentheses	EXPR("ZQGK0()")	−1	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-25
 ppl.getkey-no-parentheses	EXPR("ZQGK1()")	−1	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-25
+ppl.global-namespace	// one name in two programs: ZQLIB, then ZQTEST\nEXPORT ZRCLH()\nBEGIN\n  RETURN 5321;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.global-namespace	// one name in two programs: ZQLIB, then ZQTEST\nEXPORT ZRCLH()\nBEGIN\n  RETURN 5322;\nEND;\n\nEXPORT ZRCLT()\nBEGIN\n  RETURN 5323;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.global-namespace	EXPORT AREA(zr)\nBEGIN\n  RETURN 3.14159265359 * zr * zr;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.global-namespace	EXPR("AREA(2)")	12.5663706144	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-24
+ppl.global-namespace	EXPR("ZRCLH")	5322	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.global-namespace	EXPR("ZRCLT")	5323	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.home-no-parentheses	// ===================================================================\n// SELFTEST - proof that a .hpprgm generated on a PC runs on a Prime.\n//\n// This file has never been written by the calculator or by the\n// Connectivity Kit: `hpprime write` generated the binary from a\n// template and put this text inside it.\n//\n// If you can see this on the calculator, with the accents intact\n// (a e o c with marks below) and the three functions returning what\n// they should, the writer works.\n// ===================================================================\n\n// Must return 385 (the sum of the squares from 1 to 10).\nEXPORT SELF1()\nBEGIN\n  LOCAL zi, zs;\n  zs := 0;\n  FOR zi FROM 1 TO 10 DO\n    zs := zs + zi * zi;\n  END;\n  RETURN zs;\nEND;\n\n// Must return the whole string, accents included.\nEXPORT SELF2()\nBEGIN\n  RETURN "writer OK - àèóç - 4242";\nEND;\n\n// Must return 1 if both of the above are right, 0 if not.\n// Run this one on the calculator: type SELF3 on the Home screen --\n// with no parentheses, or Home answers syntax error.\nEXPORT SELF3()\nBEGIN\n  IF SELF1() == 385 AND SIZE(SELF2()) == 23 THEN\n    RETURN 1;\n  END;\n  RETURN 0;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.home-no-parentheses	EXPORT ZHARG(za)\nBEGIN\n  RETURN 4900 + za;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.home-no-parentheses	EXPORT ZHOK()\nBEGIN\n  RETURN 4703;\nEND;\n\nEXPORT ZHEXP()\nBEGIN\n  RETURN EXPR("ZHOK()") + 1;\nEND;\n\nEXPORT ZHEXN()\nBEGIN\n  RETURN EXPR("ZHOK") + 2;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.home-no-parentheses	EXPORT ZHOK()\nBEGIN\n  RETURN 4703;\nEND;\n\nEXPORT ZSETA()\nBEGIN\n  Entry := 1;\n  RETURN Entry + 4900;\nEND;\n\nEXPORT ZSETB()\nBEGIN\n  Entry := 2;\n  RETURN Entry + 4900;\nEND;\n\nEXPORT ZSETC()\nBEGIN\n  Entry := 0;\n  RETURN Entry + 4900;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.home-no-parentheses	EXPR("Entry")	0	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.home-no-parentheses	EXPR("SELF3")	1	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.home-no-parentheses	EXPR("ZHARG(2)")	4902	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.home-no-parentheses	EXPR("ZHEXN")	4705	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.home-no-parentheses	EXPR("ZHEXP")	4704	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.home-no-parentheses	EXPR("ZHOK")	4703	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.home-no-parentheses	EXPR("ZHOK()")	4703	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.i-e-as-locals	EXPORT ZQLE()\nBEGIN\n  LOCAL e;\n  e := 2;\n  RETURN e + 1;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.i-e-as-locals	EXPORT ZQLI()\nBEGIN\n  LOCAL i;\n  i := 2;\n  RETURN i * 3;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.i-e-as-locals	EXPR("ZQLE")	3	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.i-e-as-locals	EXPR("ZQLI")	6	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-24
+ppl.index-call	// DIM(M) stored first, its pair\nEXPORT ZRID()\nBEGIN\n  LOCAL zm, zd;\n  zm := [[1,2],[3,4]];\n  zd := DIM(zm);\n  RETURN zd(1) + 5270;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.index-call	// SIZE(M)(1)\nEXPORT ZRIC()\nBEGIN\n  LOCAL zm;\n  zm := [[1,2],[3,4]];\n  RETURN SIZE(zm)(1) + 5270;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.index-call	EXPORT ZQIX1()\nBEGIN\n  RETURN ZQLST()(2);\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.index-call	EXPORT ZQLST()\nBEGIN\n  RETURN {10,20,30};\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.index-call	EXPR("ZQIX1")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.index-call	EXPR("ZQIX2")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
+ppl.index-call	EXPR("ZRIC")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.index-call	EXPR("ZRID")	5272	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.index-call	ZQF()\nBEGIN\n  RETURN {10,20,30};\nEND;\n\nEXPORT ZQIX2()\nBEGIN\n  RETURN ZQF()(2);\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
+ppl.letter-digit-names	// a local of a letter and two digits\nEXPORT ZRRD()\nBEGIN\n  LOCAL L12;\n  L12 := 5350;\n  RETURN L12;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.letter-digit-names	EXPR("ZRRD")	5350	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// CASE: read after\nEXPORT ZRLC()\nBEGIN\n  CASE\n    IF 1 == 1 THEN\n      LOCAL zb;\n      zb := 3;\n    END;\n  END;\n  RETURN zb + 5130;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// CASE: read inside, its pair\nEXPORT ZRLCP()\nBEGIN\n  CASE\n    IF 1 == 1 THEN\n      LOCAL zb;\n      zb := 3;\n      RETURN zb + 5220;\n    END;\n  END;\n  RETURN 5221;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// ELSE: read after\nEXPORT ZRLE()\nBEGIN\n  IF 0 == 1 THEN\n    1;\n  ELSE\n    LOCAL zb;\n    zb := 3;\n  END;\n  RETURN zb + 5140;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// FOR: read after\nEXPORT ZRLF()\nBEGIN\n  LOCAL zi;\n  FOR zi FROM 1 TO 2 DO\n    LOCAL zb;\n    zb := 3;\n  END;\n  RETURN zb + 5100;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// FOR: read inside, its pair\nEXPORT ZRLFP()\nBEGIN\n  LOCAL zi, zs;\n  zs := 0;\n  FOR zi FROM 1 TO 2 DO\n    LOCAL zb;\n    zb := zi;\n    zs := zs + zb;\n  END;\n  RETURN zs + 5210;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// FOR: repeats an outer LOCAL\nEXPORT ZRLS()\nBEGIN\n  LOCAL zi, zb;\n  zb := 1;\n  FOR zi FROM 1 TO 2 DO\n    LOCAL zb;\n    zb := 3;\n  END;\n  RETURN zb + 5420;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// IF: a global of that name read after\nEXPORT ZRVB := 2;\nEXPORT ZRLG()\nBEGIN\n  IF 1 == 1 THEN\n    LOCAL ZRVB;\n    ZRVB := 3;\n  END;\n  RETURN ZRVB + 5190;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// IF: declared again after\nEXPORT ZRLD()\nBEGIN\n  IF 1 == 1 THEN\n    LOCAL zb;\n    zb := 3;\n  END;\n  LOCAL zb := 4;\n  RETURN zb + 5180;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// IF: only assigned after\nEXPORT ZRLA()\nBEGIN\n  IF 1 == 1 THEN\n    LOCAL zb;\n    zb := 3;\n  END;\n  zb := 4;\n  RETURN 5170;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// IF: repeats an outer LOCAL\nEXPORT ZRLO()\nBEGIN\n  LOCAL zb;\n  zb := 1;\n  IF zb == 1 THEN\n    LOCAL zb;\n    zb := 3;\n  END;\n  RETURN zb + 5200;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// IFERR: a local of the attempt read in its THEN\nEXPORT ZRLJ()\nBEGIN\n  IFERR\n    LOCAL zb;\n    zb := 3;\n  THEN\n    RETURN zb + 5400;\n  END;\n  RETURN 5401;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// IFERR: read after\nEXPORT ZRLI()\nBEGIN\n  IFERR\n    LOCAL zb;\n    zb := 3;\n  THEN\n    1;\n  END;\n  RETURN zb + 5160;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// REPEAT: read after\nEXPORT ZRLR()\nBEGIN\n  REPEAT\n    LOCAL zb;\n    zb := 3;\n  UNTIL 1;\n  RETURN zb + 5120;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// REPEAT: read in its own UNTIL\nEXPORT ZRLU()\nBEGIN\n  LOCAL zs;\n  zs := 0;\n  REPEAT\n    LOCAL zb;\n    zb := 3;\n    zs := zb;\n  UNTIL zb == 3;\n  RETURN zs + 5410;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// REPEAT: read inside, its pair\nEXPORT ZRLRP()\nBEGIN\n  LOCAL zs;\n  REPEAT\n    LOCAL zb;\n    zb := 3;\n    zs := zb;\n  UNTIL 1;\n  RETURN zs + 5240;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// WHILE: read after\nEXPORT ZRLW()\nBEGIN\n  LOCAL zi;\n  zi := 0;\n  WHILE zi < 1 DO\n    LOCAL zb;\n    zb := 3;\n    zi := 1;\n  END;\n  RETURN zb + 5110;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// WHILE: read inside, its pair\nEXPORT ZRLWP()\nBEGIN\n  LOCAL zi, zs;\n  zi := 0;\n  WHILE zi < 1 DO\n    LOCAL zb;\n    zb := 3;\n    zs := zb;\n    zi := 1;\n  END;\n  RETURN zs + 5230;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	// a local of THEN read in its ELSE\nEXPORT ZRLT()\nBEGIN\n  IF 0 == 1 THEN\n    LOCAL zb;\n    zb := 3;\n  ELSE\n    RETURN zb + 5150;\n  END;\n  RETURN 5151;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPORT ZLNST()\nBEGIN\n  LOCAL za;\n  za := 4734;\n  IF za == 4734 THEN\n    LOCAL zb;\n    zb := 1;\n    za := za + zb;\n  END;\n  RETURN za;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPORT ZLSCP()\nBEGIN\n  LOCAL za;\n  za := 4734;\n  IF za == 4734 THEN\n    LOCAL zb;\n    zb := 3;\n  END;\n  RETURN za + zb;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZLNST")	4735	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZLSCP")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLA")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLC")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLCP")	5223	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLD")	5184	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLE")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLF")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLFP")	5213	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLG")	5192	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLI")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLJ")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLO")	5201	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLR")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLRP")	5243	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLS")	5421	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLT")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLU")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLW")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-block-scope	EXPR("ZRLWP")	5233	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-limit	// 8 in one LOCAL\nEXPORT ZRVE()\nBEGIN\n  LOCAL za,zb,zc,zd,zf,zg,zh,zj;\n  za := 5380;\n  RETURN za;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-limit	// 9 in one LOCAL\nEXPORT ZRVN()\nBEGIN\n  LOCAL za,zb,zc,zd,zf,zg,zh,zj,zk;\n  za := 5381;\n  RETURN za;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.local-limit	EXPORT ZQL09()\nBEGIN\n  LOCAL za,zb,zc,zd,zf,zg,zh,zj,zk;\n  RETURN 9;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.local-limit	EXPORT ZQL10()\nBEGIN\n  LOCAL za,zb,zc,zd,zf,zg,zh,zj,zk,zl;\n  RETURN 10;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.local-limit	EXPORT ZQL11()\nBEGIN\n  LOCAL za,zb,zc,zd,zf,zg,zh,zj,zk,zl,zm;\n  RETURN 11;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.local-limit	EXPORT ZQL12()\nBEGIN\n  LOCAL za,zb,zc,zd,zf,zg,zh,zj,zk,zl,zm,zn;\n  RETURN 12;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.local-limit	EXPR("ZQL12")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
+ppl.local-limit	EXPR("ZRVE")	5380	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-limit	EXPR("ZRVN")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-m-matrices	// a local called m\nEXPORT ZRRM()\nBEGIN\n  LOCAL m;\n  m := 5360;\n  RETURN m;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.local-m-matrices	EXPR("ZRRM")	5360	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.locals-at-top	EXPORT ZLINI()\nBEGIN\n  LOCAL za;\n  za := 0;\n  LOCAL zb := 4733;\n  RETURN za + zb;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.locals-at-top	EXPORT ZLMID()\nBEGIN\n  LOCAL za;\n  za := 4730;\n  LOCAL zb;\n  zb := 1;\n  RETURN za + zb;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.locals-at-top	EXPORT ZLNOT()\nBEGIN\n  IF 1 == 1 THEN 1; END;\n  LOCAL zb;\n  zb := 4732;\n  RETURN zb;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.locals-at-top	EXPORT ZLTOP()\nBEGIN\n  LOCAL za, zb;\n  za := 4730;\n  zb := 6;\n  RETURN za + zb;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.locals-at-top	EXPORT ZQNB()\nBEGIN\n  LOCAL za;\n  za := 1;\n  IF za == 1 THEN\n    LOCAL zb;\n    zb := 2;\n    za := za + zb;\n  END;\n  RETURN za;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
+ppl.locals-at-top	EXPR("ZLINI")	4733	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.locals-at-top	EXPR("ZLMID")	4731	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.locals-at-top	EXPR("ZLNOT")	4732	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.locals-at-top	EXPR("ZLTOP")	4736	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.locals-at-top	EXPR("ZQNB")	3	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.locals-initialised-one-line	EXPORT ZQI3()\nBEGIN\n  LOCAL za := 1, zb := 2, zc := 3;\n  RETURN za + zb + zc;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.locals-initialised-one-line	EXPR("ZQI3")	6	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-24
+ppl.matrices-by-value	// ms for 1000 calls: read 10x10, read 100x100, write 10x10, write 100x100,\n// read a global 100x100. A step that fails answers -1 and the rest still run.\nEXPORT ZMGL;\n\nZMR(zp)\nBEGIN\n  RETURN zp(1,1);\nEND;\n\nZMW(zp)\nBEGIN\n  zp(1,1) := 2;\n  RETURN 0;\nEND;\n\nZMG()\nBEGIN\n  RETURN ZMGL(1,1);\nEND;\n\nEXPORT ZMCSB()\nBEGIN\n  LOCAL zs, zl, zi, zt, zr;\n  zs := MAKEMAT(1, 10, 10);\n  zl := MAKEMAT(1, 100, 100);\n  ZMGL := zl;\n  zr := {-1, -1, -1, -1, -1};\n  IFERR\n    zt := TICKS;\n    FOR zi FROM 1 TO 1000 DO ZMR(zs); END;\n    zr(1) := TICKS - zt;\n  THEN\n    zi := 0;\n  END;\n  IFERR\n    zt := TICKS;\n    FOR zi FROM 1 TO 1000 DO ZMR(zl); END;\n    zr(2) := TICKS - zt;\n  THEN\n    zi := 0;\n  END;\n  IFERR\n    zt := TICKS;\n    FOR zi FROM 1 TO 1000 DO ZMW(zs); END;\n    zr(3) := TICKS - zt;\n  THEN\n    zi := 0;\n  END;\n  IFERR\n    zt := TICKS;\n    FOR zi FROM 1 TO 1000 DO ZMW(zl); END;\n    zr(4) := TICKS - zt;\n  THEN\n    zi := 0;\n  END;\n  IFERR\n    zt := TICKS;\n    FOR zi FROM 1 TO 1000 DO ZMG(); END;\n    zr(5) := TICKS - zt;\n  THEN\n    zi := 0;\n  END;\n  RETURN zr;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.matrices-by-value	EXPR(""+"ZMCSB")	{1,1,1,3,1}	6	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.matrices-by-value	EXPR("ZMCSB")	{1,0,1,4,0}	6	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.matrices-by-value	EXPR("ZMCSB"+"")	{1,1,1,3,1}	6	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.matrices-by-value	EXPR("ZMVAL")	4790	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.matrices-by-value	ZMW(zp)\nBEGIN\n  zp(1,1) := 999;\n  RETURN zp(1,1);\nEND;\n\nEXPORT ZMVAL()\nBEGIN\n  LOCAL zm;\n  zm := [[4790,2],[3,4]];\n  ZMW(zm);\n  RETURN zm(1,1);\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.mu-zero-spelling	EXPORT ZQMU1()\nBEGIN\n  RETURN Inference.μ₀;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-09-25
 ppl.mu-zero-spelling	EXPORT ZQMU2()\nBEGIN\n  RETURN Inference.µ₀;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-25
 ppl.mu-zero-spelling	EXPR("ZQMU1()")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-09-25
 ppl.mu-zero-spelling	EXPR("ZQMU2()")	0.5	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-25
+ppl.no-end-keywords	// ENDFOR\nEXPORT ZREF()\nBEGIN\n  LOCAL zi;\n  FOR zi FROM 1 TO 2 DO\n    zi;\n  ENDFOR;\n  RETURN 5250;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.no-end-keywords	// ENDWHILE\nEXPORT ZREW()\nBEGIN\n  LOCAL zi;\n  WHILE zi < 1 DO\n    zi := 1;\n  ENDWHILE;\n  RETURN 5260;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.no-end-keywords	EXPORT ZQEC()\nBEGIN\n  LOCAL za;\n  za := 1;\n  CASE\n    IF za == 1 THEN RETURN 7; END;\n  ENDCASE;\n  RETURN 0;\nEND;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.no-end-keywords	EXPORT ZQEF()\nBEGIN\n  RETURN 8;\nENDFUNC;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.no-end-keywords	EXPORT ZQEP()\nBEGIN\n  RETURN 9;\nENDPROC;\n	*does not compile*		Virtual Calculator 2.4, build 2025-09-15	2026-09-25
 ppl.no-end-keywords	EXPR("ZQEP()")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-09-25
+ppl.no-end-keywords	EXPR("ZREF")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.no-end-keywords	EXPR("ZREW")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 ppl.one-based	EXPORT ZQL0()\nBEGIN\n  LOCAL zl;\n  zl := {10,20,30};\n  RETURN zl(0);\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.one-based	EXPR("ZQL0")	30	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.one-based	LOCAL zl, zi; zl := {10,20,30}; zi := 0; RETURN zl(zi);	30	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-24
@@ -839,6 +1000,8 @@ ppl.one-based	LOCAL zm, zi; zm := [[1,2],[3,4]]; zi := 0; RETURN zm(zi);	*error*
 ppl.one-based	LOCAL zm, zi; zm := [[1,2],[3,4]]; zi := 0; RETURN zm(zi, 1);	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.one-based	LOCAL zs, zi; zs := "abc"; zi := 0; RETURN zs(zi);	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-09-24
 ppl.one-based	LOCAL zs, zi; zs := "abc"; zi := 2; RETURN zs(zi);	98	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-24
+ppl.return-in-loop	// RETURN inside a FOR\nEXPORT ZRRL()\nBEGIN\n  LOCAL zi;\n  FOR zi FROM 1 TO 3 DO\n    IF zi == 2 THEN RETURN 5340 + zi; END;\n  END;\n  RETURN 5349;\nEND;\n	*compiles*		Virtual Calculator 2.4, build 2025-09-15	2026-11-07
+ppl.return-in-loop	EXPR("ZRRL")	5342	0	Virtual Calculator 2.4, build 2025-09-15	2026-11-07
 PPYR	EXPR(" PPYR")	12.00	0	Virtual Calculator 2.4, build 2025-09-15	2026-09-15
 PPYR	EXPR("PPYR")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-09-15
 PredX	EXPR("PredX(1,2,3)")	*error*		Virtual Calculator 2.4, build 2025-09-15	2026-09-13

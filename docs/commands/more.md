@@ -528,11 +528,14 @@ Milliseconds since the calculator started.
 
 ### Behaviour
 
-**No parentheses in PPL**: it is written `zt := TICKS;`, like `GETKEY` (G2),
-[ppl.getkey-no-parentheses](../topics/ppl.md#ppl.getkey-no-parentheses).
-From Python, across the bridge, a published library writes `eval('ticks')`
-bare and the examples here write `ticks()`; which form that side needs has
-not been measured (unverified),
+**Written without parentheses in PPL**, `zt := TICKS;` (G2), as any call with no
+arguments can be,
+[ppl.call-no-parentheses](../topics/ppl.md#ppl.call-no-parentheses). Typed on
+Home with them, `TICKS()` answered *syntax error* with `Entry` at 0 (G2 and
+emulator) and at 1, and a number at 2, the RPN stack (emulator),
+[ppl.home-no-parentheses](../topics/ppl.md#ppl.home-no-parentheses).
+From Python, across the bridge, `TICKS`, `TICKS()`, `ticks` and `ticks()`
+all answer the same number, as a `float` (emulator),
 [micropython.eval-parentheses](../topics/micropython.md#micropython.eval-parentheses).
 
 The number above is the one that batch happened to see, about two minutes
@@ -542,7 +545,7 @@ been on for a long time, and whether it wraps, has not been measured
 (unverified).
 
 It is the whole reason MicroPython on the Prime can time anything at all,
-since that has no `time` module (G2),
+since that has no `time` module (unverified),
 [micropython.modules](../topics/micropython.md#micropython.modules).
 
 The interpreter does not implement it, so `hpprime run` cannot check a program

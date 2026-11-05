@@ -1,0 +1,10 @@
+// IF: a global of that name read after
+EXPORT ZRVB := 2;
+EXPORT ZRLG()
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL ZRVB;
+    ZRVB := 3;
+  END;
+  RETURN ZRVB + 5190;
+END;

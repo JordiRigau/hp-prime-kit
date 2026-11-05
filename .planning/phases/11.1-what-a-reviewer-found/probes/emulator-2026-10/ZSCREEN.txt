@@ -1,0 +1,78 @@
+// ===================================================================
+// ZSCREEN - two screens to look at, for two facts that need eyes
+//
+//   ZTHEME   one fixed palette. Run it, photograph it, switch the colour
+//            theme (Shift Home, Color Theme), run it again, photograph it,
+//            and switch the theme back.  -> interface.two-themes
+//   ZROWS    20 rows of 40 characters in the small font, 12 pixels apart.
+//            Say whether every row fits, and whether it can be read.
+//            -> interface.screen-capacity
+//
+// Both wait for a key before they return, so the screen stays up.
+// On Home: ZTHEME, ZROWS (no parentheses).
+// ===================================================================
+
+// Waits for a key with the buffer drained first (interface.drain-then-wait).
+ZSWAIT()
+BEGIN
+  LOCAL zk;
+  REPEAT zk := GETKEY; UNTIL zk < 0;
+  REPEAT zk := GETKEY; UNTIL zk >= 0;
+  RETURN zk;
+END;
+
+// One cell: a rectangle filled with zf, and a line of text in zc on it.
+ZSCELL(zy, zf, zc, zt)
+BEGIN
+  RECT_P(G0, 4, zy, 315, zy + 22, zf, zf);
+  TEXTOUT_P(zt, G0, 10, zy + 4, 2, zc, 300);
+  RETURN 0;
+END;
+
+EXPORT ZTHEME()
+BEGIN
+  LOCAL zw, zk, zr, zg, zb;
+  zw := RGB(255,255,255);
+  zk := RGB(0,0,0);
+  zr := RGB(200,0,0);
+  zg := RGB(0,140,0);
+  zb := RGB(0,60,200);
+  RECT();
+  TEXTOUT_P("1 Theme = " + STRING(EXPR("Theme")) + ", black on RECT()", G0, 10,
+            4, 2, zk, 300);
+  // No colour given on purpose, which leaves no room for the width either:
+  // the one warning lint gives on this file.
+  TEXTOUT_P("2 the same text, no colour given", G0, 10, 26, 2);
+  ZSCELL(48, zw, zk, "3 black on white, both given");
+  ZSCELL(74, zk, zw, "4 white on black, both given");
+  ZSCELL(100, RGB(128,128,128), zk, "5 black on grey");
+  ZSCELL(126, zw, zr, "6 red on white");
+  ZSCELL(152, zw, zg, "7 green on white");
+  ZSCELL(178, zw, zb, "8 blue on white");
+  DRAWMENU("A", "B", "C", "", "", "OK");
+  ZSWAIT();
+  RETURN 1;
+END;
+
+EXPORT ZROWS()
+BEGIN
+  LOCAL zi, zy, zt, zs;
+  RECT();
+  FOR zi FROM 1 TO 20 DO
+    zy := (zi - 1) * 12;
+    zs := STRING(zi);
+    IF zi < 10 THEN zs := "0" + zs; END;
+    IF zi <= 14 THEN
+      zt := zs + " temp 298.15 K press 101.325 kPa  v1.0";
+    ELSE
+      IF zi <= 17 THEN
+        zt := zs + " 0123456789012345678901234567890123456";
+      ELSE
+        zt := zs + " WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW";
+      END;
+    END;
+    TEXTOUT_P(zt, G0, 0, zy, 1, RGB(0,0,0), 320);
+  END;
+  ZSWAIT();
+  RETURN 1;
+END;

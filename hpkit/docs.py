@@ -71,6 +71,11 @@ NAME_SUFFIX = '-var'
 ANCHOR = re.compile(r'^<a name="([^"]+)"></a>\s*$')
 SEPARATOR = re.compile(r'^:?-{3,}:?$')
 EVIDENCE = '**Evidence.**'
+# What a G2 label needs, in format.md, is what was run and what came back. These
+# give a reader nothing to check, and it is how one compile error became a rule.
+BARE_EVIDENCE = re.compile(
+    r'^\*\*Evidence\.\*\* (Measured|Run|Timed|Seen) on a G2 with firmware [\d.]+\.$'
+    r'|recorded in (a|the) table', re.I)
 
 # How the kinds that get no entry of their own are named in the index.
 PLURALS = OrderedDict([('cas', 'CAS names'), ('keyword', 'keywords'),
@@ -429,6 +434,11 @@ def read_topic(root, path):
         if not [t for t in texts if t.startswith(EVIDENCE)]:
             bad(n + 1, 'a fact ends with a paragraph that begins %s'
                 % EVIDENCE)
+        if f.label == 'G2' and [t for t in texts if t.startswith(EVIDENCE)
+                                and BARE_EVIDENCE.search(t)]:
+            bad(n + 1, 'a G2 fact says what was run and what came back: that '
+                'it was measured, or written down once, is not evidence. '
+                'Measure it, or label it unverified and say what was seen')
     return facts, problems
 
 
@@ -476,7 +486,7 @@ def _layer_files(root):
             dirs.sort()
             out += [os.path.join(folder, f) for f in sorted(files)
                     if f.endswith('.md')]
-    for name in ('format.md', LLMS):
+    for name in ('format.md', 'patterns.md', LLMS):
         path = os.path.join(root, 'docs', name)
         if os.path.isfile(path):
             out.append(path)
@@ -858,7 +868,8 @@ def _llms(root, entries, facts):
         'Calculator, with the answer kept in '
         '[commands/results.tsv](commands/results.tsv); `HP help`, stated in '
         'the calculator\'s built-in help; `unverified`, none of those. How an '
-        'entry and a fact are written: [format.md](format.md).', '',
+        'entry and a fact are written: [format.md](format.md). Ways apps are '
+        'built, as options and not rules: [patterns.md](patterns.md).', '',
         'Whether a name exists is looked up in '
         '[commands/names.tsv](commands/names.tsv): every name in HP\'s help, '
         'command tree and release notes, with its kind and group, the CAS '

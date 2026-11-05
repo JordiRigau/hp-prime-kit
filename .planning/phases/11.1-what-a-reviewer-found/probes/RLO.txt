@@ -1,0 +1,11 @@
+// IF: repeats an outer LOCAL
+EXPORT ZRLO()
+BEGIN
+  LOCAL zb;
+  zb := 1;
+  IF zb == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb + 5200;
+END;

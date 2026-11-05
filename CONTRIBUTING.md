@@ -14,7 +14,7 @@ measured.
 When you add a fact, say how it is known:
 
 ```markdown
-| **`LOCAL` with too many variables** | the limit is 7-8 per statement |
+| **`LOCAL` with too many variables** | the limit is 8 per statement |
 
 **Evidence**, measured against programs that compile on that same calculator:
 one that declares 8 compiles; three others stop at 7. The functions that
@@ -42,6 +42,11 @@ Four habits make this work:
 - Read a program that already works on that same machine before concluding
   that anything is impossible.
 
+Whether something compiles can be asked without a hand on the calculator: on the
+emulator with `hpprime examples --compile`, and on a G2 with `hpprime send
+--no-lint` and a control of each kind
+([usb.compile-check](docs/topics/usb.md#usb.compile-check)).
+
 ## If the fact can be caught from a PC, catch it
 
 A rule that lives only in prose gets forgotten. When a mistake is detectable
@@ -52,7 +57,7 @@ without a calculator, it gets three things:
 3. two cases in `tests/test_lint.py`: one that it catches, and one that it must
    stay quiet about.
 
-The second test matters as much as the first. Four hypotheses in this repo's
+The second test matters as much as the first. Several hypotheses in this repo's
 history looked reasonable and were false, and a linter that flags legal code is
 worse than no linter, because people learn to ignore it.
 
@@ -84,6 +89,9 @@ divergence this kit exists to catch.
   achievement numbers, no suspense.
 - No project-specific content. Examples are generic: a circle's area, a square
   root. Whatever you built this for stays in your own repository.
+- A way to build an app goes in `docs/patterns.md`, as an option with what it
+  solves and what it costs. A topic page states what the calculator does, and
+  the guided path teaches the facts, not one app's design.
 
 ## What is worth contributing
 

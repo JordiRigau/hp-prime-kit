@@ -1,0 +1,10 @@
+// IF: declared again after
+EXPORT ZRLD()
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  LOCAL zb := 4;
+  RETURN zb + 5180;
+END;

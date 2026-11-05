@@ -1,7 +1,8 @@
 # __NAME__ - a starter app for the HP Prime.
 #
-# The file has to be called main.py and its code has to sit at module level:
-# that is the entry point, and it runs when the app imports it.
+# The file is called main.py and its code sits at module level: the app
+# imports it, and that is when it runs. A lone file with another name ran
+# too, but with several files only main.py is known to be the one imported.
 #
 # `hpprime.eval` runs a line of PPL and hands the result back. It is the
 # bridge, and everything the screen does here goes through it.

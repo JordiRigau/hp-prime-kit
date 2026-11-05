@@ -1,0 +1,6 @@
+// A exported on its own
+EXPORT A := 5070;
+EXPORT ZRXA()
+BEGIN
+  RETURN 5071;
+END;

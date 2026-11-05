@@ -1,0 +1,6 @@
+EXPORT ZGKP()
+BEGIN
+  LOCAL zk;
+  zk := GETKEY();
+  RETURN zk + 4800;
+END;

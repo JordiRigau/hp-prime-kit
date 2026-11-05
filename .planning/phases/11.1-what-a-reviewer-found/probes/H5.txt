@@ -1,0 +1,22 @@
+EXPORT ZHOK()
+BEGIN
+  RETURN 4703;
+END;
+
+EXPORT ZSETA()
+BEGIN
+  Entry := 1;
+  RETURN Entry + 4900;
+END;
+
+EXPORT ZSETB()
+BEGIN
+  Entry := 2;
+  RETURN Entry + 4900;
+END;
+
+EXPORT ZSETC()
+BEGIN
+  Entry := 0;
+  RETURN Entry + 4900;
+END;

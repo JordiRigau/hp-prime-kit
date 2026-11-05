@@ -32,8 +32,11 @@ BEGIN
   RETURN n;
 END;
 """),
-    ('export-multiple', """
-EXPORT A:=1, B:=2, C:=3, D:=4, E:=5, F:=6, G:=7;
+    ('export-limit', """
+EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7, ZV8:=8, ZV9:=9;
+"""),
+    ('export-home-variable', """
+EXPORT Z := 1;
 """),
     ('single-end', """
 EXPORT F(a)
@@ -48,13 +51,14 @@ BEGIN
   RETURN M(0,1);
 END;
 """),
-    ('local-first', """
+    ('local-scope', """
 EXPORT F(a)
 BEGIN
-  LOCAL x;
-  x := a + 1;
-  LOCAL y;
-  RETURN x;
+  IF a > 0 THEN
+    LOCAL y;
+    y := a + 1;
+  END;
+  RETURN y;
 END;
 """),
     ('unbalanced', """
@@ -66,7 +70,7 @@ BEGIN
 END;
 """),
     ('expr-empty', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL zs;
   zs := "";
@@ -74,14 +78,14 @@ BEGIN
 END;
 """),
     ('textout-width', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   TEXTOUT_P("a label that may not fit", G0, 4, 24, 2, RGB(0,0,0));
   RETURN 1;
 END;
 """),
     ('textout-width', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   TEXTOUT_P("a label that may not fit", 4, 24, 2, RGB(0,0,0));
   RETURN 1;
@@ -110,7 +114,7 @@ BEGIN
 END;
 """),
     ('locals of letter + digit', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL L12, L13, L14, r2, y1;
   L12 := 1;
@@ -118,14 +122,38 @@ BEGIN
 END;
 """),
     ('several locals with initial values', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL x1:=160, x2:=299, x3:=21;
   RETURN x1;
 END;
 """),
+    # Each of these three was an error here until a G2 compiled it, on
+    # 2026-11-05: ppl.locals-at-top, ppl.export-initialised.
+    ('a LOCAL after other statements', """
+EXPORT ZF()
+BEGIN
+  LOCAL za;
+  za := 4730;
+  LOCAL zb;
+  zb := 1;
+  RETURN za + zb;
+END;
+"""),
+    ('a LOCAL after other statements, with none before it', """
+EXPORT ZF()
+BEGIN
+  IF 1 == 1 THEN 1; END;
+  LOCAL zb;
+  zb := 4732;
+  RETURN zb;
+END;
+"""),
+    ('8 initialised variables in one EXPORT', """
+EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7, ZV8:=8;
+"""),
     ('builtin called with a 0 argument', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   TEXTOUT_P("hello", 4, 24, 3, RGB(0,0,180));
   RETURN 1;
@@ -134,7 +162,7 @@ END;
     # The arrow is part of the name. Read without it, C→PX(0,0) looks like an
     # index 0 into a variable PX, and one-based fired on correct code.
     ('a name with an arrow in it, called with 0', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL zp;
   zp := C→PX(0,0);
@@ -154,21 +182,21 @@ BEGIN
 END;
 """),
     ('TEXTOUT_P with its width argument', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   TEXTOUT_P("a label", G0, 4, 24, 2, RGB(0,0,0), 70);
   RETURN 1;
 END;
 """),
     ('TEXTOUT_P in the short form, with its width', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   TEXTOUT_P("a label", 4, 24, 2, RGB(0,0,0), 70);
   RETURN 1;
 END;
 """),
     ('a TEXTOUT_P call spanning two lines', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   TEXTOUT_P("a label", G0, 4,
             24, 2, RGB(0,0,0), 70);
@@ -176,7 +204,7 @@ BEGIN
 END;
 """),
     ('8 locals, the most seen to compile', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL a, b, c, d, e2, f, g, h;
   RETURN 1;
@@ -214,13 +242,13 @@ END;
 """),
     ('an exported variable, indexed', """
 EXPORT ZDATA:={1,2,3};
-EXPORT F()
+EXPORT ZF()
 BEGIN
   RETURN ZDATA(2);
 END;
 """),
     ("the calculator's own variables", """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   L1 := {1,2};
   M1 := [[1,2],[3,4]];
@@ -228,7 +256,7 @@ BEGIN
 END;
 """),
     ('an app function, with and without its app', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   RETURN AREA(1,2) + Function.AREA(1,2);
 END;
@@ -247,7 +275,7 @@ END;
 """),
     ('a forward declaration', """
 F2();
-EXPORT F()
+EXPORT ZF()
 BEGIN
   RETURN F2();
 END;
@@ -258,7 +286,7 @@ END;
 """),
     ('a #pragma line', """
 #pragma mode( separator(.,;) integer(h32) )
-EXPORT F()
+EXPORT ZF()
 BEGIN
   RETURN 1;
 END;
@@ -266,13 +294,13 @@ END;
     ('a call inside a block comment', """
 /* STRLEN(s) would be wrong,
    but this is a comment */
-EXPORT F()
+EXPORT ZF()
 BEGIN
   RETURN 1;
 END;
 """),
     ('a call inside a string', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   MSGBOX("STRLEN(s) is not a command");
   RETURN 1;
@@ -297,13 +325,13 @@ F2(n)
 BEGIN
   RETURN {n};
 END;
-EXPORT F()
+EXPORT ZF()
 BEGIN
   RETURN F2(1)(1);
 END;
 """),
     ('a nested list, indexed twice', 'index-call', None, None, """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL zr;
   zr := {{1,2,3},{4,5,6}};
@@ -311,20 +339,20 @@ BEGIN
 END;
 """),
     ("the calculator's own list, indexed twice", 'index-call', None, None, """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   RETURN L1(2)(1);
 END;
 """),
     ('a name the file does not define, indexed twice', 'index-call', 'WARN',
      'emulator', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   RETURN ZSTRANGE(1)(2);
 END;
 """),
     ('index 0 into a list', 'one-based', 'WARN', 'emulator', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL zl;
   zl := {1,2,3};
@@ -336,67 +364,355 @@ ZHELP(flag, n)
 BEGIN
   RETURN n;
 END;
-EXPORT F()
+EXPORT ZF()
 BEGIN
   RETURN ZHELP(0, 5);
 END;
 """),
     ('13 locals in one LOCAL', 'local-limit', 'ERROR', 'G2', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL a, b, c, d, e2, f, g, h, i, j, k, l, m;
   RETURN 1;
 END;
 """),
-    ('9 locals in one LOCAL', 'local-limit', 'ERROR', 'emulator', """
-EXPORT F()
+    ('9 locals in one LOCAL', 'local-limit', 'ERROR', 'G2', """
+EXPORT ZF()
 BEGIN
   LOCAL a, b, c, d, e2, f, g, h, j;
   RETURN 1;
 END;
 """),
-    ('10 locals in one LOCAL', 'local-limit', 'ERROR', 'emulator', """
-EXPORT F()
+    ('10 locals in one LOCAL', 'local-limit', 'ERROR', 'G2', """
+EXPORT ZF()
 BEGIN
   LOCAL a, b, c, d, e2, f, g, h, i, j;
   RETURN 1;
 END;
 """),
-    ('8 locals in one LOCAL', 'local-limit', 'WARN', 'G2', """
-EXPORT F()
+    ('8 locals in one LOCAL, which compile', 'local-limit', None, None, """
+EXPORT ZF()
 BEGIN
   LOCAL a, b, c, d, e2, f, g, h;
   RETURN 1;
 END;
 """),
-    ('7 initialised variables in one EXPORT', 'export-multiple', 'ERROR', 'G2',
+    ('9 initialised variables in one EXPORT', 'export-limit', 'ERROR', 'G2',
      """
-EXPORT A:=1, B:=2, C:=3, D:=4, E:=5, F:=6, G:=7;
+EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7, ZV8:=8, ZV9:=9;
 """),
-    ('6 initialised variables in one EXPORT, which compile',
-     'export-multiple', None, None, """
-EXPORT A:=1, B:=2, C:=3, D:=4, E:=5, F:=6;
+    ('9 variables with no values in one EXPORT', 'export-limit', 'ERROR', 'G2',
+     """
+EXPORT ZV1, ZV2, ZV3, ZV4, ZV5, ZV6, ZV7, ZV8, ZV9;
 """),
-    ('a LOCAL half way down a function', 'local-first', 'ERROR', 'G2', """
-EXPORT F(a)
+    ('9 in one EXPORT, some with values, which nobody has tried', 'export-limit',
+     'WARN', 'unverified', """
+EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7, ZV8:=8, ZV9;
+"""),
+    ('8 initialised variables in one EXPORT, which compile',
+     'export-limit', None, None, """
+EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7, ZV8:=8;
+"""),
+    ('7 initialised variables in one EXPORT, which compile',
+     'export-limit', None, None, """
+EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7;
+"""),
+    ('Z exported, which does not compile', 'export-home-variable', 'ERROR',
+     'G2', """
+EXPORT Z := 4781;
+"""),
+    ('Y exported, which does not compile', 'export-home-variable', 'ERROR', 'G2',
+     """
+EXPORT Y := 5060;
+"""),
+    ('A exported, which does not compile', 'export-home-variable', 'ERROR', 'G2',
+     """
+EXPORT A := 5070;
+"""),
+    ('Z exported with no value, which does not compile', 'export-home-variable',
+     'ERROR', 'G2', """
+EXPORT Z;
+"""),
+    ('B exported, which nobody has tried', 'export-home-variable', 'WARN',
+     'unverified', """
+EXPORT B := 1;
+"""),
+    ('a prefixed name exported, the pair of Z', 'export-home-variable', None,
+     None, """
+EXPORT ZV := 4781;
+"""),
+    ('a lower-case name exported, which is not the calculator\'s variable',
+     'export-home-variable', None, None, """
+EXPORT z := 1;
+"""),
+    ('a function called like a variable, with an argument, which compiles',
+     'export-home-variable', None, None, """
+EXPORT F(za)
 BEGIN
-  LOCAL x;
-  x := a + 1;
-  LOCAL y;
-  RETURN x;
+  RETURN za;
 END;
 """),
-    ('a LOCAL inside a nested block, which compiles', 'local-first', None,
-     None, """
-EXPORT F(a)
+    ('F with no arguments, which on Home answers the variable',
+     'export-home-variable', 'WARN', 'G2', """
+EXPORT F()
 BEGIN
-  LOCAL x;
-  x := a;
-  IF x > 0 THEN
-    LOCAL y;
-    x := 1;
+  RETURN 5010;
+END;
+"""),
+    ('another letter with no arguments, which nobody has tried',
+     'export-home-variable', 'WARN', 'unverified', """
+EXPORT B()
+BEGIN
+  RETURN 5010;
+END;
+"""),
+    ('a list of initial values with a Home variable inside it',
+     'export-home-variable', None, None, """
+EXPORT ZV := {A, B};
+"""),
+    ('a nested LOCAL read after its block', 'local-scope', 'ERROR', 'G2', """
+EXPORT ZF()
+BEGIN
+  LOCAL za;
+  za := 4734;
+  IF za == 4734 THEN
+    LOCAL zb;
+    zb := 3;
   END;
-  RETURN x;
+  RETURN za + zb;
+END;
+"""),
+    ('a nested LOCAL read inside its block', 'local-scope', None, None, """
+EXPORT ZF()
+BEGIN
+  LOCAL za;
+  za := 4734;
+  IF za == 4734 THEN
+    LOCAL zb;
+    zb := 1;
+    za := za + zb;
+  END;
+  RETURN za;
+END;
+"""),
+    ('a LOCAL of a FOR read after it', 'local-scope', 'ERROR', 'G2', """
+EXPORT ZF()
+BEGIN
+  LOCAL zi;
+  FOR zi FROM 1 TO 2 DO
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb + 5100;
+END;
+"""),
+    ('a LOCAL of a FOR read inside it', 'local-scope', None, None, """
+EXPORT ZF()
+BEGIN
+  LOCAL zi, zs;
+  zs := 0;
+  FOR zi FROM 1 TO 2 DO
+    LOCAL zb;
+    zb := zi;
+    zs := zs + zb;
+  END;
+  RETURN zs + 5210;
+END;
+"""),
+    ('a LOCAL of a WHILE read after it', 'local-scope', 'ERROR', 'G2', """
+EXPORT ZF()
+BEGIN
+  LOCAL zi;
+  zi := 0;
+  WHILE zi < 1 DO
+    LOCAL zb;
+    zb := 3;
+    zi := 1;
+  END;
+  RETURN zb + 5110;
+END;
+"""),
+    ('a LOCAL of a REPEAT read after it', 'local-scope', 'ERROR', 'G2', """
+EXPORT ZF()
+BEGIN
+  REPEAT
+    LOCAL zb;
+    zb := 3;
+  UNTIL 1;
+  RETURN zb + 5120;
+END;
+"""),
+    ('a LOCAL of a REPEAT read inside it', 'local-scope', None, None, """
+EXPORT ZF()
+BEGIN
+  LOCAL zs;
+  REPEAT
+    LOCAL zb;
+    zb := 3;
+    zs := zb;
+  UNTIL 1;
+  RETURN zs + 5240;
+END;
+"""),
+    ('a LOCAL of a CASE read after it', 'local-scope', 'ERROR', 'G2', """
+EXPORT ZF()
+BEGIN
+  CASE
+    IF 1 == 1 THEN
+      LOCAL zb;
+      zb := 3;
+    END;
+  END;
+  RETURN zb + 5130;
+END;
+"""),
+    ('a LOCAL of an ELSE read after it', 'local-scope', 'ERROR', 'G2', """
+EXPORT ZF()
+BEGIN
+  IF 0 == 1 THEN
+    1;
+  ELSE
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb + 5140;
+END;
+"""),
+    ('a LOCAL of a THEN read in its ELSE', 'local-scope', 'ERROR', 'G2', """
+EXPORT ZF()
+BEGIN
+  IF 0 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  ELSE
+    RETURN zb + 5150;
+  END;
+  RETURN 5151;
+END;
+"""),
+    ('a LOCAL of an IFERR read after it', 'local-scope', 'ERROR', 'G2', """
+EXPORT ZF()
+BEGIN
+  IFERR
+    LOCAL zb;
+    zb := 3;
+  THEN
+    1;
+  END;
+  RETURN zb + 5160;
+END;
+"""),
+    ('a LOCAL of a REPEAT read in its own UNTIL', 'local-scope', 'ERROR', 'G2',
+     """
+EXPORT ZF()
+BEGIN
+  LOCAL zs;
+  zs := 0;
+  REPEAT
+    LOCAL zb;
+    zb := 3;
+    zs := zb;
+  UNTIL zb == 3;
+  RETURN zs + 5410;
+END;
+"""),
+    ('a LOCAL of what an IFERR tries, read in its THEN', 'local-scope', 'ERROR',
+     'G2', """
+EXPORT ZF()
+BEGIN
+  IFERR
+    LOCAL zb;
+    zb := 3;
+  THEN
+    RETURN zb + 5400;
+  END;
+  RETURN 5401;
+END;
+"""),
+    ('a nested LOCAL that repeats an outer one, read after', 'local-scope', None,
+     None, """
+EXPORT ZF()
+BEGIN
+  LOCAL zb;
+  zb := 1;
+  IF zb == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb + 5200;
+END;
+"""),
+    ('a nested LOCAL only assigned after its block', 'local-scope', 'ERROR',
+     'G2', """
+EXPORT ZF()
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  zb := 4;
+  RETURN 1;
+END;
+"""),
+    ('a nested LOCAL declared again after its block', 'local-scope', None,
+     None, """
+EXPORT ZF()
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  LOCAL zb;
+  zb := 4;
+  RETURN zb;
+END;
+"""),
+    ('two blocks each with a LOCAL of that name', 'local-scope', None, None, """
+EXPORT ZF()
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  IF 2 == 2 THEN
+    LOCAL zb;
+    zb := 4;
+  END;
+  RETURN 1;
+END;
+"""),
+    ('a parameter of that name, after the block', 'local-scope', None, None, """
+EXPORT F(zb)
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb;
+END;
+"""),
+    ('a global of that name, after the block', 'local-scope', None, None, """
+EXPORT zb := 2;
+EXPORT ZF()
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  RETURN zb;
+END;
+"""),
+    ('that name only in a string or a comment, after the block', 'local-scope',
+     None, None, """
+EXPORT ZF()
+BEGIN
+  IF 1 == 1 THEN
+    LOCAL zb;
+    zb := 3;
+  END;
+  // zb is gone by here
+  /* and zb is gone here too */
+  RETURN "zb";
 END;
 """),
     ("a block's END without ;", 'end-semicolon', 'ERROR', 'emulator', """
@@ -436,7 +752,7 @@ ENDPROC;
 """),
     ('a single = as a statement', 'equality-statement', 'WARN', 'emulator',
      """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL za;
   za := 1;
@@ -453,7 +769,7 @@ BEGIN
 END;
 """),
     ('6 locals in one LOCAL', 'local-limit', None, None, """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL za, zb, zc, zd, zf, zg;
   RETURN 1;
@@ -489,7 +805,7 @@ BEGIN
 END;
 """),
     ('TEXTOUT_P with its width argument', 'textout-width', None, None, """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   TEXTOUT_P("a label", G0, 4, 24, 2, RGB(0,0,0), 70);
   RETURN 1;
@@ -500,21 +816,21 @@ END;
 EVIDENCE += [
     ('the null-hypothesis mean with the Greek mu', 'mu-zero', 'ERROR',
      'emulator', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   RETURN Inference.\u03bc\u2080;
 END;
 """),
     ('the same with the micro sign, and the Greek one in a message', 'mu-zero',
      None, None, """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   MSGBOX("\u03bc\u2080");
   RETURN Inference.\u00b5\u2080;
 END;
 """),
     ("a key's code compared with 65", 'getkey-code', 'WARN', 'G2', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL zk;
   REPEAT zk := GETKEY; UNTIL zk < 0;
@@ -525,7 +841,7 @@ END;
 """),
     ("a key's code compared with codes a key has", 'getkey-code', None, None,
      """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL zk;
   REPEAT zk := GETKEY; UNTIL zk < 0;
@@ -537,7 +853,7 @@ END;
 """),
     ("a string's element compared with a string", 'string-index', 'WARN',
      'emulator', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL zs;
   zs := "abc";
@@ -547,7 +863,7 @@ END;
 """),
     ("a list of strings' element compared with a string", 'string-index', None,
      None, """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL zl;
   zl := {"a", "b"};
@@ -556,7 +872,7 @@ BEGIN
 END;
 """),
     ('LINE and DIMGROB given pixels', 'draw-units', 'WARN', 'emulator', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   DIMGROB(G1, 320, 240);
   LINE(0, 0, 320, 240);
@@ -565,7 +881,7 @@ END;
 """),
     ('the _P forms given pixels, and LINE given units', 'draw-units', None,
      None, """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   DIMGROB_P(G1, 320, 240);
   LINE_P(0, 0, 319, 239);
@@ -600,7 +916,7 @@ END;
 """),
     ('a loop that waits for a key, nothing drained', 'wait-undrained', 'WARN',
      'G2', """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL zk;
   REPEAT zk := GETKEY; UNTIL zk >= 0;
@@ -614,6 +930,31 @@ BEGIN
   REPEAT zk := GETKEY; UNTIL zk < 0;
   REPEAT zk := GETKEY; UNTIL zk >= 0;
   RETURN zk;
+END;
+"""),
+    ("WAIT(-1)'s answer compared with a key, its TYPE unchecked",
+     'wait-touch', 'WARN', 'emulator', """
+EXPORT ZF()
+BEGIN
+  LOCAL ze;
+  REPEAT
+    ze := WAIT(-1);
+  UNTIL ze == 4;
+  RETURN 1;
+END;
+"""),
+    ('a key told from a touch by its TYPE, and the click acted on',
+     'wait-touch', None, None, """
+EXPORT ZF()
+BEGIN
+  LOCAL ze;
+  REPEAT
+    ze := WAIT(-1);
+    IF TYPE(ze) == 6 THEN
+      IF B→R(ze(1)) == 3 THEN RETURN 2; END;
+    END;
+  UNTIL TYPE(ze) == 0 AND ze == 4;
+  RETURN 1;
 END;
 """),
     ('EXPR inside a FOR', 'expr-in-loop', 'WARN', 'G2', """
@@ -645,6 +986,14 @@ BEGIN
   RETURN 3.14159265359 * zr * zr;
 END;
 """),
+    ('an exported helper with arguments that draws for its caller',
+     'draw-then-return', None, None, """
+EXPORT ZBOX(zx, zy)
+BEGIN
+  RECT_P(zx, zy, zx + 10, zy + 10, RGB(0,0,0));
+  RETURN 1;
+END;
+"""),
     ('a prefixed export, and an app hook', 'export-clash', None, None, """
 EXPORT CIRCAREA(zr)
 BEGIN
@@ -656,11 +1005,42 @@ BEGIN
   RETURN 1;
 END;
 """),
+    ('box characters drawn by TEXTOUT_P in font 3', 'font-glyph', 'WARN',
+     'emulator', """
+EXPORT ZF()
+BEGIN
+  TEXTOUT_P("◄ back", 4, 24, 3, RGB(0,0,0), 100);
+  TEXTOUT_P("next, ⯈", G0, 4, 48, 3, RGB(0,0,0), 100);
+  RETURN 1;
+END;
+"""),
+    ('the same kept in a constant, and drawn in font 2', 'font-glyph', 'WARN',
+     'unverified', """
+EXPORT ZF()
+BEGIN
+  LOCAL zs;
+  zs := "◂";
+  TEXTOUT_P("▸", 4, 24, 2, RGB(0,0,0), 100);
+  RETURN zs;
+END;
+"""),
+    ('the characters that were drawn, and a box one in comments',
+     'font-glyph', None, None, """
+EXPORT ZF()
+BEGIN
+  // ◄ is a box: write ◀
+  /* "◄" */
+  TEXTOUT_P("◀ ▶ ← → ► ⇐ ⇒ « » < >",
+            4, 24, 3, RGB(0,0,0), 300);
+  TEXTOUT_P("▲ ▼ ° ω", 4, 48, 2, RGB(0,0,0), 300);
+  RETURN 1;
+END;
+"""),
 ]
 
 # Rules that need several files in view: (what, rule, level, label, files).
 MULTI = [
-    ('two files exporting one name', 'export-clash', 'ERROR', 'G2',
+    ('two files exporting one name', 'export-clash', 'WARN', 'G2',
      [('A.txt', 'EXPORT ZSAME(zx)\nBEGIN\n  RETURN zx;\nEND;\n'),
       ('B.txt', 'EXPORT ZSAME(zx)\nBEGIN\n  RETURN 2 * zx;\nEND;\n')]),
     ('two files exporting a name each', 'export-clash', None, None,
@@ -685,7 +1065,7 @@ BEGIN
 END;
 """,
     'ppl.letter-digit-names': """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL L12, L13, r2, y1;
   L12 := 1;
@@ -693,7 +1073,7 @@ BEGIN
 END;
 """,
     'ppl.local-m-matrices': """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL m;
   m := 2;
@@ -701,19 +1081,56 @@ BEGIN
 END;
 """,
     'ppl.locals-initialised-one-line': """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL za := 1, zb := 2, zc := 3;
   RETURN za + zb + zc;
 END;
 """,
+    'ppl.locals-at-top': """
+EXPORT ZF()
+BEGIN
+  LOCAL za;
+  za := 0;
+  LOCAL zb := 4733;
+  RETURN za + zb;
+END;
+""",
+    'ppl.call-no-parentheses': """
+ZPG();
+
+ZPF()
+BEGIN
+  RETURN 1;
+END;
+
+EXPORT ZF()
+BEGIN
+  ZPF;
+  RETURN ZPF + ZPF() + ZPG + ZPG();
+END;
+
+ZPG()
+BEGIN
+  RETURN 2;
+END;
+""",
     'ppl.i-e-as-locals': """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL i, e;
   i := 2;
   e := 1;
   RETURN i * 3 + e;
+END;
+""",
+    'ppl.short-circuit': """
+EXPORT ZF()
+BEGIN
+  LOCAL zl;
+  zl := {};
+  IF SIZE(zl) > 0 AND zl(1) == 3 THEN RETURN 1; END;
+  RETURN IFTE(SIZE(zl) == 0, 0, zl(1));
 END;
 """,
     'ppl.names-ignore-case': """
@@ -723,7 +1140,7 @@ BEGIN
 END;
 """,
     'ppl.getkey-no-parentheses': """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   LOCAL zk, zj;
   zk := GETKEY;
@@ -732,7 +1149,7 @@ BEGIN
 END;
 """,
     'apps.qualified-names': """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   Statistics_1Var.D1 := {1,2,2,3,7};
   Statistics_1Var.Do1VStats(Statistics_1Var.H1);
@@ -741,7 +1158,7 @@ END;
 """,
     'ppl.global-index-other-program': [
         ('DATA.txt', 'EXPORT ZNAMES:={"a","b","c"};\n'),
-        ('USE.txt', 'EXPORT F()\nBEGIN\n  RETURN ZNAMES(1);\nEND;\n')],
+        ('USE.txt', 'EXPORT ZF()\nBEGIN\n  RETURN ZNAMES(1);\nEND;\n')],
 }
 
 
@@ -831,7 +1248,7 @@ BEGIN
 END;
 """
 CALLER = """
-EXPORT F()
+EXPORT ZF()
 BEGIN
   RETURN ZLIB(21);
 END;

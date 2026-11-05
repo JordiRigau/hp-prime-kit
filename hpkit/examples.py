@@ -348,10 +348,12 @@ def read_results(root):
 
 def write_results(root, rows):
     """Replace the rows for the same (entry, call), keep the rest, and write
-    the file sorted by entry."""
+    the file sorted by entry. A new row is keyed as the file will hold it,
+    cleaned, which is how read_results keys the rows already there: a compile
+    question's call is a program's source, line breaks and all."""
     table = read_results(root)
     for row in rows:
-        table[(row['entry'], row['call'])] = row
+        table[(_clean(row['entry']), _clean(row['call']))] = row
     lines = ['# What the Virtual Calculator answered to the documentation\'s '
              'examples.',
              '# Written by `hpprime examples`; not edited by hand. One row per '

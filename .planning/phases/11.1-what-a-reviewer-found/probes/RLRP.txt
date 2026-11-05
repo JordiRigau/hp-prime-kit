@@ -1,0 +1,11 @@
+// REPEAT: read inside, its pair
+EXPORT ZRLRP()
+BEGIN
+  LOCAL zs;
+  REPEAT
+    LOCAL zb;
+    zb := 3;
+    zs := zb;
+  UNTIL 1;
+  RETURN zs + 5240;
+END;

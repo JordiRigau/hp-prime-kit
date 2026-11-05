@@ -37,56 +37,17 @@ frame.
 
 ## What the design of a screen comes down to
 
-The part of this page that is judgement rather than measurement, kept because
-it is what the facts are for.
+How a screen is designed is the app's own choice. Ways apps that work have done
+it, with what each costs, are in [patterns.md](../patterns.md); this page holds
+what any design runs into.
 
-**Update, then draw.** Every app that feels responsive reads the inputs, moves
-the state, and draws the result, rather than drawing where the input is
-handled. What a loop keeps: the touch (`x`, `y`, the event type, `dx`/`dy` for
-a drag, whether it is down, whether this is a fresh tap), the keyboard (the
-key, plus the shift and alpha layers, since one code means different things in
-each), and time (milliseconds from `ticks`, and the gap since the last
-update). The third matters more than it looks: MicroPython on the Prime has no
-`time` module, so anything that animates or times out has to ask PPL.
-
-**One widget covers nearly every screen**: a list with seven visible rows, a
-top index, a scrollbar, arrows, touch and digit jump. The data, the parts, the
-results and the diagnosis are all one row per record. Since it is pure logic --
-selection, window, bar, what each key means -- it can be tested entirely on the
-PC, and the pixel module is left drawing rows. Behaviour worth copying, all of
-it from apps that work: digits jump to a row; selection wraps; left and right
-change column when there are several and page when there are not, which is
-what the calculator's own Numeric view does; touching a row selects it and
-touching it again enters; `Cancel` and `OK` in positions 5 and 6; partial
-redraw; automatic exit on inactivity; `IFERR` around the event loop; a
-two-page soft menu rather than six unreadable labels; and theme colours. What
-is not worth copying is a full event framework with drags, long press and
-eight handlers.
-
-**A table needs no sentinels; a form does.** `Enter` on a record opening an
-`INPUT` with four fields is fast and wrong, because a form cannot say "I do not
-know this one": you end up inventing `0` for empty and then `-1` because `0` is
-a legitimate value. An editable table has no such problem -- an empty cell is
-empty -- and two details only come out of typing a real problem into one: after
-editing, the cursor moves down on its own, because data arrives by column; and
-defaults are proposed, so a four-part chain is typed without entering a single
-connecting number.
-
-**Units are stated, not asked for.** Asking at startup is worse than saying
-nothing: it lets somebody enter `25` where the table expects `298`, and the
-result comes out solved and wrong, which is the worst way to fail. Derive the
-unit from the data and show it -- in the `INPUT` label, in the help line, and
-in the column title when a whole column shares one.
-
-**What can be tested on the PC**: selection, window, bar and what each key
-does; what text goes in each row; that each string fits its column, against a
-geometry module with no imports. What cannot: drawing, reading keys, reading
-touch, whether a dialog closes where you think, how long a real data entry
-takes, and whether the calculation behind it is fast enough
-([ppl.md](ppl.md#ppl.speed-anchor)). This is why the pixel module should be as
-thin as you can make it. The interpreter on the PC follows the same rule:
-`TEXTOUT_P`, `INPUT`, `CHOOSE`, `MSGBOX` and `WAIT` are recorded in
-`machine.io` and return a neutral value, so a calculation runs with no
+**What can be tested on the PC**: any function that decides without drawing,
+such as what text goes in each row and whether it fits its column. What
+cannot: drawing, reading keys, reading touch, whether a dialog closes where
+you think, how long a real data entry takes, and whether the calculation
+behind it is fast enough ([ppl.md](ppl.md#ppl.speed-anchor)). The interpreter
+on the PC records `TEXTOUT_P`, `INPUT`, `CHOOSE`, `MSGBOX` and `WAIT` in
+`machine.io` and returns a neutral value, so a calculation runs with no
 interface.
 
 Before building a scrolling list or a menu with pages, see
@@ -129,8 +90,7 @@ The rest is measured on a G2 with firmware 2.4 revision 15515.
 | Width of one soft key | ~53 px (320 / 6) |
 
 That is what turns a touch into a button: below y 213, the key is
-`int(x / 53) + 1` when that lands in 1..6. A layout that works well for a
-list: a 20 px header, seven 24 px rows, and the help line underneath.
+`int(x / 53) + 1` when that lands in 1..6.
 
 **Evidence.** The app area and the soft-key row were measured on a G2 with
 firmware 2.4.15515; the key width is the arithmetic that follows from six
@@ -187,7 +147,7 @@ put back inside its row.
 |---|---|
 | Identifier | `interface.offscreen-grob` |
 | Kind | rule |
-| Known from | G2 |
+| Known from | unverified |
 
 Rows appear one at a time and a redraw blinks. Draw into an off-screen grob
 and copy the finished picture across in one go:
@@ -200,25 +160,42 @@ BLIT_P(G0, G1);                 // one copy, one visible change
 
 `G0` is the screen; `G1` through `G9` are yours.
 
-**Evidence.** Measured on a G2 with firmware 2.4.15515. The Python equivalent,
-`dimgrob` and `blit`, is read from a published toolkit rather than measured
-here.
+**Evidence.** Seen on a G2 with firmware 2.4.15515, with no program kept. The
+Python equivalent, `dimgrob` and `blit`, is read from a published toolkit rather than
+measured here.
 
 <a name="interface.two-themes"></a>
-## There are two themes, and black on white is broken in one of them
+## There are two themes, and in the dark one RECT() leaves black text unreadable
 
 | | |
 |---|---|
 | Identifier | `interface.two-themes` |
 | Kind | rule |
-| Known from | unverified |
+| Known from | emulator |
 
-The calculator has a light theme and a dark one. Published apps keep two sets
-of colours -- background, foreground, selection, and one per state -- and pick
-a set at startup.
+The calculator has a light colour theme and a dark one, and the first
+number of [Theme](../commands/system/Theme.md) is 2 in the dark one. There,
+`RECT()` clears the screen to RGB(25,25,25), not to white, and `TEXTOUT_P`
+with no colour given writes in a light grey, about RGB(235,235,235). Black
+given as the colour, on what `RECT()` left, is black on near-black: it can
+hardly be read. On a rectangle the program fills white itself, black reads
+as well as anywhere, and so do white on black, black on grey, and red, green
+and blue on white.
 
-**Evidence.** Read from published apps, not measured here. What would settle
-it is one program drawing a fixed palette, looked at in both themes.
+So a program that names its text colour has to name the background too, by
+filling it, rather than leave the background to `RECT()` and the theme.
+Published apps keep two sets of colours -- background, foreground,
+selection, and one per state -- and pick a set at startup (unverified: read
+from those apps), and this is why.
+
+**Evidence.** Measured on the Virtual Calculator 2.4, build 2025-09-15, on 2026-10-04, with the theme set to dark by
+hand. One program cleared with `RECT()`, printed `STRING(EXPR("Theme"))` in
+black, which read `{#2:64h,#5:64h}`, printed a line with no colour given,
+and filled six rectangles with `RECT_P` to draw black on white, white on
+black, black on grey, and red, green and blue on white. The colours above
+were read from the pixels of a screenshot of it. The same program in the
+light theme was not photographed; a reset calculator answers
+`{#1:64h,#5:64h}`, which is taken to be the light one (unverified).
 
 <a name="interface.textout-width"></a>
 ## TEXTOUT_P overflows unless you pass the width
@@ -273,6 +250,56 @@ def text_width(txt, fnt=2):
 Not measured here: one program drawing a known string and printing the return
 value would settle it.
 
+<a name="interface.font-glyphs"></a>
+## Some arrow characters come out of TEXTOUT_P as an empty box
+
+| | |
+|---|---|
+| Identifier | `interface.font-glyphs` |
+| Kind | rule |
+| Known from | emulator |
+
+The font has no glyph for some characters. `TEXTOUT_P` draws an empty box in
+their place and raises no error, so a program looks right in its source and
+wrong on the screen. Eight left and right pairs, in font 3:
+
+| Left | Right |
+|---|---|
+| ◄ U+25C4: **empty box** | ► U+25BA: drawn |
+| ◀ U+25C0: drawn, a small triangle | ▶ U+25B6: drawn, a small triangle |
+| ← U+2190: drawn | → U+2192: drawn |
+| ◂ U+25C2: **empty box** | ▸ U+25B8: **empty box** |
+| ⇐ U+21D0: drawn | ⇒ U+21D2: drawn |
+| ⯇ U+2BC7: **empty box** | ⯈ U+2BC8: **empty box** |
+| « U+00AB: drawn | » U+00BB: drawn |
+| `<`: drawn | `>`: drawn |
+
+In font 2, ▲ U+25B2, ▼ U+25BC, ° U+00B0 and ω U+03C9 are drawn.
+
+The first row is the trap: one half of a pair can be missing while the other
+is there, so seeing ► on the screen says nothing about ◄. Write ◀ ▶, or ← →,
+rather than ◄ ►. A program that keeps the symbols it draws in one constant can fix a box, if one
+turns up, in one place. A character not in this table
+has not been tried: draw it once, the way `examples/glyphs/` does, before
+building a screen on it.
+
+Only font 3 was tried for the five boxes, so whether fonts 1 and 2 lack them
+too is not known. A G2 runs the same firmware and is expected to draw the
+same, but that was not checked (unverified).
+
+**Evidence.** Measured on the Virtual Calculator 2.4, build 2025-09-15, in
+the calculator `Prime`, on 2026-09-29, by a one-screen program, HPGLIF. It
+cleared the screen with `RECT()`, drew the eight pairs with `TEXTOUT_P` in
+font 3, one row each from y 26 to y 180, black, 300 pixels wide, with a word
+between the two characters of a pair; drew the font-2 line underneath, at
+y 204; and waited for a key
+([interface.drain-then-wait](#interface.drain-then-wait)). The person running
+it read the screen and sent a screenshot. `examples/glyphs/` draws the same
+rows in the same places and fonts. `hpprime lint` flags the five in any
+string, as `font-glyph`: a warning, because the program compiles and runs,
+labelled `emulator` inside a font-3 `TEXTOUT_P` and `unverified` anywhere
+else.
+
 <a name="interface.input-fields"></a>
 ## What INPUT's field descriptions mean
 
@@ -308,7 +335,7 @@ use whose form has one drop-down and four fields over two rows.
 |---|---|
 | Identifier | `interface.input-modal` |
 | Kind | rule |
-| Known from | G2 |
+| Known from | unverified |
 
 A label that depends on another field of the same form cannot be refreshed
 while the form is open. Offer fixed variants instead, or ask one field at a
@@ -316,7 +343,7 @@ time: a one-field `INPUT` can label itself with the unit for that particular
 row, and lets somebody correct one value without walking through the other
 nine.
 
-**Evidence.** Measured on a G2 with firmware 2.4.15515.
+**Evidence.** Seen on a G2 with firmware 2.4.15515, with no program kept.
 
 <a name="interface.getkey-position"></a>
 ## GETKEY returns a position, not a character
@@ -448,11 +475,13 @@ In a program run from Home, `WAIT(-1)` waits for a key and answers its code,
 as [GETKEY](../commands/io/GETKEY.md) numbers keys: 42 for the key `1`. It
 waited straight after the `[Enter]` that started the program, so that key did
 not make it return, and it waited after the keyboard had been drained. Only
-`1` was pressed during the waits: whether other keys, or an `[Enter]`
-pressed while it waits, end it the same way was not tried. In two
+`1` was pressed during those waits, and `Esc` answered 4 in the program of
+[interface.wait-events](#interface.wait-events): whether an `[Enter]`
+pressed while it waits ends it the same way was not tried. In two
 published apps it is the event loop, answering a number for a key, a list
-for a touch and −1 every 60 s (unverified: read from those apps, not run
-here).
+for a touch and −1 every 60 s. The list is measured, in
+[interface.wait-events](#interface.wait-events); the −1 is read from those
+apps and not run here (unverified).
 
 One program on a G2 saw it not wait: a results screen flashed past and the
 form came straight back. What differed there is not known -- that program was
@@ -468,6 +497,68 @@ first answered `{42,17619}`, 42 after 17.6 seconds, and the second, after a
 reported pressing `[Enter]` to start the program, seeing it wait, and then
 pressing only `1`. The G2
 reading is from a program in daily use, and was not repeated.
+
+<a name="interface.wait-events"></a>
+## WAIT(-1) answers a touch as one list per event, and only the click is a tap
+
+| | |
+|---|---|
+| Identifier | `interface.wait-events` |
+| Kind | rule |
+| Known from | emulator |
+
+A key comes back from `WAIT(-1)` as a plain number,
+[interface.wait-minus-one](#interface.wait-minus-one). Anything on the touch
+screen comes back as a list instead, one call per event, and the list's first
+element is the event's type:
+
+| Type | Event | What the call answers |
+|---|---|---|
+| 0 | down | `{0,x,y}` |
+| 1 | move | `{1,x,y}` |
+| 2 | up | `{2}`: one element, and no position |
+| 3 | click | `{3,x,y}`, after the up |
+
+| What was done | What arrived |
+|---|---|
+| a click, short or held a little longer | down, up, click |
+| one notch of the wheel, either way | down, move, up, all at the pointer, and no click |
+| a short drag | down, move and up, again and again, and no click |
+
+The two directions of the wheel arrive the same, and no other type appeared,
+the longer click included.
+
+The elements are `#` integers, not ordinary numbers: the type arrives as
+`#0:64h`, and each coordinate with a width of −16, as `#DD:-16h`.
+[B→R](../commands/integer/B→R.md) turns a `#` integer into an ordinary number,
+but it was measured on one with no width stated; what it does with these, and
+whether `ze(1) == 3` holds without it, was not tried (unverified).
+
+Three rules follow. Treat as a key only a plain number: a one-element list is
+an up, and reading its element as a key code makes every click press ▲, code
+2, as well. Act on type 3, not type 0: a wheel notch and a drag each begin with
+a down, so a program that acts on the down takes every one of them as a tap.
+And take the position from the click, since the up carries none. Breaking the
+first two has been seen in a program in daily use: each click also acted as
+▲, and each wheel notch as a tap. `hpprime lint` warns, as `wait-touch`,
+where what `WAIT(-1)` answered is compared with a number in a function that
+never asks its `TYPE`. That program did ask it, and then read the
+one-element list as a key, which the linter does not see.
+
+What a finger on a G2 sends was not measured: whether it is the same
+sequence, and whether a finger that moves a little between down and up still
+gets its click, which the drag did not (unverified).
+
+**Evidence.** Measured on the Virtual Calculator 2.4, build 2025-09-15,
+instance "Prime", on 2026-09-29, operated with a mouse. A one-screen program
+looped `ze := WAIT(-1)` and printed each answer with `STRING`, as a number,
+or as a list with its `SIZE`, and stopped after two `Esc`, which arrived as
+4, plain numbers. The person at the emulator did each action and sent
+screenshots. One click answered `{#0:64h,#DD:-16h,#7D:-16h}`, `{#2:64h}`,
+`{#3:64h,#DD:-16h,#7D:-16h}`; one wheel notch
+`{#0:64h,#103:-16h,#A3:-16h}`, `{#1:64h,#103:-16h,#A3:-16h}`, `{#2:64h}`.
+Every position fell inside the 320 × 240 screen: x 221 and 259, y 125 and
+163.
 
 <a name="interface.mouse-lists"></a>
 ## MOUSE returns lists inside lists
@@ -508,6 +599,10 @@ keeps the previous reading and derives `down`, a fresh `tap`, and `dx`/`dy`
 for a drag. And a tap is reported once, on release: `tap and not down`, true
 in exactly one update.
 
+`WAIT(-1)` answers events rather than readings, and its click arrives once,
+after the up, with its position:
+[interface.wait-events](#interface.wait-events).
+
 **Evidence.** Read from a published Python library's source, not measured
 here. Its debounce was arrived at independently by another author, which is
 a fair sign it is not optional.
@@ -526,11 +621,10 @@ falls on top of the soft-key row, in the F6 position. If your finger is still
 there when the dialog closes, the same touch arrives at the screen underneath,
 as though you had pressed its F6.
 
-The fix is a debounce with memory, and it belongs in the pure-logic module
-rather than the pixel one, precisely so that it can be tested on the PC: count
-the screen as touched when a dialog closes, and pass only on the first contact
-of a new touch. Call that purge on closing any dialog and on returning from
-any screen, so that no single place can forget. It solves two things at once:
+A debounce with memory fixes it: count the screen as touched when a dialog
+closes, and pass only on the first contact of a new touch, on closing any
+dialog and on returning from any screen. Where to put it is a choice:
+[patterns.md](../patterns.md#a-touch-debounced-with-memory). It solves two things at once:
 the screen is read dozens of times a second while a finger stays down, and the
 touch that closes a dialog outlives the dialog.
 
@@ -538,16 +632,27 @@ touch that closes a dialog outlives the dialog.
 acted on the touch that had just dismissed a notice.
 
 <a name="interface.screen-capacity"></a>
-## About 20 rows of 40 characters fit in the small font
+## 20 rows of 40 ordinary characters fit in the small font, with no room to spare
 
 | | |
 |---|---|
 | Identifier | `interface.screen-capacity` |
 | Kind | rule |
-| Known from | unverified |
+| Known from | emulator |
 
-Use it to rule a design out before drawing it, not to call one good.
+In font 1, twenty rows 12 pixels apart fill the 240-pixel screen, and each
+row's ink is about 10 pixels tall, which leaves one or two between rows. A
+row of 40 ordinary characters, letters, digits and spaces, takes about 197
+of the 320 pixels; 40 digits about 236; 40 `W` do not fit. With soft keys
+along the bottom, the 213 pixels above them hold 17 such rows
+([interface.geometry](#interface.geometry)). The person who read it said
+the rows fit and are very narrow: dense enough to rule a design out, not
+to call one comfortable.
 
-**Evidence.** An estimate from the font sizes, not a measurement.
-[interface.text-measure](#interface.text-measure) is how it would be measured
-for real.
+**Evidence.** Measured on the Virtual Calculator 2.4, build 2025-09-15, on 2026-10-04, with a program that wrote
+twenty rows with `TEXTOUT_P` in font 1 and a width of 320: fourteen of
+ordinary text, three of digits, three of `W`, each 40 characters. The widths
+and heights above were read from the pixels of a screenshot cropped by hand
+at about 2.6 times, so they are good to a pixel or two;
+[interface.text-measure](#interface.text-measure) is how a program would
+measure them exactly.

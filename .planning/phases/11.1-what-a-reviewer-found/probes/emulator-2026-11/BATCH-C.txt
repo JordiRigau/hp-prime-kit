@@ -1,0 +1,277 @@
+# The G2's probe programs of 2026-11-05, unchanged, for the Virtual Calculator:
+#   hpprime examples --compile THIS_FILE --probe ...   (each `# --probe` line below)
+# Programs that share an exported name on the G2, one replacing the other there,
+# are in different batches here, since a batch leaves them all on the calculator.
+# --probe ppl.export-initialised=EXPR("ZEEIG")
+# --probe ppl.export-home-variable=EXPR("ZRFN")
+# --probe ppl.home-no-parentheses=EXPR("SELF3")
+# --probe ppl.home-no-parentheses=EXPR("ZHOK")
+# --probe ppl.home-no-parentheses=EXPR("ZHARG(2)")
+# --probe ppl.call-no-parentheses=EXPR("ZPEAR")
+# --probe ppl.call-no-parentheses=EXPR("ZPFWD")
+# --probe ppl.call-no-parentheses=EXPR("ZPLAT")
+# --probe ppl.call-no-parentheses=EXPR("ZPX")
+# --probe ppl.call-no-parentheses=EXPR("ZPOTH")
+# --probe ppl.call-no-parentheses=EXPR("ZPOTP")
+# --probe ppl.call-no-parentheses=EXPR("ZPSTM")
+# --probe ppl.no-end-keywords=EXPR("ZREF")
+# --probe ppl.no-end-keywords=EXPR("ZREW")
+# --probe ppl.local-limit=EXPR("ZRVE")
+# --probe ppl.local-limit=EXPR("ZRVN")
+# --probe ppl.index-call=EXPR("ZRIC")
+# --probe ppl.index-call=EXPR("ZRID")
+# --probe ppl.compilation-order=EXPR("ZROTH()")
+# --probe ppl.compilation-order=EXPR("ZROCA()")
+# --probe ppl.export-home-variable=EXPR("F")
+# --probe ppl.export-home-variable=EXPR("F()")
+# --probe ppl.home-no-parentheses=EXPR("Entry")
+
+# E8.txt
+[ppl.export-initialised] ZQC01
+EXPORT ZV1:=1, ZV2:=2, ZV3:=3, ZV4:=4, ZV5:=5, ZV6:=6, ZV7:=7, ZV8:=8;
+EXPORT ZEEIG()
+BEGIN
+  RETURN 4760 + ZV1 + ZV8;
+END;
+
+# RFN.txt
+[ppl.export-home-variable] ZQC02
+// RETURN F; when F is a function and a Home variable
+EXPORT F()
+BEGIN
+  RETURN 5012;
+END;
+
+EXPORT ZRFN()
+BEGIN
+  RETURN F;
+END;
+
+# H1.txt
+[ppl.home-no-parentheses] ZQC03
+// ===================================================================
+// SELFTEST - proof that a .hpprgm generated on a PC runs on a Prime.
+//
+// This file has never been written by the calculator or by the
+// Connectivity Kit: `hpprime write` generated the binary from a
+// template and put this text inside it.
+//
+// If you can see this on the calculator, with the accents intact
+// (a e o c with marks below) and the three functions returning what
+// they should, the writer works.
+// ===================================================================
+
+// Must return 385 (the sum of the squares from 1 to 10).
+EXPORT SELF1()
+BEGIN
+  LOCAL zi, zs;
+  zs := 0;
+  FOR zi FROM 1 TO 10 DO
+    zs := zs + zi * zi;
+  END;
+  RETURN zs;
+END;
+
+// Must return the whole string, accents included.
+EXPORT SELF2()
+BEGIN
+  RETURN "writer OK - àèóç - 4242";
+END;
+
+// Must return 1 if both of the above are right, 0 if not.
+// Run this one on the calculator: type SELF3 on the Home screen --
+// with no parentheses, or Home answers syntax error.
+EXPORT SELF3()
+BEGIN
+  IF SELF1() == 385 AND SIZE(SELF2()) == 23 THEN
+    RETURN 1;
+  END;
+  RETURN 0;
+END;
+
+# H5.txt
+[ppl.home-no-parentheses] ZQC04
+EXPORT ZHOK()
+BEGIN
+  RETURN 4703;
+END;
+
+EXPORT ZSETA()
+BEGIN
+  Entry := 1;
+  RETURN Entry + 4900;
+END;
+
+EXPORT ZSETB()
+BEGIN
+  Entry := 2;
+  RETURN Entry + 4900;
+END;
+
+EXPORT ZSETC()
+BEGIN
+  Entry := 0;
+  RETURN Entry + 4900;
+END;
+
+# H6.txt
+[ppl.home-no-parentheses] ZQC05
+EXPORT ZHARG(za)
+BEGIN
+  RETURN 4900 + za;
+END;
+
+# P1.txt
+[ppl.call-no-parentheses] ZQC06
+ZPF()
+BEGIN
+  RETURN 4710;
+END;
+
+EXPORT ZPEAR()
+BEGIN
+  RETURN ZPF;
+END;
+
+# P2.txt
+[ppl.call-no-parentheses] ZQC07
+ZPG();
+
+EXPORT ZPFWD()
+BEGIN
+  RETURN ZPG;
+END;
+
+ZPG()
+BEGIN
+  RETURN 4711;
+END;
+
+# P3.txt
+[ppl.call-no-parentheses] ZQC08
+EXPORT ZPLAT()
+BEGIN
+  RETURN ZPH;
+END;
+
+ZPH()
+BEGIN
+  RETURN 4712;
+END;
+
+# P5lib.txt
+[ppl.call-no-parentheses] ZQC09
+EXPORT ZPX()
+BEGIN
+  RETURN 4714;
+END;
+
+# P5.txt
+[ppl.call-no-parentheses] ZQC10
+EXPORT ZPOTH()
+BEGIN
+  RETURN ZPX;
+END;
+
+EXPORT ZPOTP()
+BEGIN
+  RETURN ZPX();
+END;
+
+# P6.txt
+[ppl.call-no-parentheses] ZQC11
+EXPORT ZPCNT := 0;
+
+ZPI()
+BEGIN
+  ZPCNT := ZPCNT + 1;
+END;
+
+EXPORT ZPSTM()
+BEGIN
+  ZPCNT := 0;
+  ZPI;
+  ZPI;
+  RETURN ZPCNT + 4720;
+END;
+
+# REF.txt
+[ppl.no-end-keywords] ZQC12
+// ENDFOR
+EXPORT ZREF()
+BEGIN
+  LOCAL zi;
+  FOR zi FROM 1 TO 2 DO
+    zi;
+  ENDFOR;
+  RETURN 5250;
+END;
+
+# REW.txt
+[ppl.no-end-keywords] ZQC13
+// ENDWHILE
+EXPORT ZREW()
+BEGIN
+  LOCAL zi;
+  WHILE zi < 1 DO
+    zi := 1;
+  ENDWHILE;
+  RETURN 5260;
+END;
+
+# RV8.txt
+[ppl.local-limit] ZQC14
+// 8 in one LOCAL
+EXPORT ZRVE()
+BEGIN
+  LOCAL za,zb,zc,zd,zf,zg,zh,zj;
+  za := 5380;
+  RETURN za;
+END;
+
+# RV9.txt
+[ppl.local-limit] ZQC15
+// 9 in one LOCAL
+EXPORT ZRVN()
+BEGIN
+  LOCAL za,zb,zc,zd,zf,zg,zh,zj,zk;
+  za := 5381;
+  RETURN za;
+END;
+
+# RIC.txt
+[ppl.index-call] ZQC16
+// SIZE(M)(1)
+EXPORT ZRIC()
+BEGIN
+  LOCAL zm;
+  zm := [[1,2],[3,4]];
+  RETURN SIZE(zm)(1) + 5270;
+END;
+
+# RID.txt
+[ppl.index-call] ZQC17
+// DIM(M) stored first, its pair
+EXPORT ZRID()
+BEGIN
+  LOCAL zm, zd;
+  zm := [[1,2],[3,4]];
+  zd := DIM(zm);
+  RETURN zd(1) + 5270;
+END;
+
+# ROBlib.txt
+[ppl.compilation-order] ZQC18
+// the order: the callee arrives, the caller not sent again
+EXPORT ZROTH()
+BEGIN
+  RETURN 5310;
+END;
+
+# ROC.txt
+[ppl.compilation-order] ZQC19
+// the order: the caller sent again
+EXPORT ZROCA()
+BEGIN
+  RETURN ZROTH();
+END;
