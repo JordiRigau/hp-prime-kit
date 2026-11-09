@@ -162,6 +162,9 @@ EXPORT Info()       // [Shift][Apps]. Only accepts PRINT
 EXPORT RESET()      // put the globals back as they started
 ```
 
+HP chooses these names and the calculator calls them. The functions are yours
+to write, in the app's program.
+
 **Evidence.** Measured on a G2 with firmware 2.4.15515, in apps built by
 `hpprime build`. `Info()` accepting only `PRINT` is what that app showed; what else it
 would accept was not tried.
@@ -286,6 +289,8 @@ wrappers are the same template for every app and name no file, drew the
 line the file draws when it runs and set the PPL global `PZ` to
 `"ZPYENT start.py ran"`, which Home then showed; its Numeric view showed
 `>import start`.
+
+The test programs are in [docs/evidence](../evidence/README.md#apps.main-py).
 
 <a name="apps.install"></a>
 ## An app is installed by dragging the folder, never by copying into the mirror

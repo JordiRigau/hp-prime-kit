@@ -115,6 +115,8 @@ compiled, by the same command with its two controls coming out as they must, and
 `Check` named the line of the `LOCAL`. `hpprime lint` catches 9 and more as an
 error.
 
+The test programs are in [docs/evidence](../evidence/README.md#ppl.local-limit).
+
 <a name="ppl.local-block-scope"></a>
 ## A LOCAL lasts until the end of its block
 
@@ -170,6 +172,8 @@ compile `Check` named the line where `zb` was used after its block. `hpprime lin
 catches a use after the block as `local-scope`, and `hpprime run` refuses to load
 it.
 
+The test programs are in [docs/evidence](../evidence/README.md#ppl.local-block-scope).
+
 <a name="ppl.index-call"></a>
 ## The result of a call cannot be indexed where it is produced
 
@@ -197,6 +201,8 @@ function returning `{10,20,30}`, called and indexed with `(2)` where it is
 produced, did not compile whether it was defined in the same file or in a program
 compiled before it ([results.tsv](../commands/results.tsv)). `hpprime lint` catches
 it as `index-call`.
+
+The test programs are in [docs/evidence](../evidence/README.md#ppl.index-call).
 
 <a name="ppl.export-initialised"></a>
 ## One EXPORT statement holds at most 8 variables
@@ -230,6 +236,8 @@ coming out as they must ([results.tsv](../commands/results.tsv)). The seven that
 failed once were recorded without their program, so their names are not known.
 `hpprime lint` catches 9 and more as `export-limit`, and `hpprime run` refuses to
 load them.
+
+The test programs are in [docs/evidence](../evidence/README.md#ppl.export-initialised).
 
 <a name="ppl.export-home-variable"></a>
 ## A variable of Home's cannot be exported, though a function can be called like one
@@ -284,6 +292,8 @@ was refused as `export-home-variable`, and warns on the others, labelled
 `hpprime run` refuses to load what was refused, and raises "not covered" on the
 others.
 
+The test programs are in [docs/evidence](../evidence/README.md#ppl.export-home-variable).
+
 <a name="ppl.no-end-keywords"></a>
 ## END closes everything: there is no ENDIF or ENDFOR
 
@@ -310,6 +320,8 @@ the same way on 2026-09-25, and it did not compile
 compile on that build either, on 2026-11-07, by the same command, whose control that
 does not compile is the `ENDIF`. `hpprime lint` catches them, and the names
 are not on the list of names in `docs/commands/names.tsv`.
+
+The test programs are in [docs/evidence](../evidence/README.md#ppl.no-end-keywords).
 
 <a name="ppl.minus-sign"></a>
 ## The calculator writes a negative with the mathematical minus sign
@@ -586,6 +598,8 @@ A program of its own, `RETURN 5340 + zi;` inside a `FOR` when `zi` is 2, answere
 examples --compile`, with its two controls coming out as they must
 ([results.tsv](../commands/results.tsv)); it was not run on a G2.
 
+The test programs are in [docs/evidence](../evidence/README.md#ppl.return-in-loop).
+
 <a name="ppl.letter-digit-names"></a>
 ## A letter followed by a digit is a usable name
 
@@ -608,6 +622,8 @@ not run on a G2. A local called `Z` compiles too
 local named exactly like a list or a matrix in use, such as `M1` or `L1`, so the
 safe habit of prefixing locals stands.
 
+The test programs are in [docs/evidence](../evidence/README.md#ppl.letter-digit-names).
+
 <a name="ppl.local-m-matrices"></a>
 ## A local called m does not clash with the M0..M9 matrices
 
@@ -627,6 +643,8 @@ with the name unchanged, on a G2 with firmware 2.4.15515. `LOCAL m; m := 5360;
 RETURN m;` answered 5360 on the Virtual Calculator 2.4, build 2025-09-15, on
 2026-11-07, by `hpprime examples --compile`, with its two controls coming out as they
 must ([results.tsv](../commands/results.tsv)); it was not run on a G2.
+
+The test programs are in [docs/evidence](../evidence/README.md#ppl.local-m-matrices).
 
 <a name="ppl.locals-initialised-one-line"></a>
 ## Locals can be initialised on one line
@@ -677,6 +695,8 @@ controls coming out as they must ([results.tsv](../commands/results.tsv)). The
 hypothesis came from one compile error on a
 G2, recorded without its program, so what failed there is not known. `hpprime
 lint` called this an error until it was measured, and the rule was removed.
+
+The test programs are in [docs/evidence](../evidence/README.md#ppl.locals-at-top).
 
 <a name="ppl.i-e-as-locals"></a>
 ## i and e work as local names
@@ -898,6 +918,8 @@ characters made `ZHOK())`, which is not the call. `Entry` was set by the same
 programs as on the G2, and read 0 at the end
 ([results.tsv](../commands/results.tsv)).
 
+The test programs are in [docs/evidence](../evidence/README.md#ppl.home-no-parentheses).
+
 <a name="ppl.call-no-parentheses"></a>
 ## In source, a call with no arguments can leave out its parentheses
 
@@ -927,6 +949,8 @@ answered the same on the Virtual Calculator 2.4, build 2025-09-15, on 2026-11-07
 ([results.tsv](../commands/results.tsv)). `hpprime lint` stays quiet on all of them,
 and `hpprime run` answers the same.
 
+The test programs are in [docs/evidence](../evidence/README.md#ppl.call-no-parentheses).
+
 <a name="ppl.getkey-no-parentheses"></a>
 ## GETKEY works with and without parentheses in PPL
 
@@ -950,6 +974,8 @@ Both also answered −1 on the Virtual Calculator 2.4, build 2025-09-15, on
 they must ([results.tsv](../commands/results.tsv)), and the two programs above
 answered 4799 and 4809 there on 2026-11-07, the same way. The Python form is in programs
 that run on a G2 with firmware 2.4.15515.
+
+The test programs are in [docs/evidence](../evidence/README.md#ppl.getkey-no-parentheses).
 
 <a name="ppl.matrices-by-value"></a>
 ## Matrices are passed by value, and only a write costs more with size
@@ -992,6 +1018,8 @@ step above 1 ms, which agrees, but `TICKS` counts whole milliseconds, so on a PC
 that fast the ratios cannot be read from it
 ([results.tsv](../commands/results.tsv)).
 
+The test programs are in [docs/evidence](../evidence/README.md#ppl.matrices-by-value).
+
 <a name="ppl.expr-empty"></a>
 ## EXPR of an empty string fails
 
@@ -1010,6 +1038,8 @@ two controls coming out as they must:
 is an error on the Virtual Calculator 2.4, build 2025-09-15, too, where the same
 program answered 5331 on 2026-11-07, by `hpprime examples --compile`, with its two
 controls coming out as they must ([results.tsv](../commands/results.tsv)).
+
+The test programs are in [docs/evidence](../evidence/README.md#ppl.expr-empty).
 
 <a name="ppl.expr-dynamic-access"></a>
 ## EXPR is how a name is resolved at run time, and it is not free
@@ -1035,6 +1065,8 @@ milliseconds the ratio cannot be read ([results.tsv](../commands/results.tsv)). 
 cost grows with what the name holds was not measured. A per-element loop over a data
 program once had to be changed for this, in an app, and that program was not kept.
 `hpprime lint` warns on it as `expr-in-loop`.
+
+The test programs are in [docs/evidence](../evidence/README.md#ppl.expr-dynamic-access).
 
 <a name="ppl.global-namespace"></a>
 ## Exported names share one namespace with Home
@@ -1082,6 +1114,8 @@ Virtual Calculator 2.4, build 2025-09-15, on 2026-09-24, by `hpprime examples
 files exporting one name, and `hpprime lint` on an export named like one of HP's, as
 `export-clash`.
 
+The test programs are in [docs/evidence](../evidence/README.md#ppl.global-namespace).
+
 <a name="ppl.decimal-point"></a>
 ## The decimal point in source is always a dot
 
@@ -1126,6 +1160,8 @@ in a run of its own, the same caller checked after `ZROTH` answered 5310
 mechanism the open question in
 [ppl.global-index-other-program](#ppl.global-index-other-program) asks about for
 globals.
+
+The test programs are in [docs/evidence](../evidence/README.md#ppl.compilation-order).
 
 <a name="ppl.check-last-error"></a>
 ## Which bad line Check names depends on what is wrong with it

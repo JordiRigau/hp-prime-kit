@@ -1,0 +1,85 @@
+# Names the documentation writes in code font that are not on HP's list, and
+# whose they are. docs/format.md says what each origin means. hpprime lint and
+# hpprime run read this, and hpprime docs --check fails on a name that is on
+# neither list. Names are compared exactly: reset is a library's, RESET a hook.
+# name	origin	whose
+CHOOSE_R	library	CHOOSE_R, by Jacob Wall
+LibMenu	library	LibMenu, by primer
+chgflag	library	LibMenu, by primer
+deftab	library	LibMenu, by primer
+draw	library	LibMenu, by primer
+entrytoggle	library	LibMenu, by primer
+events	library	LibMenu, by primer
+gettoggle	library	LibMenu, by primer
+reset	library	LibMenu, by primer
+PrimeLibs	library	PrimeLibs
+isPressed	library	PrimeLibs
+isTapped	library	PrimeLibs
+SZ_Show_Text	library	SZ_Show_Text
+SkeletonApp	library	SkeletonApp, by Juerg W. Buser
+fillrect	python	HP's hpprime module
+keyboard	python	HP's hpprime module
+repr	python	MicroPython
+Info	hook	apps.hooks
+Num	hook	apps.hooks
+RESET	hook	apps.hooks
+START	hook	apps.hooks
+DEFAULT	hp	a keyword of CASE
+DOWNTO	hp	a keyword of FOR
+PYTHON	hp	reported as a command by micropython.ppl-calls-python, and not run here
+HPKCMP	tools	the program hpprime compare sends
+HPKDOC	tools	the program hpprime examples sends
+SELF1	test	examples/selftest
+SELF2	test	examples/selftest
+SELF3	test	examples/selftest
+SELF4	test	not kept
+SELFTEST	test	examples/selftest
+HPKITTST	test	not kept
+ZCBAD	test	docs/evidence
+ZCOK	test	docs/evidence
+ZCOKB	test	docs/evidence
+ZHARG	test	docs/evidence
+ZHOK	test	docs/evidence
+ZMW	test	docs/evidence
+ZPG	test	docs/evidence
+ZQ	test	not kept
+ZQLIB	test	the name the programs in docs/evidence were sent under
+ZQREAD	test	not kept
+ZQSTAT	test	not kept
+ZQTEST	test	the name the programs in docs/evidence were sent under
+ZRCLH	test	docs/evidence
+ZRCLT	test	docs/evidence
+ZRCLU	test	docs/evidence
+ZRFH	test	docs/evidence
+ZRLU	test	docs/evidence
+ZROCA	test	docs/evidence
+ZROTH	test	docs/evidence
+ZV	test	docs/evidence
+ZV1	test	docs/evidence
+CIRCAREA	example	the starter hpprime new writes
+MAIN	example	the starter hpprime new writes
+MYFUNC	example	any function with no arguments
+NAMES	example	a list a program exports, in a fact about indexing it
+TDRAW	example	step 3 of the guided path
+TKEY	example	step 3 of the guided path
+TPAUSE	example	step 3 of the guided path
+TS1	example	a program's own name, in a fact about names
+PZ	example	the global a Python app sets to say how far it got
+DOCS	example	a name given to a calculator on the emulator
+LAB	example	a name given to a calculator on the emulator
+ENDCASE	none	does not exist: ppl.no-end-keywords
+ENDFOR	none	does not exist: ppl.no-end-keywords
+ENDFUNC	none	does not exist: ppl.no-end-keywords
+ENDIF	none	does not exist: ppl.no-end-keywords
+ENDPROC	none	does not exist: ppl.no-end-keywords
+ENDWHILE	none	does not exist: ppl.no-end-keywords
+STRLEN	none	does not exist: the kind of name a model invents
+STRINGFROM	none	does not exist: the kind of name a model invents
+PILIST	none	does not exist: the name starts with a capital pi
+PLIST	none	does not exist: the name starts with a capital pi
+ABCDEFGHIJKLMNOPQRSTUVWXYZ	none	the alphabet, as typed on the entry line
+OK	none	the label of a soft key
+EC	none	a byte, in hexadecimal
+FE	none	a byte, in hexadecimal
+FF	none	a byte, in hexadecimal
+FF16	none	two bytes, in hexadecimal

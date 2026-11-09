@@ -142,7 +142,7 @@ loop; and a two-page soft menu rather than six crowded labels.
 **Solves:** many screens from one piece of code, and one set of habits for
 the person using it.
 
-**Costs:** writing it once, or starting from `CHOOSE_R` or `SkeletonApp`
+**Costs:** writing it once, or installing a library to start from, `CHOOSE_R` or `SkeletonApp`
 ([libraries.md](topics/libraries.md)). A full event framework with drags, long
 presses and many handlers costs more than most apps use.
 

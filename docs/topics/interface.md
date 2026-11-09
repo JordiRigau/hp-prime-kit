@@ -52,7 +52,8 @@ interface.
 
 Before building a scrolling list or a menu with pages, see
 [libraries.md](libraries.md): which of the three levels a screen
-needs, and what `CHOOSE_R`, `LibMenu` and `SkeletonApp` already give you.
+needs, and what the third-party libraries `CHOOSE_R`, `LibMenu` and
+`SkeletonApp` already give you.
 
 ## Where this comes from
 
@@ -61,7 +62,7 @@ them running on real calculators:
 
 | Program | What it contributed |
 |---|---|
-| **SkeletonApp** (Andreas Möller) | the event loop and the soft-menu geometry |
+| **SkeletonApp** (Juerg W. Buser) | the event loop and the soft-menu geometry |
 | **CHOOSE_R 1.0** (Jacob Wall) | the windowed list, partial redraw, inactivity exit |
 | **LibMenu 3.0** | the two-page soft menu |
 | **ktest** / **WaitLab** | what each input method returns, exactly |
@@ -196,6 +197,8 @@ black, black on grey, and red, green and blue on white. The colours above
 were read from the pixels of a screenshot of it. The same program in the
 light theme was not photographed; a reset calculator answers
 `{#1:64h,#5:64h}`, which is taken to be the light one (unverified).
+
+The test programs are in [docs/evidence](../evidence/README.md#interface.two-themes).
 
 <a name="interface.textout-width"></a>
 ## TEXTOUT_P overflows unless you pass the width
@@ -656,3 +659,5 @@ and heights above were read from the pixels of a screenshot cropped by hand
 at about 2.6 times, so they are good to a pixel or two;
 [interface.text-measure](#interface.text-measure) is how a program would
 measure them exactly.
+
+The test programs are in [docs/evidence](../evidence/README.md#interface.screen-capacity).

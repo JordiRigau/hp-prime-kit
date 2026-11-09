@@ -30,6 +30,14 @@ DOCUMENTED = ('statement', 'command', 'function', 'app function',
               'app variable', 'variable', 'unknown')
 
 
+# The names the documentation writes that are not on HP's list, and whose they
+# are: docs/format.md says what each origin means.
+OTHERS_PATH = os.path.join(ROOT, 'docs', 'commands', 'not-hp.tsv')
+OTHER_FIELDS = ('name', 'origin', 'whose')
+ORIGINS = ('library', 'python', 'hook', 'tools', 'test', 'example', 'hp',
+           'none')
+
+
 class Name(object):
     def __init__(self, line, name, kind, group, menu, syntax, source):
         self.line = line
@@ -45,20 +53,30 @@ class Name(object):
         return self.kind in DOCUMENTED
 
 
-def read(path=PATH):
-    """-> ([Name], [(line, problem)]). Comment lines start with #."""
-    out, problems, seen = [], [], set()
+def _rows(path, fields):
+    """-> ([(line, cells)], [(line, problem)]) for a tab-separated list whose
+    comment lines start with #."""
+    rows, problems = [], []
     if not os.path.isfile(path):
-        return out, [(0, 'there is no list of names at %s' % path)]
+        return rows, [(0, 'there is no list of names at %s' % path)]
     for n, line in enumerate(io.open(path, encoding='utf-8'), 1):
         line = line.rstrip('\n').rstrip('\r')
         if not line.strip() or line.startswith('#'):
             continue
         cells = line.split('\t')
-        if len(cells) != len(FIELDS):
+        if len(cells) == len(fields):
+            rows.append((n, cells))
+        else:
             problems.append((n, 'a row has %d fields: %s'
-                             % (len(FIELDS), ', '.join(FIELDS))))
-            continue
+                             % (len(fields), ', '.join(fields))))
+    return rows, problems
+
+
+def read(path=PATH):
+    """-> ([Name], [(line, problem)]). Comment lines start with #."""
+    out, seen = [], set()
+    rows, problems = _rows(path, FIELDS)
+    for n, cells in rows:
         name = Name(n, *cells)
         if name.kind not in KINDS:
             problems.append((n, 'unknown kind "%s"' % name.kind))
@@ -87,3 +105,33 @@ def known(everything=None):
     if everything is None:
         everything = load()
     return set(n.lower() for n in everything)
+
+
+class Other(object):
+    def __init__(self, line, name, origin, whose):
+        self.line = line
+        self.name = name
+        self.origin = origin
+        self.whose = whose
+
+
+def read_others(path=OTHERS_PATH):
+    """-> ([Other], [(line, problem)]): the names that are not on HP's list,
+    and whose they are."""
+    out, seen = [], set()
+    rows, problems = _rows(path, OTHER_FIELDS)
+    for n, cells in rows:
+        other = Other(n, *cells)
+        if other.origin not in ORIGINS:
+            problems.append((n, 'unknown origin "%s"' % other.origin))
+        if other.name in seen:
+            problems.append((n, '%s is listed twice' % other.name))
+        seen.add(other.name)
+        out.append(other)
+    return out, problems
+
+
+def others(path=OTHERS_PATH):
+    """-> {name: Other}, empty if the list is not there. Compared exactly,
+    unlike HP's names: `reset` is a library's and `RESET` an app's hook."""
+    return dict((o.name, o) for o in read_others(path)[0])

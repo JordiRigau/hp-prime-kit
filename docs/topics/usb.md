@@ -351,6 +351,8 @@ RETURN 4700; END;` answered 4700. `ZCBAD`, whose `IF` closes with `ENDIF;`, whic
 does not exist ([ppl.no-end-keywords](ppl.md#ppl.no-end-keywords)), opened no dialog,
 came back as `Z*C*B*A*D` and answered 0. `ZCOKB`, sent next, answered 4702.
 
+The test programs are in [docs/evidence](../evidence/README.md#usb.compile-check).
+
 <a name="usb.file-request"></a>
 ## Asking for a file was answered once, and why not since is not known
 

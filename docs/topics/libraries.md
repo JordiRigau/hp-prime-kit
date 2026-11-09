@@ -9,16 +9,16 @@ somebody has usually written the missing piece.
 
 ## Which level
 
-| What the screen has to do | Reach for |
-|---|---|
-| Ask for one value | `INPUT` with a single field |
-| Ask for several at once | `INPUT` with a field list, after reading its limits |
-| Choose one of a handful | `CHOOSE` |
-| Choose one of many, scrolling | `CHOOSE_R`, or your own list |
-| Say something and wait | `MSGBOX`, or `TEXTOUT_P` plus a key wait |
-| Offer up to six actions | `DRAWMENU`, or `LibMenu` for toggles and pages |
-| A table you move around and edit | your own, on the windowed-list pattern |
-| A whole app with its own event loop | your own, or start from `SkeletonApp` |
+| What the screen has to do | Comes with the calculator | A library, to install first | Written by you |
+|---|---|---|---|
+| Ask for one value | `INPUT` with a single field | | |
+| Ask for several at once | `INPUT` with a field list, after reading its limits | | |
+| Choose one of a handful | `CHOOSE` | | |
+| Choose one of many, scrolling | | `CHOOSE_R` | your own list |
+| Say something and wait | `MSGBOX`, or `TEXTOUT_P` plus a key wait | | |
+| Offer up to six actions | `DRAWMENU` | `LibMenu`, for toggles and pages | |
+| A table you move around and edit | | | on the windowed-list pattern |
+| A whole app with its own event loop | | `SkeletonApp`, to start from | your own |
 
 Two of those rows are worth expanding before you commit to a design. `INPUT`
 is modal and builds its labels once, and a text field makes the user type
@@ -42,7 +42,8 @@ with no test suite, and reading the source is also the fastest way to learn
 the platform -- the key codes and menu geometry here came from exactly
 that.
 
-Where they live: [hpcalc.org](https://www.hpcalc.org/prime/). Most were
+Where they live: [hpcalc.org](https://www.hpcalc.org/prime/programming/), and
+the list below links each one. Most were
 announced on the HP Museum forum, which blocks automated access, so a person
 has to fetch them.
 
@@ -64,7 +65,10 @@ work give it, and what it costs, is in
 | Kind | rule |
 | Known from | unverified |
 
-**CHOOSE_R**, Jacob Wall, version 1.0, 2019 -- `CHOOSE_R(title, items,
+None of these comes with the calculator. Each is somebody's program, which has
+to be installed before anything can call it.
+
+**[CHOOSE_R](https://www.hpcalc.org/details/9104)**, Jacob Wall, version 1.0, 2019 -- `CHOOSE_R(title, items,
 cur_sel, del_opt)`. `items` is a list of strings, numbered for you from 1;
 `cur_sel` is where the highlight starts; `del_opt` puts a Delete option on the
 menu. It answers 0 if cancelled, the index if something was chosen, and the
@@ -73,15 +77,15 @@ scrolling window with a scrollbar, touch, colours taken from the calculator's
 theme, and an automatic exit after a period of inactivity. Its internals are
 the clearest worked example of the windowed list.
 
-**LibMenu**, version 3, 2016 -- the six labels along the bottom, with entries
+**[LibMenu](https://www.hpcalc.org/details/7782)**, primer, version 3, 2016 -- the six labels along the bottom, with entries
 that toggle and tabs that group them into pages: `reset()`, `draw()`,
 `events()`, `deftab(from, to, active)`, `entry(pos, txt, action)`,
 `entrytoggle(pos, txt)`, `gettoggle(pos)`, `chgflag(pos)`.
 
-**SZ_Show_Text**, Sasa, version 1.1, 2018 -- a text display utility, for when
+**[SZ_Show_Text](https://www.hpcalc.org/details/8947)**, Sasa, version 1.1, 2018 -- a text display utility, for when
 the answer is a paragraph rather than a number.
 
-**PrimeLibs**, José Felten, version 1.0 alpha -- the only Python toolkit here:
+**[PrimeLibs](https://www.hpcalc.org/details/9544)**, José Felten, version 1.0 alpha -- the only Python toolkit here:
 `gui.py` (widget classes), `pointer.py` (touch), `kbd.py` (the keyboard, with
 shift and alpha layers), `palette.py` (theme colours), `time.py` (the module
 MicroPython does not have, built on `eval('ticks')`), `filebrowser.py`, and
@@ -89,7 +93,7 @@ the rest. Every widget derives from `Component`, which carries position and
 size and answers `isPressed()` and `isTapped()`, so an app is a loop that
 updates and draws a tree of them.
 
-**SkeletonApp**, Andreas Möller -- an app skeleton with a complete event loop:
+**[SkeletonApp](https://www.hpcalc.org/details/7566)**, Juerg W. Buser -- an app skeleton with a complete event loop:
 drags, long press, and a handler per gesture. The soft-menu geometry on these pages
 was measured from it. For an app driven by arrows, `Enter` and six buttons,
 its full event framework is more than you need: take the loop and leave the
@@ -97,7 +101,8 @@ rest.
 
 **Evidence.** Read, not run. The signatures and behaviour above are taken from
 each library's own source and header comments; nothing here has been executed
-on a calculator, and versions move.
+on a calculator, and versions move. The links, and the author of SkeletonApp and
+of LibMenu, are what hpcalc.org listed on 2026-11-09.
 
 <a name="libraries.skeletonapp-container"></a>
 ## SkeletonApp's .hpprgm is not the container the tools read

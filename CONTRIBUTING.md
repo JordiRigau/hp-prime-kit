@@ -22,7 +22,9 @@ failed declared 13, 16 and 18.
 ```
 
 The minimum is what was run, on what hardware, on what firmware, and what was
-seen. "G2, firmware 2.4.15515" is a fact; "on my calculator" is not.
+seen. "G2, firmware 2.4.15515" is a fact; "on my calculator" is not. Keep the
+program in [`docs/evidence/`](docs/evidence/README.md), listed under its fact,
+so that somebody else can run it again.
 
 If you cannot measure it, because it comes from a forum, from HP's reference or
 from somebody else's code, say where it came from and mark it `Unverified`.

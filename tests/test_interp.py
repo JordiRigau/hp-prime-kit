@@ -1003,11 +1003,17 @@ def not_covered_is_not_an_error():
            'EXPORT LISTED() BEGIN RETURN Xmin; END;\n'
            'EXPORT LCALL() BEGIN RETURN SSS(3,4,5); END;\n'
            'EXPORT GREEK() BEGIN RETURN \u03a3LIST({1,2,3}); END;\n'
+           'EXPORT ALIB() BEGIN RETURN CHOOSE_R("t",{"a"},1,0); END;\n'
            'EXPORT NOBODY() BEGIN RETURN ZQNOSUCH; END;')
     if m.call('GOOD') != 7.0:
         return False, 'GOOD did not answer 7'
+    try:
+        m.call('ALIB')
+    except P.Unsupported as e:
+        if 'the library CHOOSE_R' not in str(e):
+            return False, 'ALIB did not name its library: %s' % e
     for name in ('QREAD', 'QSET', 'QCALL', 'QSTORE', 'LISTED', 'LCALL',
-                 'GREEK'):
+                 'GREEK', 'ALIB'):
         try:
             got = m.call(name)
             return False, '%s answered %r' % (name, got)

@@ -22,7 +22,8 @@ call itself answers whether something was picked, which has not been measured
 here (unverified).
 
 **Fourteen items is where HP's syntax stops** (HP help). Past that, or when
-the list has to scroll, the published `CHOOSE_R` is what people reach for,
+the list has to scroll, the third-party library `CHOOSE_R`, which has to be
+installed first, is what people reach for,
 and it has been read here rather than run (unverified),
 [libraries.published](../../topics/libraries.md#libraries.published).
 

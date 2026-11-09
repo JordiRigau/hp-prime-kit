@@ -33,7 +33,8 @@ is not evidence at all: the interpreter is checked against these labels, not
 the other way round.
 
 A label can link to its evidence. Where it does not, the entry says in words
-where the evidence is.
+where the evidence is. The programs run to measure a fact are kept in
+[evidence](evidence/README.md), listed by fact.
 
 What the Virtual Calculator answered is kept in `docs/commands/results.tsv`,
 one row per example, with the version the calculator reported. `hpprime
@@ -180,6 +181,33 @@ calculator...
 - A fact's identifier is its topic and a slug, as in `ppl.local-limit`.
 - An identifier does not change once it is published. A rename leaves the old
   one pointing at the new.
+
+## Where a name comes from
+
+A name in code font is one of HP's unless the page says otherwise: it comes with
+the calculator, and it is on [the list of names](#the-list-of-names) or is one
+of the calculator's variables, such as `M1` or `L1`. A name that is not HP's
+says whose it is:
+
+| Origin | What it is | To use it |
+|---|---|---|
+| `library` | somebody's published program, such as `CHOOSE_R`: [libraries.published](topics/libraries.md#libraries.published) | install it on the calculator first |
+| `hook` | a function you write, under a name HP chooses and calls, such as `START`: [apps.hooks](topics/apps.md#apps.hooks) | write it in an app's program |
+| `example` | written for a page, such as `CIRCAREA` or `MYFUNC`, or written by you | write it |
+| `test` | a program written to measure something, such as `ZHOK`. Those that were kept are in [evidence](evidence/README.md) | nothing: it is not meant to be used |
+| `tools` | a program the tools put on a calculator to bring an answer back, such as `HPKDOC` | the tools send it |
+| `python` | Python on the calculator, from MicroPython or from HP's `hpprime` module, such as `fillrect` | call it from Python, not from PPL |
+| `hp` | HP's, though its list leaves it out, such as the keyword `DOWNTO` | nothing |
+| `none` | nothing on the calculator: named to say so, such as `ENDIF` | it does not exist |
+
+[not-hp.tsv](commands/not-hp.tsv) holds every such name with its origin.
+`hpprime docs --check` fails on a name in capitals, or written as a call, that
+is on neither list, and on a library's name in a paragraph that does not say it
+is one. `hpprime lint` and `hpprime run` read it to say whose a name is.
+
+`hpprime` names two things: the command on your PC ([tools.md](tools.md)), and
+HP's Python module on the calculator
+([micropython.modules](topics/micropython.md#micropython.modules)).
 
 ## The list of names
 

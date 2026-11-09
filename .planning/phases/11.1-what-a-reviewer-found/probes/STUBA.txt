@@ -1,5 +1,0 @@
-// Left by a test of the hp-prime-kit on 2026-11-05. Safe to delete.
-EXPORT ZQDONA()
-BEGIN
-  RETURN 4999;
-END;

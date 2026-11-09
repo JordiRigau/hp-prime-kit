@@ -1280,6 +1280,31 @@ def levels(found, rule):
     return sorted(set(a.level for a in found if a.rule == rule))
 
 
+def saying(found, rule, text):
+    return any(a.rule == rule and text in a.msg for a in found)
+
+
+LIBRARY_CALL = """
+EXPORT ZL()
+BEGIN
+  RETURN CHOOSE_R("t", {"a"}, 1, 0);
+END;
+"""
+PYTHON_CALL = """
+EXPORT ZY()
+BEGIN
+  fillrect(0, 0, 0, 10, 10, 0, 0);
+  RETURN 1;
+END;
+"""
+REPORTED_CALL = """
+EXPORT ZR()
+BEGIN
+  PYTHON("x");
+  RETURN 1;
+END;
+"""
+
 SETS = [
     ('a stranger in a file on its own is a warning',
      lambda: levels(lint_files([('A.txt', STRANGER)], False),
@@ -1293,6 +1318,24 @@ SETS = [
     ('and is quiet with --set, when that file is in view',
      lambda: levels(lint_files([('A.txt', LIBRARY), ('B.txt', CALLER)],
                                True), 'unknown-name') == []),
+    ('a library\'s function is named as the library\'s',
+     lambda: saying(lint_files([('A.txt', LIBRARY_CALL)], False),
+                    'unknown-name', 'the library CHOOSE_R')),
+    ('and a stranger is still called one',
+     lambda: saying(lint_files([('A.txt', STRANGER)], False),
+                    'unknown-name', 'is not a PPL name')),
+    ('a library no file in the set supplies is an error with --set',
+     lambda: levels(lint_files([('A.txt', LIBRARY_CALL)], True),
+                    'unknown-name') == ['ERROR']),
+    ('Python written in PPL is called Python',
+     lambda: saying(lint_files([('A.txt', PYTHON_CALL)], False),
+                    'unknown-name', 'is Python on the calculator')),
+    ('a name reported as HP\'s is not called invented',
+     lambda: not saying(lint_files([('A.txt', REPORTED_CALL)], False),
+                        'unknown-name', 'is not a PPL name')),
+    ('and it stays a warning with --set, since nobody has run it',
+     lambda: levels(lint_files([('A.txt', REPORTED_CALL)], True),
+                    'unknown-name') == ['WARN']),
 ]
 
 

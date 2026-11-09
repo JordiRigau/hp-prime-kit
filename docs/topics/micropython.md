@@ -11,6 +11,8 @@ to write an app's interface and logic, leaning on PPL for what the calculator
 does not otherwise expose. A Python file that imports only what both sides have
 runs unchanged on the PC and on the calculator, and one way to build an app
 around that is in [patterns.md](../patterns.md#one-python-file-in-both-places).
+The module is HP's, on the calculator, and only shares its name with the
+`hpprime` command these pages use on a PC.
 
 There is no official HP documentation for any of this. What follows was
 measured on a G2 with firmware 2.4 revision 15515, or read from apps that run
@@ -155,6 +157,8 @@ printed what each answered with its Python type: `TICKS` and `TICKS()`
 answered `1151588.0`, `ticks` and `ticks()` `1151589.0`, `GETKEY` and
 `GETKEY()` `-1.0`, all `float`, and none raised.
 
+The test programs are in [docs/evidence](../evidence/README.md#micropython.eval-parentheses).
+
 <a name="micropython.list-with-string-closes-the-app"></a>
 ## A list with a string inside closes the app
 
@@ -234,6 +238,8 @@ whether it was the number written. The lines for `1e20`, `1e-20` and
 the app reached its last step, as the mark it left in a PPL global showed.
 Whether the eval answered wrongly, raised, or broke the line that printed
 it, that probe cannot tell.
+
+The test programs are in [docs/evidence](../evidence/README.md#micropython.number-notation).
 
 <a name="micropython.bridge-cost"></a>
 ## A bridge crossing was timed at 0.2 ms

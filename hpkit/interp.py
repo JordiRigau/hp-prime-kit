@@ -1212,6 +1212,14 @@ class Machine(object):
             if _listed(name):
                 raise Unsupported('%s is on HP\'s list of names and is not '
                                   'covered' % name)
+            other = _not_hp(name)
+            if other is not None and other.origin == 'library':
+                raise Unsupported('%s is not one of HP\'s: it belongs to the '
+                                  'library %s, whose source is not loaded '
+                                  'here' % (name, other.whose))
+            if other is not None and other.origin == 'hp':
+                raise Unsupported('%s is not on HP\'s list of names and is '
+                                  'not covered: %s' % (name, other.whose))
             raise PPLError('no such %s (not a variable, not a function, '
                            'not a supported command)' % name)
 
@@ -1662,6 +1670,18 @@ def _b_inverse(m, a):
 BARE_BUILTINS = set(['GETKEY'])
 
 _LISTED = None
+_OTHERS = None
+
+
+def _names():
+    """hpkit.names, whether this runs inside the kit or on its own."""
+    try:
+        from hpkit import names
+    except ImportError:
+        sys.path.insert(0, os.path.dirname(os.path.dirname(
+            os.path.abspath(__file__))))
+        from hpkit import names
+    return names
 
 
 def _listed(name):
@@ -1670,14 +1690,16 @@ def _listed(name):
     undefined variable: Xmin answers on the calculator."""
     global _LISTED
     if _LISTED is None:
-        try:
-            from hpkit import names
-        except ImportError:
-            sys.path.insert(0, os.path.dirname(os.path.dirname(
-                os.path.abspath(__file__))))
-            from hpkit import names
-        _LISTED = names.known()
+        _LISTED = _names().known()
     return name.lower() in _LISTED
+
+
+def _not_hp(name):
+    """The row of docs/commands/not-hp.tsv for `name`, or None."""
+    global _OTHERS
+    if _OTHERS is None:
+        _OTHERS = _names().others()
+    return _OTHERS.get(name)
 
 # A loop that never ends would hang the tool with no message, and the usual
 # way to write one here is not a mistake: a wait loop is correct PPL, and

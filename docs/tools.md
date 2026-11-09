@@ -12,6 +12,10 @@ shell: `.\hpprime` in PowerShell, where the `.\` is required, `hpprime` in
 cmd.exe, and `./hpprime` on macOS and Linux. `python hpprime.py` works
 everywhere and is the one to fall back on.
 
+`hpprime` on these pages is always this command. HP's Python module on the
+calculator has the same name and nothing to do with it
+([micropython.md](topics/micropython.md)).
+
 Every command exits 0 on success and non-zero on failure, so they all work as
 gates in a script.
 
@@ -192,7 +196,9 @@ compiler reports itself and no fact about the platform is involved.
 The last, `unknown-name`, knows every PPL name. A call to a name that is
 not on the documentation's [list of names](commands/names.tsv), and that the
 program does not define, is flagged: the command a model invents, `STRLEN(s)`
-for `SIZE(s)`, caught before the calculator answers *syntax error*. It knows
+for `SIZE(s)`, caught before the calculator answers *syntax error*. A name the
+documentation knows to be somebody else's says so: `CHOOSE_R` is named as a
+library's, and `fillrect` as Python ([not-hp.tsv](commands/not-hp.tsv)). It knows
 the calculator's own variables too (`A` to `Z`, `L0` to `L9`, `M0` to `M9`,
 `G0` to `G9`, `Z0` to `Z9`), and it compares the calculator's names without
 regard to case, so that it never flags a spelling the calculator accepts:

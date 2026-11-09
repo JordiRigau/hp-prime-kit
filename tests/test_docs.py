@@ -17,12 +17,16 @@ LINK = re.compile(r'\[[^\]]*\]\(([^)]+)\)')
 HEADING = re.compile(r'^#{1,6}\s+(.*?)\s*$', re.M)
 # .claude holds the worktrees of any desktop-app session: other copies of all of
 # this, which are not what a person gets, and which this used to count too.
-SKIP_DIRS = {'.git', '__pycache__', '.claude'}
+# .planning is working notes that git keeps out, so nobody else gets them either.
+SKIP_DIRS = {'.git', '__pycache__', '.claude', '.planning'}
 
 # Where a person's programs go. The folder ships with its note and nothing
 # else, and git keeps out of the rest, so an update never meets their files.
 PROGRAMS = os.path.join(ROOT, 'programs')
 PROGRAMS_RULES = ('programs/*', '!programs/README.md')
+
+# The programs run to measure the facts, and the page that lists them.
+EVIDENCE = os.path.join(ROOT, 'docs', 'evidence')
 
 
 def markdown_files():
@@ -65,6 +69,15 @@ def programs_problems(gitignore, tracked):
             problems.append('%s is tracked: a person\'s program would ship'
                             % f)
     return problems
+
+
+def evidence_problems(index, files):
+    """-> what is wrong with docs/evidence. `index` is the text of its
+    README.md, `files` everything else in the folder, relative to it. A
+    program the page does not list is kept and never found."""
+    listed = set(t.partition('#')[0] for t in LINK.findall(index))
+    return ['%s is not listed in its README.md' % f
+            for f in sorted(files) if f not in listed]
 
 
 def _git(*args):
@@ -152,6 +165,31 @@ def main():
         ok += 1
         print('  ok    programs/ ships its note alone, and git keeps out of '
               'the rest')
+
+    # docs/evidence: every program kept there is listed.
+    kept = []
+    for folder, dirs, files in os.walk(EVIDENCE):
+        kept += [os.path.relpath(os.path.join(folder, f), EVIDENCE)
+                 .replace(os.sep, '/') for f in files]
+    if 'README.md' in kept:
+        kept.remove('README.md')
+        problems = evidence_problems(
+            io.open(os.path.join(EVIDENCE, 'README.md'),
+                    encoding='utf-8').read(), kept)
+    else:
+        problems = ['docs/evidence/README.md is missing']
+    # And the check itself: fed a page that lists one of two files, it names
+    # the other.
+    fed = evidence_problems('[a](x/a.txt)', ['x/a.txt', 'x/b.txt'])
+    if fed != ['x/b.txt is not listed in its README.md']:
+        problems.append('the check missed a planted file: %s' % fed)
+    if problems:
+        bad += 1
+        for p in problems:
+            print('  FAIL  docs/evidence: %s' % p)
+    else:
+        ok += 1
+        print('  ok    docs/evidence lists every program it keeps')
 
     print('\nPASS: %d   FAIL: %d' % (ok, bad))
     return 1 if bad else 0

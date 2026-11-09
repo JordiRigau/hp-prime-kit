@@ -89,6 +89,10 @@ Virtual Calculator. Cite the identifier when you rely on a rule.
   first or the last depending on the error. [ppl.check-last-error, emulator]
 - x = 2; as a statement assigns NOTHING: it compares and throws the answer
   away, with no error. Assign with :=. [ppl.equality-operators, emulator]
+- Only names on HP's list come with the calculator. CHOOSE_R, LibMenu and
+  SkeletonApp are libraries: a program that calls one does not compile until
+  the library is on the calculator, so say so when you use one.
+  [libraries.published, unverified] [ppl.compilation-order, G2]
 
 Do not invent commands. If you are not sure a command exists, say so instead
 of guessing. If you are not sure of a limit, say you are not sure.

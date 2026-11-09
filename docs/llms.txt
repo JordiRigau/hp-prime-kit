@@ -4,7 +4,7 @@
 
 Every claim carries one of four labels, strongest first: `G2`, measured on a physical HP Prime G2; `emulator`, run on HP's Virtual Calculator, with the answer kept in [commands/results.tsv](commands/results.tsv); `HP help`, stated in the calculator's built-in help; `unverified`, none of those. How an entry and a fact are written: [format.md](format.md). Ways apps are built, as options and not rules: [patterns.md](patterns.md).
 
-Whether a name exists is looked up in [commands/names.tsv](commands/names.tsv): every name in HP's help, command tree and release notes, with its kind and group, the CAS names included, which get no entry. 706 of the 706 names that get an entry have one so far, so a name listed there and missing here is on HP's list but not yet written up.
+Whether a name exists is looked up in [commands/names.tsv](commands/names.tsv): every name in HP's help, command tree and release notes, with its kind and group, the CAS names included, which get no entry. 706 of the 706 names that get an entry have one so far, so a name listed there and missing here is on HP's list but not yet written up. A name that is not on it is somebody else's or nobody's, and [commands/not-hp.tsv](commands/not-hp.tsv) says which.
 
 Cite a fact by its identifier, such as `ppl.local-limit`, and a command by its name, such as `LEFT`.
 

@@ -13,6 +13,15 @@ so it writes syntax that reads well and does not compile, and states limits
 that nobody measured. This reference records what was measured, on a
 calculator or on HP's Virtual Calculator, and says so where nothing was.
 
+## What you can do with it
+
+| | |
+|---|---|
+| **Ask an assistant for a program** | open this folder in Claude Code, Cursor, Codex or Copilot and say what the calculator should do: [Working with an AI](#working-with-an-ai) |
+| **Check a program on your PC** | what will not compile, and the real file run before the calculator sees it: [The tools](#the-tools) |
+| **Control a G2 from your PC** | with a G2 on its USB cable, see its screen, press its keys, type a name and install a program: [Remote control of a G2](#remote-control-of-a-g2) |
+| **Look something up** | one entry per PPL name, and the facts no single command owns: [The documentation](#the-documentation) |
+
 ---
 
 ## The documentation
@@ -32,6 +41,11 @@ Every claim carries one of four labels, strongest first
 | `emulator` | run on HP's Virtual Calculator, with the answer kept in [results.tsv](docs/commands/results.tsv) |
 | `HP help` | stated in the calculator's built-in help |
 | `unverified` | none of those, and it says where it came from |
+
+A name in code font is HP's unless the page says otherwise: a library's, to
+install first, one you write, or a program written to measure something.
+[format.md](docs/format.md#where-a-name-comes-from) has the words, and
+[not-hp.tsv](docs/commands/not-hp.tsv) every such name.
 
 Where it stands:
 
@@ -80,6 +94,7 @@ command by its name. Whether a name exists at all is in
 | [formats.md](docs/topics/formats.md) | the binary container and the internal number format, both decoded, and what is still not |
 | [deploy.md](docs/topics/deploy.md) | getting it onto the calculator: the emulator folder you can write into, and the two traps of the one you cannot |
 | [patterns.md](docs/patterns.md) | ways apps that work are built, each with what it solves and what it costs. Options, not rules |
+| [evidence](docs/evidence/README.md) | the programs run to measure the facts, listed by fact, to read them or run them again |
 
 ## The tools
 
@@ -106,6 +121,7 @@ hpprime install programs/CIRCLE/CIRCLE.hpprgm --restart
 
 `new` writes a starter that already runs in a folder of its own under
 [`programs/`](programs/README.md), where what you make goes and git keeps out.
+`CIRCAREA` is a function that starter defines, not one of the calculator's.
 
 The last line installs into the emulator and opens it, with nothing to drag. On
 a physical calculator that step is `hpprime send`, for a program on a G2 from
@@ -137,6 +153,43 @@ divergence so you can see what one looks like:
 ```bash
 python examples/conformance/conformance.py --break
 ```
+
+## Remote control of a G2
+
+With a physical G2 on its USB cable, the PC can see what the calculator is
+showing, press its keys and install a program. Nothing is installed on the
+calculator, and the PC needs no driver. It takes Windows, and the Connectivity
+Kit closed, because Windows gives the calculator to one program at a time
+([usb.one-program-at-a-time](docs/topics/usb.md#usb.one-program-at-a-time)).
+
+```bash
+hpprime screen -o now.png                  # what it is showing, as a picture
+hpprime press 2 + 2 enter                  # its keys, one after another
+hpprime type CIRCAREA --enter              # a name and Enter, with the keys worked out
+hpprime send programs/CIRCLE/CIRCLE.txt    # a program, installed and compiled
+```
+
+Together they close the loop: a program goes over the cable, its name is typed
+on Home, and the answer is read from the picture, with nobody touching the
+calculator. An assistant working in this folder can do all of that itself. It is
+told to look at the screen before any key, and to ask before closing the
+Connectivity Kit, before sending, and before any key that changes what the
+calculator holds ([AGENTS.md](AGENTS.md)).
+
+| Command | What to expect |
+|---|---|
+| `screen` | a 320x240 PNG, in 0.4 to 2.8 s. Asking changes nothing on the screen ([usb.screen](docs/topics/usb.md#usb.screen)) |
+| `press` | a key, by name or by code. The calculator sets the pace, about 3 s a key, and acknowledges nothing, so only the screen says a key acted. The keys tried so far are listed in [usb.keys](docs/topics/usb.md#usb.keys) |
+| `type` | letters and digits, with Alpha and Shift worked out ([usb.letters](docs/topics/usb.md#usb.letters)). Home does not always refuse a name it does not know, so read the answer ([usb.start-by-name](docs/topics/usb.md#usb.start-by-name)) |
+| `send` | a program, from its source or from a built `.hpprgm`, once the linter has passed it. Its functions answer on Home with no compile by hand. A program of that name is replaced without asking, and nothing shows on the screen, so run it to know it arrived ([usb.send-program](docs/topics/usb.md#usb.send-program)) |
+
+All of it was measured on one G2 on firmware 2.4.15515, from Windows. HP
+documents none of it, so a firmware update can change any of it: `screen`,
+`press` and `type` warn on any other build, and `send` refuses unless told
+otherwise. Not measured: a G1, an app or any other kind of file sent this way,
+and what a running program does with keys sent this way. Every option is in
+[tools.md](docs/tools.md#screen), and what is known about each command in
+[usb.md](docs/topics/usb.md).
 
 ## Working with an AI
 

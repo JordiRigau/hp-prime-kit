@@ -132,6 +132,7 @@ VARIABLE_KINDS = ('variable', 'app variable')
 
 _KNOWN = None
 _KINDS = None
+_NOT_HP = None
 
 
 def _kit(module):
@@ -152,6 +153,31 @@ def known_names():
     if _KNOWN is None:
         _KNOWN = _kit('names').known()
     return _KNOWN
+
+
+def not_hp(name):
+    """-> the row of docs/commands/not-hp.tsv for `name`, or None."""
+    global _NOT_HP
+    if _NOT_HP is None:
+        _NOT_HP = _kit('names').others()
+    return _NOT_HP.get(name)
+
+
+def whose(name):
+    """What to say of a name neither PPL's nor the program's, when the
+    documentation knows whose it is: -> a sentence, or None."""
+    other = not_hp(name)
+    if other is None:
+        return None
+    if other.origin == 'library':
+        return ('%s is not one of HP\'s: it belongs to the library %s, which '
+                'has to be on the calculator before this compiles (see '
+                'libraries.published)' % (name, other.whose))
+    if other.origin == 'python':
+        return '%s is Python on the calculator, not PPL' % name
+    if other.origin == 'hp':
+        return '%s is not on HP\'s list of names: %s' % (name, other.whose)
+    return None
 
 
 def _listed_kinds():
@@ -1133,11 +1159,11 @@ def check_source(path, text):
         defined = functions | variables
         for name, num in calls:
             if not is_known(name, defined):
+                said = whose(name) or ('%s is not a PPL name, and this file '
+                                       'does not define it' % name)
                 found.append(Finding(path, num, 'WARN', 'unknown-name',
-                                     '%s is not a PPL name, and this file '
-                                     'does not define it. If another program '
-                                     'exports it, lint them together with '
-                                     '--set' % name))
+                                     said + '. If another program exports '
+                                     'it, lint them together with --set'))
 
     return found, exports
 
@@ -1532,11 +1558,16 @@ def lint_files(paths, as_set=False):
         for f, (_, calls) in scans:
             for name, line in calls:
                 if not is_known(name, defined):
-                    everything.append(Finding(f, line, 'ERROR',
-                                              'unknown-name',
-                                              '%s is not a PPL name, and none '
-                                              'of these files defines it'
-                                              % name))
+                    # A name reported as HP's and never run is not an error:
+                    # an error is only what was measured.
+                    other = not_hp(name)
+                    level = ('WARN' if other is not None
+                             and other.origin == 'hp' else 'ERROR')
+                    everything.append(Finding(f, line, level, 'unknown-name',
+                                              whose(name)
+                                              or '%s is not a PPL name, and '
+                                              'none of these files defines '
+                                              'it' % name))
 
     return files, everything
 

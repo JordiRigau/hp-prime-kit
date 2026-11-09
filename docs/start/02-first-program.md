@@ -45,6 +45,10 @@ evidence:
 | `END;` | `END` closes every block: there is no `ENDIF` ([ppl.no-end-keywords](../topics/ppl.md#ppl.no-end-keywords)) |
 | the `;` after `END` | it is required, and a missing one is reported on the next line ([ppl.end-semicolon](../topics/ppl.md#ppl.end-semicolon)) |
 
+`CIRCAREA` and `MAIN` are names you chose, so they exist once this program is on
+the calculator. `INPUT`, `MSGBOX` and `STRING` come with the calculator, and each
+has an [entry](../commands/index.md).
+
 The split between the two functions is the point of the file. `CIRCAREA` is
 pure arithmetic and `MAIN` talks to the screen, so everything on the
 `CIRCAREA` side can be tested on your PC. Keeping that line as the program

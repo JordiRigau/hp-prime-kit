@@ -16,7 +16,9 @@ Load [`docs/llms.txt`](docs/llms.txt) first. It is the index of the
 documentation: every fact and every command entry on one line, with its link
 and a one-line summary, kept small enough to load whole. Follow the links you
 need from there. Whether a name exists at all is in
-[`docs/commands/names.tsv`](docs/commands/names.tsv), HP's own list.
+[`docs/commands/names.tsv`](docs/commands/names.tsv), HP's own list. A name that
+is not on it is somebody else's or nobody's, and
+[`docs/commands/not-hp.tsv`](docs/commands/not-hp.tsv) says which.
 
 Then read [`docs/topics/ppl.md`](docs/topics/ppl.md): the limits that break
 compilation, and six hypotheses that look reasonable and are false, each
@@ -39,6 +41,7 @@ Then, depending on the task:
 | one PPL command | its entry, linked from [`docs/llms.txt`](docs/llms.txt) |
 | every `hpprime` command | [`docs/tools.md`](docs/tools.md) |
 | how other apps are laid out, as options | [`docs/patterns.md`](docs/patterns.md) |
+| what was run to measure a fact | [`docs/evidence/README.md`](docs/evidence/README.md): measurements and not examples to copy, and some do not compile on purpose |
 
 The non-negotiables, as a checklist. Each names the fact that holds it, with
 its evidence, in `ppl.md`:
@@ -66,6 +69,11 @@ its evidence, in `ppl.md`:
   right whenever you tell somebody how to test on the calculator
   (`ppl.home-no-parentheses`). In source, both forms work
   (`ppl.call-no-parentheses`).
+- When you name a function to somebody, say whose it is: HP's, which comes with
+  the calculator; a library's, which has to be installed first
+  (`libraries.published`, `unverified`), since a program that calls it does not
+  compile without it (`ppl.compilation-order`); or one written here. The words
+  are in [`docs/format.md`](docs/format.md#where-a-name-comes-from).
 
 ## 2. The workflow to follow
 
